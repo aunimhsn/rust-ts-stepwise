@@ -8,6 +8,7 @@ Read only by the steps that need them:
 
 - [Technical choices](docs/technical-choices.md): the libraries, the services and the main designs, with their reasons.
 - `docs/roadmap-archive.md`: the detail of the steps done, moved there once their pull request is merged.
+- [Backlog](docs/backlog.md): the ideas, polish and edge cases found along the way, until the owner makes them a step.
 
 ## Steps
 
