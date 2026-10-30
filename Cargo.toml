@@ -8,6 +8,8 @@ authors = ["Aunim HASSAN"]
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/aunimhsn/rust-ts-stepwise"
 readme = "README.md"
+# An application, never published on crates.io.
+publish = false
 
 [dependencies]
 
