@@ -16,6 +16,17 @@ Rules:
 - No sensitive data (passwords, payment): Stepwise has no account and sends nothing; the progress stays in the learner's browser.
 - Over its limits, a site may stop being served or GitHub may suggest a CDN.
 
-Risk for the owner to accept (written on 2026-10-31):
+## Address
+
+Stepwise is served at **`https://stepwise.sylent.art/`** (decided by the owner on 2026-10-31), a subdomain of the owner's website, without buying a domain:
+
+- `sylent.art` is itself a project site (the repository `aunimhsn/sylent.art`, with its own `CNAME`), not the user site `aunimhsn.github.io`: GitHub allows one user site per account but one project site per repository, so the two websites don't conflict. Each site has its own bandwidth limit.
+- The owner adds a DNS `CNAME` record at the registrar of `sylent.art`: `stepwise` → `aunimhsn.github.io`; the custom domain is set in **Settings › Pages** of the repository, with **Enforce HTTPS**.
+- The owner verifies `sylent.art` in the GitHub account (**Settings › Pages › Add a domain**, a DNS `TXT` record), so that no one else can claim a subdomain pointing to GitHub without a repository behind it. No domain was verified on 2026-10-31.
+- The website never hard-codes its path: it works at the root of a domain as well as under `/rust-ts-stepwise/` (the default address `https://aunimhsn.github.io/rust-ts-stepwise/`), with the `paths.base` setting of SvelteKit. The domain can change later without changing the code.
+
+## Risks accepted by the owner
+
+On 2026-10-31:
 
 - A class or a school visiting at once could, in theory, reach the soft bandwidth limit: unlikely at the sizes above. If it happens, the same static files can move to another host (Cloudflare Pages, Netlify) without changing the code.
