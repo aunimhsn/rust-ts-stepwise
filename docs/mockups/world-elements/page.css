@@ -31,3 +31,8 @@ body { margin: 0; background: #2a2d31; color: #e9ecef; font: 14px/1.4 system-ui,
 /* A slider of the tabs, with its value. */
 .page-tabs input[type="range"] { width: 180px; accent-color: #e9ecef; }
 .page-tabs output { min-width: 2ch; color: #dee2e6; font-variant-numeric: tabular-nums; }
+
+/* The table of contents under the header, past ten sections. */
+.page-contents { display: flex; flex-wrap: wrap; gap: 4px 16px; padding: 10px 16px 0; font-size: 13px; }
+.page-contents a { color: #adb5bd; text-decoration: none; }
+.page-contents a:hover { color: #e9ecef; text-decoration: underline; }

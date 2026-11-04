@@ -4,8 +4,6 @@
 // A group with a `range` instead of `options` is a slider, for a value tuned by eye.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(THEMES).map(([key, theme]) => [key, theme.title])), fallback: Object.keys(THEMES)[0] },
-  // The tail of the yellow stroke below the head of the logo: candidate files in daylight/candidates/.
-  logoTail: { label: "Tail", options: { long: "Long", short: "Short", none: "None" }, fallback: "short" },
   vision: { label: "Vision", options: { normal: "Normal", protanopia: "Protanopia", deuteranopia: "Deuteranopia", tritanopia: "Tritanopia" }, fallback: "normal" },
 };
 
@@ -33,8 +31,10 @@ function renderSheet() {
   for (const key of Object.keys(VARIANTS)) document.documentElement.dataset[key] = chosen[key];
   const theme = THEMES[chosen.theme];
   document.getElementById("sheet").innerHTML = `
-    <header class="page-header"><h1>Style ${theme.title}</h1><p>${theme.text}</p></header>
-    ${SECTIONS.map(([title, content], index) => `<section class="page-section" id="section-${index + 1}"><h2>${title}</h2>${content()}</section>`).join("")}`;
+    <header class="page-header"><h1>World elements · ${theme.title}</h1><p>${theme.text}</p></header>
+    ${SECTIONS.length > 10 ? `<nav class="page-contents" aria-label="Sections">${SECTIONS.map(([title], index) =>
+      `<a href="#section-${index + 1}">${index + 1}. ${title}</a>`).join("")}</nav>` : ""}
+    ${SECTIONS.map(([title, content], index) => `<section class="page-section" id="section-${index + 1}"><h2>${index + 1}. ${title}</h2>${content()}</section>`).join("")}`;
 }
 
 function render() {

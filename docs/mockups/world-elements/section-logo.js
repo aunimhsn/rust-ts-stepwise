@@ -1,8 +1,8 @@
 // Section: the logo, the smiling robot carried up by a stroke of yellow paint, at the sizes of an
 // icon and beside the name.
 
-// The logo, as the tab "Tail" says.
-const logoFile = () => element(chosen.logoTail === "long" ? "logo" : `candidates/logo-tail-${chosen.logoTail}`);
+// The logo.
+const logoFile = () => element("logo");
 
 const LOGO_GROUNDS = [["On a light page", "#f4f6f8", "#222935"], ["On a dark page", "#1b1d20", "#e9ecef"]];
 
