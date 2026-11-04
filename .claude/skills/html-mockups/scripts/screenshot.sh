@@ -1,12 +1,14 @@
 #!/bin/sh
 # Headless screenshot of a mock-up page, to check a change before asking the owner.
 #
-#   screenshot.sh <url> <output.png> [width] [height]
+#   screenshot.sh <url> <output.png> [width] [height | full]
 #
 # The page must be served (python3 -m http.server 8765 --bind 127.0.0.1 at the repository
-# root). Uses Firefox, installed normally or as a Flatpak; a throwaway profile avoids
-# disturbing a running Firefox. The display scale differs from the owner's screen: the
-# screenshot shows the direction, the owner tunes the pixels by eye.
+# root). Uses Playwright and its own Chromium when installed (see screenshot.cjs): it also
+# reports the errors of the browser console, and `full` captures the whole page. Otherwise
+# uses Firefox, installed normally or as a Flatpak; a throwaway profile avoids disturbing a
+# running Firefox. The display scale differs from the owner's screen: the screenshot shows
+# the direction, the owner tunes the pixels by eye.
 set -eu
 
 url=$1
@@ -20,6 +22,16 @@ case $output in
   *) output="$PWD/$output" ;;
 esac
 
+playwright_home=${PLAYWRIGHT_HOME:-$HOME/.local/share/mockup-tools}
+if command -v node >/dev/null 2>&1 && [ -d "$playwright_home/node_modules/playwright" ]; then
+  exec node "$(dirname "$0")/screenshot.cjs" "$url" "$output" "$width" "$height"
+fi
+
+if [ "$height" = full ]; then
+  echo "A full page needs Playwright (see screenshot.cjs); Firefox takes the window only." >&2
+  height=2000
+fi
+
 if command -v firefox >/dev/null 2>&1; then
   firefox_command="firefox"
   profile=$(mktemp -d)
@@ -32,7 +44,7 @@ elif command -v flatpak >/dev/null 2>&1 && flatpak info org.mozilla.firefox >/de
   shot="$folder/screenshot.png"
   mkdir -p "$profile"
 else
-  echo "Firefox not found: install it, or take the screenshot by hand." >&2
+  echo "Neither Playwright nor Firefox found: install Playwright (see screenshot.cjs)." >&2
   exit 1
 fi
 
