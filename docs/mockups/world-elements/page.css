@@ -21,3 +21,7 @@ body { margin: 0; background: #2a2d31; color: #e9ecef; font: 14px/1.4 system-ui,
 :root[data-vision="protanopia"] .app-cell { filter: url(#vision-protanopia); }
 :root[data-vision="deuteranopia"] .app-cell { filter: url(#vision-deuteranopia); }
 :root[data-vision="tritanopia"] .app-cell { filter: url(#vision-tritanopia); }
+
+/* A slider of the tabs, with its value. */
+.page-tabs input[type="range"] { width: 180px; accent-color: #e9ecef; }
+.page-tabs output { min-width: 2ch; color: #dee2e6; font-variant-numeric: tabular-nums; }
