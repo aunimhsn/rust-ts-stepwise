@@ -51,7 +51,10 @@ function appCell({ wall = false, wallEdge = true, wallRim = true, paint, around 
   if (goalStand) images.push(`<img src="${element("goal-stand")}" alt="">`);
   // The robot covers the paint of its cell: the learner follows it through the code.
   // The item it carries lies on its back, smaller, and turns with it.
-  if (robot) images.push(`<div class="app-robot is-${robot}"><img src="${element("robot")}" alt="">${carrying ? `<div class="is-carried">${appItem()}</div>` : ""}</div>`);
+  // "Eyes lit" draws no item: the eyes take the color of the item instead.
+  const carried = carrying && chosen.carry !== "hidden" ? `<div class="is-carried is-${chosen.carry}">${appItem()}</div>` : "";
+  const eyes = carrying && chosen.carry === "hidden" ? `<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="26.5" cy="23.5" r="3.4" fill="${ITEM_COLORS[chosen.itemColor]}"/><circle cx="37.5" cy="23.5" r="3.4" fill="${ITEM_COLORS[chosen.itemColor]}"/></svg>` : "";
+  if (robot) images.push(`<div class="app-robot is-${robot}"><img src="${element("robot")}" alt="">${eyes}${carried}</div>`);
   // A goal not met: a small red flag planted in the corner of its cell, over the robot. Its red,
   // distinct from the red paint, may follow the error color of the design system (step 4).
   if (missed) images.push(`<img src="${element("goal-missed")}" alt="">`);

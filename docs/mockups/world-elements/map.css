@@ -1,8 +1,11 @@
 /* A cell of the map: its layers stacked, each an SVG file of the chosen style. */
 .app-cell { position: relative; width: var(--cell, 48px); height: var(--cell, 48px); }
 .app-cell img, .app-cell svg, .app-robot, .is-carried { position: absolute; inset: 0; width: 100%; height: 100%; }
-/* The item carried by the robot, on its back (out of 64: centered at 32, 40, at 60 %). */
-.is-carried { transform: translateY(12.5%) scale(.6); }
+/* The item carried by the robot (out of 64): on its back, centered at 32, 40, at 60 %; smaller at
+   45 %, lower; or held in front, ahead of its eyes. */
+.is-carried.is-back { transform: translateY(12.5%) scale(.6); }
+.is-carried.is-small { transform: translateY(16%) scale(.42); }
+.is-carried.is-front { transform: translateY(-36%) scale(.42); }
 .app-cell .is-east { transform: rotate(90deg); }
 .app-cell .is-south { transform: rotate(180deg); }
 .app-cell .is-west { transform: rotate(270deg); }

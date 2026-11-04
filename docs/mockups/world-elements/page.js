@@ -6,6 +6,8 @@ const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(THEMES).map(([key, theme]) => [key, theme.title])), fallback: Object.keys(THEMES)[0] },
   // The item: its shape (with its slot) and its color.
   itemShape: { label: "Item", options: { hexagon: "Hexagon", cell: "Energy cell", gem: "Gem", orb: "Orb" }, fallback: "hexagon" },
+  // How the robot carries the item, so that its eyes, and so its direction, stay visible.
+  carry: { label: "Carry", options: { back: "On its back", small: "Small, on its back", front: "Held in front", hidden: "Eyes lit" }, fallback: "back" },
   itemColor: { label: "Item color", options: { teal: "Teal", ivory: "Ivory", violet: "Violet" }, fallback: "teal" },
   vision: { label: "Vision", options: { normal: "Normal", protanopia: "Protanopia", deuteranopia: "Deuteranopia", tritanopia: "Tritanopia" }, fallback: "normal" },
 };
