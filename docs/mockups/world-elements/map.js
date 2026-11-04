@@ -34,7 +34,7 @@ function appCell({ wall = false, paint, around = [], goalPaint, goalAround = [],
   if (paint) images.push(appPaint(paint, around));
   // A goal met hides its mark: the paint alone shows that the cell is done.
   if (goalPaint && goalPaint !== paint) images.push(appGoalPaint(goalPaint, goalAround));
-  for (const [shown, name] of [[goalItem, "goal-item"], [item, "item"], [goalStand, `candidates/goal-stand-${chosen.goalStand}`]]) {
+  for (const [shown, name] of [[goalItem, "goal-item"], [item, "item"], [goalStand, "goal-stand"]]) {
     if (shown) images.push(`<img src="${element(name)}" alt="">`);
   }
   // The robot covers the paint of its cell: the learner follows it through the code.
