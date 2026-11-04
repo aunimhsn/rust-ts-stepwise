@@ -22,7 +22,7 @@ const SMALL_MAP_EXTRAS = {
   "8,5": { goalStand: true },
 };
 
-// The passages the robot painted (see pathLinks in section-painted-paths.js).
+// The passages the robot painted (see pathLinks in map.js).
 const SMALL_MAP_LINKS = [
   ...pathLinks("2,1", "3,1", "4,1"), ...pathLinks("3,1", "3,2"),
   ...pathLinks("4,2", "4,3"),

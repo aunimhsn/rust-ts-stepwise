@@ -6,7 +6,7 @@
 .app-cell .is-west { transform: rotate(270deg); }
 
 /* The map: a grid of cells, without gaps, so that the tiles meet as in the application. */
-.app-map { display: grid; grid-template-columns: repeat(var(--columns), var(--cell, 48px)); box-shadow: 0 8px 30px #0006; }
+.app-map { display: grid; width: max-content; grid-template-columns: repeat(var(--columns), var(--cell, 48px)); box-shadow: 0 8px 30px #0006; }
 
 /* A swatch of a paint, with its name and its shade. */
 .app-swatch { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #adb5bd; }
