@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <clipPath id="paint"><rect x="5" y="5" width="54" height="54" rx="7"/></clipPath>
+  <rect x="5" y="5" width="54" height="54" rx="7" fill="#ff5a4f" filter="url(#glow)"/>
+  <g clip-path="url(#paint)">
+  <path d="M-36 57 L14 7" fill="none" stroke="#00000033" stroke-width="4"/>
+  <path d="M-25 57 L25 7" fill="none" stroke="#00000033" stroke-width="4"/>
+  <path d="M-14 57 L36 7" fill="none" stroke="#00000033" stroke-width="4"/>
+  <path d="M-3 57 L47 7" fill="none" stroke="#00000033" stroke-width="4"/>
+  <path d="M8 57 L58 7" fill="none" stroke="#00000033" stroke-width="4"/>
+  <path d="M19 57 L69 7" fill="none" stroke="#00000033" stroke-width="4"/>
+  <path d="M30 57 L80 7" fill="none" stroke="#00000033" stroke-width="4"/>
+  <path d="M41 57 L91 7" fill="none" stroke="#00000033" stroke-width="4"/>
+  <path d="M52 57 L102 7" fill="none" stroke="#00000033" stroke-width="4"/>
+  </g>
+</svg>
