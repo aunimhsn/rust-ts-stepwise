@@ -1,20 +1,38 @@
-// Section: the font of the name beside the logo, six candidates under the SIL Open Font License.
+// Section: the name beside the logo, in Fredoka 600, the head of the robot lined up with the letters.
 
-const WORDMARK_FONTS = [
-  ["Fredoka", 600, "Rounded and playful, like the robot."],
-  ["Nunito", 800, "Rounded, calm, very readable."],
-  ["Baloo 2", 700, "Chunky and friendly, a game title."],
-  ["Lexend", 600, "Designed to make reading easier; clean."],
-  ["Outfit", 700, "Geometric and clean, close to Shapez 2."],
-  ["Space Grotesk", 700, "Technical, a nod to code."],
-];
+const NAME_FONT = "600 100px Fredoka, sans-serif";
+// The head of the robot in logo.svg, out of 64: from 24 to 56.2 (its outline included).
+const HEAD_TOP = 23.4 / 64;
+const HEAD_BOTTOM = 56.8 / 64;
 
-SECTIONS.push(["Font of the name", () => `
-  <p>The name beside the logo in six fonts, all under the SIL Open Font License, so that the application can embed them. The tab <b>Name</b> changes its case. The fonts of the interface come with the design system (step 4).</p>
-  ${LOGO_GROUNDS.map(([title, ground, ink]) => `<h3>${title}</h3>
-  <div class="page-row" style="background:${ground};padding:20px;border-radius:8px;gap:36px 48px">${WORDMARK_FONTS.map(([font, weight, note]) => `
-    <div style="display:flex;flex-direction:column;gap:12px;color:${ink}">
-      <div style="display:flex;align-items:center;gap:12px;font:${weight} 44px/1 '${font}', sans-serif"><img src="${element("logo")}" width="60" height="60" alt="">${chosen.nameCase === "lower" ? "stepwise" : "Stepwise"}</div>
-      <div style="display:flex;align-items:center;gap:7px;font:${weight} 19px/1 '${font}', sans-serif"><img src="${element("logo")}" width="26" height="26" alt="">${chosen.nameCase === "lower" ? "stepwise" : "Stepwise"}</div>
-      <span style="font-size:12px;opacity:.75">${font} ${weight} · ${note}</span></div>`).join("")}
-  </div>`).join("")}`]);
+// The height of a letter of the name, out of its font size: an "S" for the capitals, an "x" for
+// the lowercase letters.
+function letterHeight(letter) {
+  const context = document.createElement("canvas").getContext("2d");
+  context.font = NAME_FONT;
+  return context.measureText(letter).actualBoundingBoxAscent / 100;
+}
+
+// The name at a font size, centered on the head of the robot: the logo is sized so that its head is
+// a little taller than the capitals, then raised so that the middle of its head meets the middle of
+// the capitals or of the lowercase letters, as the tab "Center on" says.
+function appWordmark(fontSize, ink) {
+  const cap = letterHeight("S") * fontSize;
+  const middleOfText = (chosen.nameAlign === "cap" ? cap : letterHeight("x") * fontSize) / 2;
+  const size = cap / (HEAD_BOTTOM - HEAD_TOP) * 1.25;
+  // Distance from the bottom of the image to the middle of the head.
+  const middleOfHead = (1 - (HEAD_TOP + HEAD_BOTTOM) / 2) * size;
+  const lift = middleOfText - middleOfHead + Number(chosen.nameOffset) * fontSize / 44;
+  const name = chosen.nameCase === "lower" ? "stepwise" : "Stepwise";
+  return `<div style="color:${ink};font:600 ${fontSize}px/1.4 Fredoka, sans-serif;white-space:nowrap">
+    <img src="${element("logo")}" width="${size.toFixed(1)}" height="${size.toFixed(1)}" alt="" style="vertical-align:${lift.toFixed(2)}px;margin-right:${(fontSize * 0.22).toFixed(1)}px">${name}</div>`;
+}
+
+SECTIONS.push(["Name", () => `
+  <p>The name in Fredoka 600, under the SIL Open Font License. The name is centered on the head of the robot: on the middle of its capitals, or of its lowercase letters (tab <b>Center on</b>); the slider <b>Offset</b> tunes it by eye. The tab <b>Name</b> changes its case.</p>
+  <div class="page-row">${LOGO_GROUNDS.map(([title, ground, ink]) => `
+    <div class="page-slot"><span>${title}</span>
+      <div style="background:${ground};padding:20px 24px;border-radius:8px;display:flex;flex-direction:column;gap:14px">
+        ${[64, 44, 24, 16].map(size => appWordmark(size, ink)).join("")}
+      </div></div>`).join("")}
+  </div>`]);

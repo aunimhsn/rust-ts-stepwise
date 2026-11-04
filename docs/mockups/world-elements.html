@@ -11,8 +11,8 @@
   Serve the repository root, then open http://127.0.0.1:<port>/docs/mockups/world-elements.html:
     python3 -m http.server 8765 --bind 127.0.0.1
 -->
-<!-- Candidate fonts of the name, all under the SIL Open Font License (Google Fonts). -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Fredoka:wght@600&family=Lexend:wght@600&family=Nunito:wght@800&family=Outfit:wght@700&family=Space+Grotesk:wght@700&display=block">
+<!-- The font of the name, Fredoka, under the SIL Open Font License (Google Fonts). -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600&display=block">
 <link rel="stylesheet" href="world-elements/page.css">
 <link rel="stylesheet" href="world-elements/map.css">
 </head>
@@ -42,6 +42,8 @@
 <script src="world-elements/section-painted-paths.js"></script>
 <script src="world-elements/section-small-map.js"></script>
 <script src="world-elements/section-elements.js"></script>
-<script>render();</script>
+<script>render();
+// The name is aligned on the measured capitals of its font: draw again once it has loaded.
+document.fonts.ready.then(render);</script>
 </body>
 </html>
