@@ -6,8 +6,6 @@ const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(THEMES).map(([key, theme]) => [key, theme.title])), fallback: Object.keys(THEMES)[0] },
   // The goal "this color here", in the shape of the stroke to paint.
   goalPaint: { label: "Goal paint", options: { ghost: "Ghost", outline: "Outline" }, fallback: "ghost" },
-  // How the color under the robot stays visible when the robot covers the stroke.
-  onPaint: { label: "Robot on paint", options: { hidden: "Hidden", sensor: "Sensor", front: "Sensor, item in front", visor: "Visor", halo: "Halo" }, fallback: "visor" },
   vision: { label: "Vision", options: { normal: "Normal", protanopia: "Protanopia", deuteranopia: "Deuteranopia", tritanopia: "Tritanopia" }, fallback: "normal" },
 };
 
