@@ -17,7 +17,7 @@ const ROBOT_EXTRAS = {
 };
 
 SECTIONS.push(["Robot", () => `
-  <p>The bay at its back is larger, so that the item it carries reads at 32 px. The tab <b>Grippers</b> changes the grippers, folded at its front: they store the item in the bay (the animation comes with the mini-scenes of step 3).</p>
+  <p>Its pincer, folded at its front, stores the item in the bay at its back (the animation comes with the mini-scenes of step 3).</p>
   ${[96, 48, 32].map(size => `<div class="page-row" style="gap:8px;margin-bottom:8px">${["north", "east", "south", "west"].flatMap(robot =>
     [appCell({ robot }, size), appCell({ robot, carrying: true }, size)]).join("")}</div>`).join("")}
   <div class="page-row" style="margin-top:12px">${appMap(ROBOT_ROWS, ROBOT_EXTRAS, 48)}${appMap(ROBOT_ROWS, ROBOT_EXTRAS, 32)}</div>`]);
