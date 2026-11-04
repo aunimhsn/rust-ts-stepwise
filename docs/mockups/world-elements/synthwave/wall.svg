@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <rect x="0" y="0" width="64" height="64" fill="#13061f"/>
+  <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <rect x="5" y="5" width="54" height="54" rx="3" fill="#2a0c4a"/>
+  <path d="M6 10 L58 10" fill="none" stroke="#7b3cff" stroke-opacity="0.35" stroke-width="1"/>
+  <path d="M6 15 L58 15" fill="none" stroke="#7b3cff" stroke-opacity="0.35" stroke-width="1"/>
+  <path d="M6 20 L58 20" fill="none" stroke="#7b3cff" stroke-opacity="0.35" stroke-width="1"/>
+  <path d="M6 25 L58 25" fill="none" stroke="#7b3cff" stroke-opacity="0.35" stroke-width="1"/>
+  <path d="M6 30 L58 30" fill="none" stroke="#7b3cff" stroke-opacity="0.35" stroke-width="1"/>
+  <path d="M6 35 L58 35" fill="none" stroke="#7b3cff" stroke-opacity="0.35" stroke-width="1"/>
+  <path d="M6 40 L58 40" fill="none" stroke="#7b3cff" stroke-opacity="0.35" stroke-width="1"/>
+  <path d="M6 45 L58 45" fill="none" stroke="#7b3cff" stroke-opacity="0.35" stroke-width="1"/>
+  <path d="M6 50 L58 50" fill="none" stroke="#7b3cff" stroke-opacity="0.35" stroke-width="1"/>
+  <path d="M6 55 L58 55" fill="none" stroke="#7b3cff" stroke-opacity="0.35" stroke-width="1"/>
+  <rect x="5" y="5" width="54" height="54" rx="3" fill="none" stroke="#c08bff" stroke-width="2" filter="url(#glow)"/>
+</svg>
