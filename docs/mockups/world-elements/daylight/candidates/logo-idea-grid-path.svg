@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<rect width="64" height="64" rx="14" fill="#5d687a"/>
+<rect x="5" y="5" width="16" height="16" rx="3" fill="#e1e5ea"/><rect x="5" y="24" width="16" height="16" rx="3" fill="#e1e5ea"/><rect x="5" y="43" width="16" height="16" rx="3" fill="#e1e5ea"/><rect x="24" y="5" width="16" height="16" rx="3" fill="#e1e5ea"/><rect x="24" y="24" width="16" height="16" rx="3" fill="#e1e5ea"/><rect x="24" y="43" width="16" height="16" rx="3" fill="#e1e5ea"/><rect x="43" y="5" width="16" height="16" rx="3" fill="#e1e5ea"/><rect x="43" y="24" width="16" height="16" rx="3" fill="#e1e5ea"/><rect x="43" y="43" width="16" height="16" rx="3" fill="#e1e5ea"/>
+<path d="M13 13 V51 H45" fill="none" stroke="#dc2f34" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="44.5" y="44.5" width="13" height="13" rx="3.5" fill="#fff" stroke="#222935" stroke-width="1.5"/>
+<rect x="46.5" y="47.5" width="9" height="4" rx="2" fill="#222935"/>
+</svg>
