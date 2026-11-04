@@ -44,7 +44,17 @@ function appCell({ wall = false, paint, around, goalPaint, goalItem = false, ite
   if (goalStand) layers.push("goal-stand");
   const images = layers.map(name => `<img src="${element(name)}" alt="">`);
   if (paint) images.splice(1, 0, appPaint(paint, around));
-  if (robot) images.push(`<img class="is-${robot}" src="${element(carrying ? "robot-carrying" : "robot")}" alt="">`);
+  if (robot) {
+    const shade = paint && THEMES[chosen.theme].paints[paint];
+    if (shade && chosen.onPaint === "halo") images.push(`<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="26" fill="${shade}"/></svg>`);
+    images.push(`<img class="is-${robot}" src="${element(carrying ? "robot-carrying" : "robot")}" alt="">`);
+    // The sensor: the panel on the back of the robot lights with the color of its cell, under the item it carries.
+    if (shade && chosen.onPaint === "sensor") {
+      images.push(`<svg class="is-${robot}" viewBox="0 0 64 64" aria-hidden="true"><rect x="23" y="34" width="18" height="12" rx="3" fill="${shade}"/></svg>`);
+      // The item carried, drawn again over the panel, as in robot-carrying.svg (scale 0.6 around 32, 40).
+      if (carrying) images.push(`<svg class="is-${robot}" viewBox="0 0 64 64" aria-hidden="true"><image href="${element("item")}" x="12.8" y="20.8" width="38.4" height="38.4"/></svg>`);
+    }
+  }
   return `<div class="app-cell" style="--cell:${size}px">${images.join("")}</div>`;
 }
 

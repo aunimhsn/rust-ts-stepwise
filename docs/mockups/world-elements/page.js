@@ -5,6 +5,8 @@ const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(THEMES).map(([key, theme]) => [key, theme.title])), fallback: Object.keys(THEMES)[0] },
   paint: { label: "Paint", options: { cell: "Per cell", full: "Full cell", joined: "Joined", seams: "Joined + seams", stroke: "Stroke" }, fallback: "stroke" },
   // The width of the stroke, out of 64 for a cell; the robot is 42 wide with its tracks, 32 without.
+  // How the color under the robot stays visible when the robot covers the stroke.
+  onPaint: { label: "Robot on paint", options: { hidden: "Hidden", sensor: "Sensor", halo: "Halo" }, fallback: "sensor" },
   width: { label: "Stroke width", options: { 30: "30", 34: "34", 38: "38" }, fallback: "34" },
   vision: { label: "Vision", options: { normal: "Normal", protanopia: "Protanopia", deuteranopia: "Deuteranopia", tritanopia: "Tritanopia" }, fallback: "normal" },
 };

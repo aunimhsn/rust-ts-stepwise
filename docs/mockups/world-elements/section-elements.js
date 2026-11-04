@@ -15,6 +15,8 @@ const ELEMENTS = [
     ...["north", "east", "south", "west"].map(direction => [`Facing ${direction}`, { robot: direction }]),
     ["Carrying an item", { robot: "north", carrying: true }],
     ["On a paint", { robot: "north", paint: "yellow" }],
+    ["On a paint, facing east", { robot: "east", paint: "blue" }],
+    ["On a paint, carrying", { robot: "north", paint: "red", carrying: true }],
     ["On its goal", { robot: "north", goalStand: true }],
   ]],
 ];
