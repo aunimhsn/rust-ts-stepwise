@@ -51,12 +51,15 @@ function appCell({ wall = false, wallEdge = true, wallRim = true, paint, around 
   if (goalStand) images.push(`<img src="${element("goal-stand")}" alt="">`);
   // The robot covers the paint of its cell: the learner follows it through the code.
   // The item it carries lies on its back, smaller, and turns with it.
-  // "Eyes lit" draws no item: the eyes take the color of the item instead.
   // Held in front, the item overlaps the front of the robot a little; the larger, the further out.
-  const front = chosen.carry === "front" ? ` style="transform: translateY(${(17 - chosen.frontSize * 0.1 - 32) / 64 * 100}%) scale(${chosen.frontSize / 100})"` : "";
-  const carried = carrying && chosen.carry !== "hidden" ? `<div class="is-carried is-${chosen.carry}"${front}>${appItem()}</div>` : "";
-  const eyes = carrying && chosen.carry === "hidden" ? `<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="26.5" cy="23.5" r="3.4" fill="${ITEM_COLORS[chosen.itemColor]}"/><circle cx="37.5" cy="23.5" r="3.4" fill="${ITEM_COLORS[chosen.itemColor]}"/></svg>` : "";
-  if (robot) images.push(`<div class="app-robot is-${robot}"><img src="${element("robot")}" alt="">${eyes}${carried}</div>`);
+  // With grippers, two arms come out of the front corners of the robot and hold it.
+  const held = ["front", "grippers"].includes(chosen.carry);
+  const front = held ? ` style="transform: translateY(${(17 - chosen.frontSize * 0.1 - 32) / 64 * 100}%) scale(${chosen.frontSize / 100})"` : "";
+  const carried = carrying ? `<div class="is-carried is-${held ? "front" : chosen.carry}"${front}>${appItem()}</div>` : "";
+  const reach = 9 + chosen.frontSize * 0.07;
+  const grippers = carrying && chosen.carry === "grippers" ? `<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M21 17 L21 ${20 - reach} Q21 ${17 - reach} 25 ${17 - reach}
+    M43 17 L43 ${20 - reach} Q43 ${17 - reach} 39 ${17 - reach}" fill="none" stroke="${INK}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>` : "";
+  if (robot) images.push(`<div class="app-robot is-${robot}"><img src="${element("robot")}" alt="">${carried}${grippers}</div>`);
   // A goal not met: a small red flag planted in the corner of its cell, over the robot. Its red,
   // distinct from the red paint, may follow the error color of the design system (step 4).
   if (missed) images.push(`<img src="${element("goal-missed")}" alt="">`);
