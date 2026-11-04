@@ -4,14 +4,6 @@
 // A group with a `range` instead of `options` is a slider, for a value tuned by eye.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(THEMES).map(([key, theme]) => [key, theme.title])), fallback: Object.keys(THEMES)[0] },
-  // The case of the name beside the logo.
-  nameCase: { label: "Name", options: { title: "Stepwise", lower: "stepwise" }, fallback: "title" },
-  // The name centered on the head of the robot: on the middle of its capitals, or of its lowercase
-  // letters; the slider moves it by a fraction of a pixel, at the size of 44 px.
-  nameAlign: { label: "Center on", options: { cap: "Capitals", lower: "Lowercase" }, fallback: "cap" },
-  nameOffset: { label: "Offset", range: { min: -3, max: 3, step: 0.5 }, fallback: "0" },
-  // The gap between the head of the robot and the name, in % of the font size.
-  nameGap: { label: "Gap", range: { min: 0, max: 30, step: 1 }, fallback: "14" },
   vision: { label: "Vision", options: { normal: "Normal", protanopia: "Protanopia", deuteranopia: "Deuteranopia", tritanopia: "Tritanopia" }, fallback: "normal" },
 };
 
