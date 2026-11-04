@@ -1,8 +1,5 @@
 // Section: the stroke follows the path of the robot while its brush is down.
 
-// The passages of a path through the cells, from a list of "x,y" points.
-const pathLinks = (...points) => points.slice(1).map((point, index) => `${points[index]} ${point}`);
-
 const PATHS_MAP = [
   ".......",
   ".rrrr..",

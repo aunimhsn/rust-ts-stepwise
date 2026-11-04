@@ -2,6 +2,9 @@
 
 const element = name => `world-elements/${chosen.theme}/${name}.svg`;
 
+// The shade of a paint, decided in step 1b (themes.js).
+const paintShade = color => PAINT_SHADES[color];
+
 // The width of the paint stroke, out of 64 for a cell (the robot is 42 wide with its tracks).
 const STROKE = 28;
 const SIDES = { n: [32, 0], e: [64, 32], s: [32, 64], w: [0, 32] };
@@ -16,38 +19,46 @@ const strokeShape = (around, width, color) =>
 // The paint of a cell: a brush stroke through the centers, which crosses the edge to a painted
 // neighbor of the same color and stops, rounded, in the middle of the cell at the ends.
 function appPaint(color, around = []) {
-  return `<svg viewBox="0 0 64 64" aria-hidden="true">${strokeShape(around, STROKE, THEMES[chosen.theme].paints[color])}</svg>`;
+  return `<svg viewBox="0 0 64 64" aria-hidden="true">${strokeShape(around, STROKE, paintShade(color))}</svg>`;
 }
 
-// The goal "this color here", in the shape of the stroke to paint, as the "Goal paint" tab says:
-// the stroke in transparency (ghost), or its outline (a mask cuts the inside, so that a paint
-// already on the cell stays visible through it).
-let maskCount = 0;
+// The goal "this color here": the stroke to paint, in transparency. A paint already on the cell
+// stays visible through it.
 function appGoalPaint(color, around = []) {
-  const shade = THEMES[chosen.theme].paints[color];
-  if (chosen.goalPaint === "ghost") {
-    return `<svg viewBox="0 0 64 64" aria-hidden="true"><g opacity=".35">${strokeShape(around, STROKE, shade)}</g></svg>`;
-  }
-  const id = `goal-mask-${maskCount += 1}`;
-  return `<svg viewBox="0 0 64 64" aria-hidden="true"><mask id="${id}" maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="64">
-    ${strokeShape(around, STROKE + 2, "#fff")}${strokeShape(around, STROKE - 5, "#000")}</mask>
-    <rect width="64" height="64" fill="${shade}" mask="url(#${id})"/></svg>`;
+  const shade = paintShade(color);
+  return `<svg viewBox="0 0 64 64" aria-hidden="true"><g opacity=".35">${strokeShape(around, STROKE, shade)}</g></svg>`;
 }
 
 // A cell: its ground (floor or wall), then the paint, the goal marks, the item and the robot.
-// `robot` is a direction (north, east, south, west), `carrying` adds the item on its back.
+// `robot` is a direction (north, east, south, west), `carrying` adds the item in its bay, `pincer`
+// its pincer, out only while it picks up or drops an item. `lit` is the end of a run: its eyes lit
+// in yellow on "success", dimmed on "failure".
 // `around` and `goalAround` list the sides where the stroke of the paint and of the goal go on.
-function appCell({ wall = false, paint, around = [], goalPaint, goalAround = [], goalItem = false, item = false, goalStand = false, robot, carrying = false } = {}, size = 48) {
+// `missed` marks a goal not met once the program has ended.
+// `wallEdge` adds the darker edge at the bottom of a wall above a floor cell, and `wallRim` the light
+// rim at the top of a wall below a floor cell: a flat hint of height.
+function appCell({ wall = false, wallEdge = true, wallRim = true, paint, around = [], goalPaint, goalAround = [], goalItem = false, item = false, goalStand = false, robot, carrying = false, pincer = false, lit, missed = false } = {}, size = 48) {
   const images = [`<img src="${element(wall ? "wall" : "floor")}" alt="">`];
+  if (wall && wallRim) images.push(`<img src="${element("wall-rim")}" alt="">`);
+  if (wall && wallEdge) images.push(`<img src="${element("wall-edge")}" alt="">`);
   if (paint) images.push(appPaint(paint, around));
-  if (goalPaint) images.push(appGoalPaint(goalPaint, goalAround));
+  // A goal met hides its mark: the paint alone shows that the cell is done.
+  if (goalPaint && goalPaint !== paint) images.push(appGoalPaint(goalPaint, goalAround));
   for (const [shown, name] of [[goalItem, "goal-item"], [item, "item"], [goalStand, "goal-stand"]]) {
     if (shown) images.push(`<img src="${element(name)}" alt="">`);
   }
   // The robot covers the paint of its cell: the learner follows it through the code.
-  if (robot) images.push(`<img class="is-${robot}" src="${element(carrying ? "robot-carrying" : "robot")}" alt="">`);
+  // The item it carries lies in its bay, the light panel at its back, and turns with it.
+  const carried = carrying ? `<img class="is-carried" src="${element("item")}" alt="">` : "";
+  if (robot) images.push(`<div class="app-robot is-${robot}"><img src="${element("robot")}" alt="">${pincer ? `<img src="${element("pincer")}" alt="">` : ""}${carried}${lit ? `<img src="${element(lit === "success" ? "eyes-lit" : "eyes-dim")}" alt="">` : ""}</div>`);
+  // A goal not met: a small red flag planted in the corner of its cell, over the robot. Its red,
+  // distinct from the red paint, may follow the error color of the design system (step 4).
+  if (missed) images.push(`<img src="${element("goal-missed")}" alt="">`);
   return `<div class="app-cell" style="--cell:${size}px">${images.join("")}</div>`;
 }
+
+// The passages of a path through the cells, from a list of "x,y" points.
+const pathLinks = (...points) => points.slice(1).map((point, index) => `${points[index]} ${point}`);
 
 // A map from rows of characters: `#` a wall, `.` a floor, `r` `y` `b` a paint.
 // `extras` adds the goal marks, the items and the robot, keyed by "x,y".
@@ -62,8 +73,12 @@ function appMap(rows, extras = {}, size = 48, links) {
   const cells = rows.flatMap((row, y) => [...row].map((char, x) => {
     const paint = paintAt(x, y);
     const goal = goalAt(x, y);
+    // Outside the grid counts as a wall: a wall on the bottom row has no edge, on the top row no rim.
+    const floorAt = (nx, ny) => rows[ny]?.[nx] !== undefined && rows[ny][nx] !== "#";
     return appCell({
       wall: char === "#",
+      wallEdge: floorAt(x, y + 1),
+      wallRim: floorAt(x, y - 1),
       paint,
       around: paint ? sides(x, y, (nx, ny) => paintAt(nx, ny) === paint
         && (!links || links.includes(`${x},${y} ${nx},${ny}`) || links.includes(`${nx},${ny} ${x},${y}`))) : [],
@@ -75,5 +90,15 @@ function appMap(rows, extras = {}, size = 48, links) {
   return `<div class="app-map" style="--columns:${rows[0].length};--cell:${size}px">${cells.join("")}</div>`;
 }
 
-const appSwatches = () => `<div class="page-row">${Object.entries(THEMES[chosen.theme].paints).map(([name, shade]) =>
-  `<span class="app-swatch"><i style="background:${shade}"></i><code>${name}</code> ${shade}</span>`).join("")}</div>`;
+// The contrast ratio of a shade against the floor (WCAG), to check that a paint stands out.
+const luminance = hex => [1, 3, 5].map(index => parseInt(hex.slice(index, index + 2), 16) / 255)
+  .map(value => value <= 0.03928 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4)
+  .reduce((sum, value, index) => sum + value * [0.2126, 0.7152, 0.0722][index], 0);
+const contrast = (first, second) => {
+  const [light, dark] = [luminance(first), luminance(second)].sort((a, b) => b - a);
+  return ((light + 0.05) / (dark + 0.05)).toFixed(1);
+};
+const FLOOR = "#e1e5ea";
+
+const appSwatches = () => `<div class="page-row">${Object.keys(PAINT_SHADES).map(color =>
+  `<span class="app-swatch"><i style="background:${paintShade(color)}"></i><code>${color}</code> ${paintShade(color)} · ${contrast(paintShade(color), FLOOR)}:1 on the floor</span>`).join("")}</div>`;

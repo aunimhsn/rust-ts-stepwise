@@ -11,6 +11,8 @@
   Serve the repository root, then open http://127.0.0.1:<port>/docs/mockups/world-elements.html:
     python3 -m http.server 8765 --bind 127.0.0.1
 -->
+<!-- The font of the name, Fredoka, under the SIL Open Font License (Google Fonts). -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600&display=block">
 <link rel="stylesheet" href="world-elements/page.css">
 <link rel="stylesheet" href="world-elements/map.css">
 </head>
@@ -28,9 +30,20 @@
 <script src="world-elements/page.js"></script>
 <script src="world-elements/map.js"></script>
 <!-- One script per section, the newest first: it is shown at the top of the page. -->
+<script src="world-elements/section-wordmark.js"></script>
+<script src="world-elements/section-logo.js"></script>
+<script src="world-elements/section-end-of-run.js"></script>
+<script src="world-elements/section-robot.js"></script>
+<script src="world-elements/section-item.js"></script>
+<script src="world-elements/section-paints.js"></script>
+<script src="world-elements/section-ground.js"></script>
+<script src="world-elements/section-goals-missed.js"></script>
+<script src="world-elements/section-goal-marks.js"></script>
 <script src="world-elements/section-painted-paths.js"></script>
 <script src="world-elements/section-small-map.js"></script>
 <script src="world-elements/section-elements.js"></script>
-<script>render();</script>
+<script>render();
+// The name is aligned on the measured capitals of its font: draw again once it has loaded.
+document.fonts.ready.then(render);</script>
 </body>
 </html>

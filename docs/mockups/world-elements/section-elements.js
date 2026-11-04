@@ -1,7 +1,7 @@
 // Section: each element alone, large and at its size on the map. The overlays lie on a floor.
 
 const ELEMENTS = [
-  ["Ground", [["Floor", {}], ["Wall", { wall: true }]]],
+  ["Ground", [["Floor", {}], ["Wall, between two floor cells", { wall: true }], ["Wall, inside a mass", { wall: true, wallRim: false, wallEdge: false }]]],
   ["Paints", ["red", "yellow", "blue"].map(color => [`<code>${color}</code>`, { paint: color }])],
   ["Item", [["Item", { item: true }]]],
   ["Goal marks", [
@@ -10,12 +10,16 @@ const ELEMENTS = [
     ["Item here", { goalItem: true }],
     ["Red here, painted blue", { paint: "blue", goalPaint: "red" }],
     ["Item here, done", { goalItem: true, item: true }],
+    ["Goal not met", { goalItem: true, missed: true }],
   ]],
   ["Robot", [
     ...["north", "east", "south", "west"].map(direction => [`Facing ${direction}`, { robot: direction }]),
     ["Carrying an item", { robot: "north", carrying: true }],
     ["On a paint", { robot: "north", paint: "yellow" }],
     ["On its goal", { robot: "north", goalStand: true }],
+    ["Picking up, its pincer out", { robot: "north", pincer: true, item: true }],
+    ["Every goal met", { robot: "north", lit: "success" }],
+    ["A goal not met", { robot: "north", lit: "failure" }],
   ]],
 ];
 

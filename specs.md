@@ -13,7 +13,7 @@ Stepwise teaches the first steps of programming. The learner writes a small prog
 ## Design principles
 
 - **Look**: flat, clean and calm, seen from above, inspired by the clarity of Shapez 2 (no 3D, no perspective). Every element of the map reads at a glance; color is kept for what carries meaning (paints, errors, success, the current line).
-- **Identity**: our own robot, friendly and simple, whose head is the logo of Stepwise. Its look comes from the sheet of the world elements.
+- **Identity**: our own robot, friendly and simple, whose smiling head is the logo of Stepwise. Its look comes from the sheet of the world elements (see [Look of the world](#look-of-the-world)).
 - **The robot shows what the program does**: every action is animated, the line being run is highlighted, and nothing happens without the learner seeing it.
 - **Tone of the messages**: short, friendly, in the second person, never blaming. An error says what happened, where (line and column), and how to fix it, with the words of the language: *"Expected ':' at the end of the `if` line."*
 - **Strict where it builds a habit**: indentation of exactly four spaces, `snake_case` names, a function defined before it is called, a variable declared before it is used. Each rule has its own clear message.
@@ -66,7 +66,7 @@ else:
 | Whole number | `0`, `42`, `-7` | 64-bit; a result beyond that range stops the program with an error. No decimal numbers in version 1. |
 | Boolean | `true`, `false` | The only values a condition accepts: `if 3:` is an error, there is no "truthy" value. |
 | Text | `"I am stuck"` | Double quotes, on one line; `\"`, `\\` and `\n` inside. Used by `print`. |
-| Color | `red`, `yellow`, `blue` | The three paints of the world: enough for the sensors to tell three cases apart (four with an unpainted cell), few enough to read at a glance and to stay distinct with a red-green color blindness. Their shades come from the sheet of the world elements. |
+| Color | `red`, `yellow`, `blue` | The three paints of the world: enough for the sensors to tell three cases apart (four with an unpainted cell), few enough to read at a glance and to stay distinct with a red-green color blindness. Their shades are in [Look of the world](#look-of-the-world). |
 
 Lists and decimal numbers come later (see the [backlog](docs/backlog.md)).
 
@@ -149,7 +149,7 @@ The errors that depend on the values (a wall in front, a division by zero, a con
 | Screen | Content |
 |---|---|
 | Home | The chapters and their levels, each locked, open or done; the sandbox; the manual; the settings. |
-| Level | The goal of the level, the map, the code editor, the controls, the console and the variables panel. |
+| Level | The goal of the level, the map with its legend, the code editor, the controls, the console and the variables panel. |
 | Sandbox | The level screen without goal, on an open map. |
 | Manual | The manual of the language. |
 
@@ -180,6 +180,7 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
   - given cells have given paints (and, when the level says so, no other cell is painted);
   - items lie on given cells;
   - the robot carries an item, or carries none.
+- **New elements**: each element of the map (see [Map](#map)) is introduced by the first level that uses it: the goal of this level names it, links to the section **The map** of the manual, and the legend of the level marks it as new. There is no tutorial level showing every element at once: a chapter brings one idea, and an element waits for the chapter that needs it.
 - When the program ends and every goal is met, the variant passes; once every variant has, a success panel offers the next level. When a goal isn't met, the console says which one, and the cells concerned are marked on the map.
 
 ### Code editor
@@ -216,6 +217,9 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
 - A program that never ends (an infinite loop) keeps running, visibly, until **Stop**: the robot keeps moving or turning, the highlighted line keeps changing, and a step counter next to the controls keeps rising, even for a loop that doesn't move the robot. The page never freezes, even at **Instant**.
 - A breakpoint pauses the program before it runs that line.
 - The robot's actions are animated at the chosen speed: moving, turning, painting, picking up, dropping, and a bump against a wall that stops the program.
+- The robot picks up and drops an item with a pincer that comes out of its front, then goes back in; the item it carries lies in the bay at its back.
+- At the end of a run, the robot shows the result: when every goal is met, its eyes light up in yellow and it hops; when a goal isn't met, its eyes dim, it shakes its head, and the cells of the goals not met get a red flag (see [Levels and progression](#levels-and-progression)).
+- **Sounds**, when the setting is on: a short, soft sound when a run succeeds, another when it fails (never scolding), and one when the robot bumps into a wall; none at each step. The browser plays them only after a click, such as **Run**.
 - The keyboard shortcuts of the controls are decided with the mock-up.
 
 ### Console
@@ -245,6 +249,7 @@ The manual of the Stepwise language, on its own page, reachable from every scree
 7. **Functions**: `function`, the parameters, `return`, why a function is defined before it is called.
 8. **Conventions**: the `snake_case` names, choosing a clear name, the four spaces, one idea per function, the comments; what Stepwise checks and what is only good practice.
 9. **Errors**: how to read an error message, with the most common ones and how to fix them.
+10. **The map**: every element of the world with its drawing and one sentence: the floor, the wall, the paints, the item, the goal marks, the flag of a goal not met, the robot.
 
 The manual is searchable (a search field filters its sections and commands), and each section has its own address, so that a level, the command menu and an error message can link to it.
 
@@ -256,6 +261,7 @@ An open map with a few walls, paints and items, without goal. The code is saved 
 
 - **Unlock all levels**: on or off (off by default).
 - **Suggest while typing**: the command menu opens by itself while typing (on by default).
+- **Sounds**: on or off (off by default, so that a classroom stays quiet).
 - **Reset progress**: clears the levels done, the code and the breakpoints of every level, after a confirmation.
 
 ### Interface language
@@ -270,6 +276,25 @@ The interface is in English. Every text of the interface, the error messages and
 - One kind of item in version 1 (its look comes from the sheet of the world elements).
 - The goal cells of a level are marked on the map (where to stand, which color where, where to put the items), so that the learner sees the target before writing code.
 - Outside the grid counts as a wall.
+- **Legend**: a button next to the map opens the legend of the level: only the elements present on its map, each with its drawing and one sentence, the new ones marked as new, and a link to the section **The map** of the manual.
+
+### Look of the world
+
+The sheet of the world elements, [`docs/mockups/world-elements.html`](docs/mockups/world-elements.html), is the reference of every element: flat, seen from above, in the Daylight style. Each element is an SVG file of `docs/mockups/world-elements/daylight/`, reused as it is by the application, which stacks them in a cell; only the paint strokes are drawn by the map.
+
+| Element | Look | Shades |
+|---|---|---|
+| Floor | A light gray cell with a thin line around it, so that the cells can be counted. | `#e1e5ea`, line `#cad1da` |
+| Wall | A plain slate cell; the walls meet as one mass. A wall below a floor cell has a light rim at its top, a wall above a floor cell a darker edge at its bottom: a flat hint of height. | `#5d687a`, rim `#7d899c`, edge `#3f4857` |
+| Paints | A stroke 28/64 of a cell wide through the centers of the cells, along the painted passages (see [Map](#map)), rounded at its ends. The red is darker and the yellow lighter so that they stay apart in a red-green color blindness. | `red` scarlet `#dc2f34`, `yellow` bright amber `#ffb300`, `blue` cobalt `#2459d6` |
+| Item | A teal hexagon with a dark center. | `#5fd0b0`, ink `#222935` |
+| Goal: paint | The stroke to paint, in its color at 35 % opacity; a cell painted with the right color hides it. | the paint |
+| Goal: item | A slot of the shape of the item, a recess in the floor. | `#c3cad4`, rim `#a9b3c0` |
+| Goal: where to stand | A large square slot, in which the robot fits. | as the item slot |
+| Goal not met | A small red flag planted in the corner of the cell, once a run ends without meeting it. | `#c2255c` (may follow the error color of the design system) |
+| Robot | White, with two tracks, a dark visor with two cyan eyes at its front (its direction), and a bay at its back that holds the item it carries. Its pincer comes out of its front only while it picks up or drops an item. At the end of a run, its eyes light up in yellow when every goal is met, and dim when not. | body `#ffffff`, ink `#222935`, eyes `#3fc3ff`, bay `#d5dbe3`, lit `#ffd23f`, dim `#7d8798` |
+| Logo | The head of the robot with happy eyes and a smile, carried up by a stroke of yellow paint that rises above it as a chevron. | the robot, the yellow paint |
+| Name | `stepwise` in lowercase, in Fredoka 600 (SIL Open Font License), beside the logo: the middle of the head of the robot meets the middle of the lowercase letters, raised by 0.011 em; the name starts 0.18 em after the head, whose height is 1.25 times the capitals. | the ink of the page |
 
 ## Local files
 
