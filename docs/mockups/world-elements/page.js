@@ -4,9 +4,6 @@
 // A group with a `range` instead of `options` is a slider, for a value tuned by eye.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(THEMES).map(([key, theme]) => [key, theme.title])), fallback: Object.keys(THEMES)[0] },
-  // The logo of Stepwise, the head of the robot: candidate files in daylight/candidates/.
-  logo: { label: "Logo", options: { face: "Face", visor: "Visor", tile: "Tile", pincer: "With pincer" }, fallback: "face" },
-  logoEyes: { label: "Logo eyes", options: { cyan: "Cyan", yellow: "Yellow" }, fallback: "cyan" },
   vision: { label: "Vision", options: { normal: "Normal", protanopia: "Protanopia", deuteranopia: "Deuteranopia", tritanopia: "Tritanopia" }, fallback: "normal" },
 };
 
