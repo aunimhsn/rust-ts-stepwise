@@ -50,12 +50,13 @@ const appHalo = () => `<svg viewBox="0 0 64 64" aria-hidden="true" style="overfl
   <circle cx="32" cy="32" r="50" fill="url(#halo)"/></svg>`;
 
 // A cell: its ground (floor or wall), then the paint, the goal marks, the item and the robot.
-// `robot` is a direction (north, east, south, west), `carrying` adds the item in its bay.
+// `robot` is a direction (north, east, south, west), `carrying` adds the item in its bay, `pincer`
+// its pincer, out only while it picks up or drops an item.
 // `around` and `goalAround` list the sides where the stroke of the paint and of the goal go on.
 // `missed` marks a goal not met once the program has ended.
 // `wallEdge` adds the darker edge at the bottom of a wall above a floor cell, and `wallRim` the light
 // rim at the top of a wall below a floor cell: a flat hint of height.
-function appCell({ wall = false, wallEdge = true, wallRim = true, paint, around = [], goalPaint, goalAround = [], goalItem = false, item = false, goalStand = false, robot, carrying = false, lit, missed = false } = {}, size = 48) {
+function appCell({ wall = false, wallEdge = true, wallRim = true, paint, around = [], goalPaint, goalAround = [], goalItem = false, item = false, goalStand = false, robot, carrying = false, pincer = false, lit, missed = false } = {}, size = 48) {
   const images = [`<img src="${element(wall ? "wall" : "floor")}" alt="">`];
   if (wall && wallRim) images.push(`<img src="${element("wall-rim")}" alt="">`);
   if (wall && wallEdge) images.push(`<img src="${element("wall-edge")}" alt="">`);
@@ -70,7 +71,7 @@ function appCell({ wall = false, wallEdge = true, wallRim = true, paint, around 
   const carried = carrying ? `<img class="is-carried" src="${element("item")}" alt="">` : "";
   // Its yellow light spreads on the floor around it, under it.
   if (robot && lit === "success" && chosen.success !== "eyes") images.push(appHalo());
-  if (robot) images.push(`<div class="app-robot is-${robot}"><img src="${element("robot")}" alt="">${carried}${appLit(lit)}</div>`);
+  if (robot) images.push(`<div class="app-robot is-${robot}"><img src="${element("robot")}" alt="">${pincer ? `<img src="${element("pincer")}" alt="">` : ""}${carried}${appLit(lit)}</div>`);
   // A goal not met: a small red flag planted in the corner of its cell, over the robot. Its red,
   // distinct from the red paint, may follow the error color of the design system (step 4).
   if (missed) images.push(`<img src="${element("goal-missed")}" alt="">`);
