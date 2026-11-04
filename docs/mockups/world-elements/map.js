@@ -26,27 +26,6 @@ function appGoalPaint(color, around = []) {
   return `<svg viewBox="0 0 64 64" aria-hidden="true"><g opacity=".35">${strokeShape(around, STROKE, shade)}</g></svg>`;
 }
 
-// The mark of a goal not met, over everything else on its cell, as the "Goal not met" tab says:
-// a frame, a badge in the corner with "!" or "?", or a small flag planted in the corner, an object
-// of the world rather than an alert of the application.
-// Its shade, distinct from the red paint, waits for the error color of the design system (step 4).
-const MISSED = "#c2255c";
-function appMissed() {
-  const badge = sign => `<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="51" cy="13" r="11" fill="${MISSED}" stroke="#fff" stroke-width="2"/>${sign}</svg>`;
-  if (chosen.goalMissed === "badge") {
-    return badge(`<path d="M51 7 L51 14" stroke="#fff" stroke-width="3" stroke-linecap="round"/><circle cx="51" cy="19" r="1.9" fill="#fff"/>`);
-  }
-  if (chosen.goalMissed === "question") {
-    return badge(`<path d="M47.4 9.6 A3.8 3.8 0 1 1 52.6 13.2 Q51 14 51 15.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/><circle cx="51" cy="19.3" r="1.8" fill="#fff"/>`);
-  }
-  if (chosen.goalMissed === "flag") {
-    return `<svg viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="47" cy="27" rx="4" ry="1.6" fill="#222935" opacity=".3"/>
-      <path d="M47 27 L47 4" stroke="#222935" stroke-width="2.2" stroke-linecap="round"/>
-      <path d="M47.5 4.5 L60 9 L47.5 13.5 Z" fill="${MISSED}" stroke="#222935" stroke-width="1.2" stroke-linejoin="round"/></svg>`;
-  }
-  return `<svg viewBox="0 0 64 64" aria-hidden="true"><rect x="3" y="3" width="58" height="58" rx="8" fill="none" stroke="${MISSED}" stroke-width="4"/></svg>`;
-}
-
 // A cell: its ground (floor or wall), then the paint, the goal marks, the item and the robot.
 // `robot` is a direction (north, east, south, west), `carrying` adds the item on its back.
 // `around` and `goalAround` list the sides where the stroke of the paint and of the goal go on.
@@ -61,7 +40,9 @@ function appCell({ wall = false, paint, around = [], goalPaint, goalAround = [],
   }
   // The robot covers the paint of its cell: the learner follows it through the code.
   if (robot) images.push(`<img class="is-${robot}" src="${element(carrying ? "robot-carrying" : "robot")}" alt="">`);
-  if (missed) images.push(appMissed());
+  // A goal not met: a small red flag planted in the corner of its cell, over the robot. Its red,
+  // distinct from the red paint, may follow the error color of the design system (step 4).
+  if (missed) images.push(`<img src="${element("goal-missed")}" alt="">`);
   return `<div class="app-cell" style="--cell:${size}px">${images.join("")}</div>`;
 }
 

@@ -10,6 +10,7 @@ const ELEMENTS = [
     ["Item here", { goalItem: true }],
     ["Red here, painted blue", { paint: "blue", goalPaint: "red" }],
     ["Item here, done", { goalItem: true, item: true }],
+    ["Goal not met", { goalItem: true, missed: true }],
   ]],
   ["Robot", [
     ...["north", "east", "south", "west"].map(direction => [`Facing ${direction}`, { robot: direction }]),
