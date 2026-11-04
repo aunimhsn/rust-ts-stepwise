@@ -11,3 +11,7 @@
 /* A swatch of a paint, with its name and its shade. */
 .app-swatch { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #adb5bd; }
 .app-swatch i { width: 18px; height: 18px; border-radius: 3px; }
+
+/* A goal not met whose frame pulses (the "Pulse" choice of the "Goal not met" tab). */
+@keyframes app-pulse { 50% { opacity: .25; } }
+.app-cell.is-pulse svg:last-child { animation: app-pulse 1.2s ease-in-out infinite; }

@@ -4,6 +4,8 @@
 // A group with a `range` instead of `options` is a slider, for a value tuned by eye.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(THEMES).map(([key, theme]) => [key, theme.title])), fallback: Object.keys(THEMES)[0] },
+  // The cells of a goal not met, once the program has ended.
+  goalMissed: { label: "Goal not met", options: { frame: "Frame", badge: "Badge", pulse: "Pulse", spotlight: "Spotlight" }, fallback: "frame" },
   vision: { label: "Vision", options: { normal: "Normal", protanopia: "Protanopia", deuteranopia: "Deuteranopia", tritanopia: "Tritanopia" }, fallback: "normal" },
 };
 
