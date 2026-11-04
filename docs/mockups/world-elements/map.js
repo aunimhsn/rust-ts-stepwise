@@ -28,11 +28,12 @@ function appGoalPaint(color, around = []) {
 
 // A wall merged with its neighbors (the "Merged" and "Raised" choices of the "Wall" tab): one
 // slate mass, rounded only at its outer corners, where the two sides around the corner are floor.
-// "Raised" adds a darker lip where the cell below is floor, a flat hint of height.
+// "Raised" adds a darker lip where the cell below is floor, a flat hint of height; "Raised square"
+// keeps the lip with square corners.
 const WALL_RADIUS = 12;
 let clipCount = 0;
 function appMergedWall(corners, lip) {
-  const r = corner => corners.includes(corner) ? WALL_RADIUS : 0;
+  const r = corner => corners.includes(corner) && chosen.wall !== "square" ? WALL_RADIUS : 0;
   const [nw, ne, se, sw] = ["nw", "ne", "se", "sw"].map(r);
   const path = `M${nw} 0 L${64 - ne} 0 A${ne} ${ne} 0 0 1 64 ${ne} L64 ${64 - se} A${se} ${se} 0 0 1 ${64 - se} 64
     L${sw} 64 A${sw} ${sw} 0 0 1 0 ${64 - sw} L0 ${nw} A${nw} ${nw} 0 0 1 ${nw} 0 Z`;
@@ -48,7 +49,7 @@ function appMergedWall(corners, lip) {
 // `parity` picks the shade of a checkered floor; `wallCorners` and `wallLip` shape a merged wall.
 function appCell({ wall = false, parity = 0, wallCorners = ["nw", "ne", "se", "sw"], wallLip = true, paint, around = [], goalPaint, goalAround = [], goalItem = false, item = false, goalStand = false, robot, carrying = false, missed = false } = {}, size = 48) {
   const floor = chosen.floor === "checker" ? `checker-${parity ? "odd" : "even"}` : chosen.floor;
-  const merged = wall && (chosen.wall === "merged" || chosen.wall === "raised");
+  const merged = wall && ["merged", "raised", "square"].includes(chosen.wall);
   const images = [`<img src="${element(`candidates/${wall && !merged ? `wall-${chosen.wall}` : `floor-${floor}`}`)}" alt="">`];
   if (merged) images.push(appMergedWall(wallCorners, wallLip));
   if (paint) images.push(appPaint(paint, around));
