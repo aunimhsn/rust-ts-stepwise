@@ -46,14 +46,24 @@ function appCell({ wall = false, paint, around, goalPaint, goalItem = false, ite
   if (paint) images.splice(1, 0, appPaint(paint, around));
   if (robot) {
     const shade = paint && THEMES[chosen.theme].paints[paint];
-    if (shade && chosen.onPaint === "halo") images.push(`<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="26" fill="${shade}"/></svg>`);
-    images.push(`<img class="is-${robot}" src="${element(carrying ? "robot-carrying" : "robot")}" alt="">`);
-    // The sensor: the panel on the back of the robot lights with the color of its cell, under the item it carries.
-    if (shade && chosen.onPaint === "sensor") {
-      images.push(`<svg class="is-${robot}" viewBox="0 0 64 64" aria-hidden="true"><rect x="23" y="34" width="18" height="12" rx="3" fill="${shade}"/></svg>`);
-      // The item carried, drawn again over the panel, as in robot-carrying.svg (scale 0.6 around 32, 40).
-      if (carrying) images.push(`<svg class="is-${robot}" viewBox="0 0 64 64" aria-hidden="true"><image href="${element("item")}" x="12.8" y="20.8" width="38.4" height="38.4"/></svg>`);
+    const mode = chosen.onPaint;
+    const overlay = (body, extra = "") => images.push(`<svg class="is-${robot}" viewBox="0 0 64 64" aria-hidden="true"${extra}>${body}</svg>`);
+    const carried = (x, y, size) => `<image href="${element("item")}" x="${x}" y="${y}" width="${size}" height="${size}"/>`;
+    if (shade && mode === "halo") overlay(`<circle cx="32" cy="32" r="26" fill="${shade}"/>`);
+    // With the item in front, the robot is drawn empty-handed and the item ahead of it, on every cell.
+    const itemInFront = carrying && mode === "front";
+    images.push(`<img class="is-${robot}" src="${element(carrying && !itemInFront ? "robot-carrying" : "robot")}" alt="">`);
+    if (shade && (mode === "sensor" || mode === "front")) {
+      // The sensor: the panel on the back of the robot lights with the color of its cell.
+      overlay(`<rect x="23" y="34" width="18" height="12" rx="3" fill="${shade}"/>`);
+      // Carried on the back, the item is drawn again over the panel (scale 0.6 around 32, 40).
+      if (carrying && mode === "sensor") overlay(carried(12.8, 20.8, 38.4));
     }
+    if (shade && mode === "visor") {
+      // The visor lights with the color of the cell, and the eyes turn dark on it.
+      overlay(`<rect x="20" y="18" width="24" height="11" rx="5.5" fill="${shade}"/><circle cx="26.5" cy="23.5" r="2.8" fill="#222935"/><circle cx="37.5" cy="23.5" r="2.8" fill="#222935"/>`);
+    }
+    if (itemInFront) overlay(carried(17.6, -3.4, 28.8));
   }
   return `<div class="app-cell" style="--cell:${size}px">${images.join("")}</div>`;
 }

@@ -6,7 +6,7 @@ const VARIANTS = {
   paint: { label: "Paint", options: { cell: "Per cell", full: "Full cell", joined: "Joined", seams: "Joined + seams", stroke: "Stroke" }, fallback: "stroke" },
   // The width of the stroke, out of 64 for a cell; the robot is 42 wide with its tracks, 32 without.
   // How the color under the robot stays visible when the robot covers the stroke.
-  onPaint: { label: "Robot on paint", options: { hidden: "Hidden", sensor: "Sensor", halo: "Halo" }, fallback: "sensor" },
+  onPaint: { label: "Robot on paint", options: { hidden: "Hidden", sensor: "Sensor", front: "Sensor, item in front", visor: "Visor", halo: "Halo" }, fallback: "visor" },
   width: { label: "Stroke width", options: { 30: "30", 34: "34", 38: "38" }, fallback: "34" },
   vision: { label: "Vision", options: { normal: "Normal", protanopia: "Protanopia", deuteranopia: "Deuteranopia", tritanopia: "Tritanopia" }, fallback: "normal" },
 };
