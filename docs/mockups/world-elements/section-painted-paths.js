@@ -1,4 +1,4 @@
-// Section: which painted cells the stroke joins, by their neighbors or by the path of the robot.
+// Section: the stroke follows the path of the robot while its brush is down.
 
 // The passages of a path through the cells, from a list of "x,y" points.
 const pathLinks = (...points) => points.slice(1).map((point, index) => `${points[index]} ${point}`);
@@ -43,10 +43,9 @@ stop_painting()`,
   },
 ];
 
-SECTIONS.push(["Painted paths: joined by neighbors, or by the path of the robot?", () => PATH_EXAMPLES.map(({ title, code, links, robot }) => `
+SECTIONS.push(["Painted paths: the stroke follows the robot", () => PATH_EXAMPLES.map(({ title, code, links, robot }) => `
   <h3>${title}</h3>
   <div class="page-row">
     <div class="page-slot"><span>The program (the robot starts on the left, facing east)</span><pre class="page-code">${code}</pre></div>
-    <div class="page-slot"><span>By neighbors: every red cell next to another joins it</span>${appMap(PATHS_MAP, robot, 48)}</div>
-    <div class="page-slot"><span>By path: only where the robot went while painting</span>${appMap(PATHS_MAP, robot, 48, links)}</div>
+    <div class="page-slot"><span>The stroke joins two cells only where the robot went while painting</span>${appMap(PATHS_MAP, robot, 48, links)}</div>
   </div>`).join("")]);
