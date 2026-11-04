@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <rect x="0" y="0" width="64" height="64" fill="#a9a59b"/>
+  <rect x="3" y="3" width="58" height="58" rx="2" fill="#c3bfb5"/>
+  <circle cx="37.6" cy="21.4" r="1.1" fill="#aeaa9f" fill-opacity="1"/>
+  <circle cx="24.5" cy="25.5" r="0.6" fill="#aeaa9f" fill-opacity="1"/>
+  <circle cx="15.9" cy="50.5" r="0.8" fill="#d0ccc2" fill-opacity="1"/>
+  <circle cx="36.8" cy="31.3" r="0.6" fill="#d0ccc2" fill-opacity="1"/>
+  <circle cx="48.1" cy="12.5" r="0.7" fill="#d0ccc2" fill-opacity="1"/>
+  <circle cx="32.5" cy="43.9" r="0.5" fill="#aeaa9f" fill-opacity="1"/>
+  <circle cx="35.1" cy="32.6" r="0.8" fill="#aeaa9f" fill-opacity="1"/>
+  <circle cx="48.5" cy="5.4" r="0.9" fill="#aeaa9f" fill-opacity="1"/>
+  <circle cx="33.9" cy="27.9" r="0.9" fill="#aeaa9f" fill-opacity="1"/>
+  <circle cx="12.8" cy="40.0" r="0.9" fill="#aeaa9f" fill-opacity="1"/>
+  <circle cx="6.5" cy="50.0" r="0.5" fill="#aeaa9f" fill-opacity="1"/>
+  <circle cx="10.1" cy="40.2" r="1.0" fill="#aeaa9f" fill-opacity="1"/>
+  <circle cx="44.0" cy="48.4" r="0.7" fill="#aeaa9f" fill-opacity="1"/>
+  <circle cx="5.3" cy="26.8" r="0.6" fill="#d0ccc2" fill-opacity="1"/>
+  <circle cx="6.5" cy="49.7" r="0.6" fill="#d0ccc2" fill-opacity="1"/>
+  <circle cx="43.6" cy="17.6" r="0.9" fill="#d0ccc2" fill-opacity="1"/>
+  <circle cx="49.4" cy="41.5" r="0.7" fill="#d0ccc2" fill-opacity="1"/>
+  <circle cx="45.0" cy="34.6" r="0.7" fill="#aeaa9f" fill-opacity="1"/>
+  <circle cx="23.8" cy="5.5" r="0.8" fill="#aeaa9f" fill-opacity="1"/>
+  <circle cx="54.4" cy="36.1" r="0.9" fill="#d0ccc2" fill-opacity="1"/>
+  <circle cx="48.5" cy="37.6" r="0.5" fill="#aeaa9f" fill-opacity="1"/>
+  <circle cx="41.7" cy="17.7" r="1.2" fill="#d0ccc2" fill-opacity="1"/>
+</svg>

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>World elements</title>
+<!--
+  Sheet of the world elements (roadmap step 1). Each style is a folder of SVG files in
+  world-elements/, one file per element, reused as they are by the application.
+
+  Serve the repository root, then open http://127.0.0.1:<port>/docs/mockups/world-elements.html:
+    python3 -m http.server 8765 --bind 127.0.0.1
+-->
+<link rel="stylesheet" href="world-elements/page.css">
+<link rel="stylesheet" href="world-elements/map.css">
+</head>
+<body>
+<p class="page-warning" id="file-warning" hidden>Opened as a file: serve the repository root (see the comment at the top of this page) so that the SVG files load.</p>
+<nav class="page-tabs" id="tabs" aria-label="Styles and variants"></nav>
+<main id="sheet"></main>
+<!-- Filters of the color blindness simulation (Machado et al., 2009, full severity). -->
+<svg class="page-filters" aria-hidden="true">
+  <filter id="vision-protanopia"><feColorMatrix type="matrix" values="0.152 1.053 -0.205 0 0  0.115 0.786 0.099 0 0  -0.004 -0.048 1.052 0 0  0 0 0 1 0"/></filter>
+  <filter id="vision-deuteranopia"><feColorMatrix type="matrix" values="0.367 0.861 -0.228 0 0  0.280 0.673 0.047 0 0  -0.012 0.043 0.969 0 0  0 0 0 1 0"/></filter>
+  <filter id="vision-tritanopia"><feColorMatrix type="matrix" values="1.256 -0.077 -0.179 0 0  -0.078 0.931 0.148 0 0  0.005 0.691 0.304 0 0  0 0 0 1 0"/></filter>
+</svg>
+<script src="world-elements/themes.js"></script>
+<script src="world-elements/page.js"></script>
+<script src="world-elements/map.js"></script>
+<!-- One script per section, the newest first: it is shown at the top of the page. -->
+<script src="world-elements/section-small-map.js"></script>
+<script src="world-elements/section-elements.js"></script>
+<script>render();</script>
+</body>
+</html>

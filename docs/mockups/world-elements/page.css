@@ -1,0 +1,23 @@
+/* The page around the elements: neutral, so that it doesn't compete with the styles. */
+body { margin: 0; background: #2a2d31; color: #e9ecef; font: 14px/1.4 system-ui, sans-serif; }
+.page-tabs { position: sticky; top: 0; z-index: 10; display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 10px 16px; background: #1b1d20; border-bottom: 1px solid #3a3f45; }
+.page-tabs .group { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.page-tabs .group > span { margin-right: 4px; color: #adb5bd; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+.page-tabs button { padding: 4px 10px; border: 1px solid #3a3f45; border-radius: 4px; background: #24272b; color: #dee2e6; font: inherit; cursor: pointer; }
+.page-tabs button[aria-pressed="true"] { background: #e9ecef; color: #1b1d20; border-color: #e9ecef; }
+.page-header { padding: 18px 16px 0; }
+.page-header h1 { margin: 0 0 4px; font-size: 20px; }
+.page-header p { margin: 0; max-width: 760px; color: #adb5bd; }
+.page-section { padding: 8px 16px 24px; scroll-margin-top: 60px; }
+.page-section h2 { font-size: 15px; color: #adb5bd; font-weight: 600; }
+.page-section h3 { margin: 18px 0 8px; font-size: 13px; color: #868e96; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+.page-row { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
+.page-slot > span { display: block; margin-bottom: 6px; color: #adb5bd; font-size: 12px; }
+.page-slot code { color: #dee2e6; }
+.page-warning { margin: 0; padding: 10px 16px; background: #8a6a10; color: #fff; }
+.page-filters { position: absolute; width: 0; height: 0; }
+
+/* The color blindness simulation applies to the drawings only. */
+:root[data-vision="protanopia"] .app-cell { filter: url(#vision-protanopia); }
+:root[data-vision="deuteranopia"] .app-cell { filter: url(#vision-deuteranopia); }
+:root[data-vision="tritanopia"] .app-cell { filter: url(#vision-tritanopia); }
