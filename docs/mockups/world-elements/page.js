@@ -4,9 +4,6 @@
 // A group with a `range` instead of `options` is a slider, for a value tuned by eye.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(THEMES).map(([key, theme]) => [key, theme.title])), fallback: Object.keys(THEMES)[0] },
-  // The ground: candidate files in daylight/candidates/, except the merged walls, drawn by the map.
-  floor: { label: "Floor", options: { grid: "Grid", thin: "Thin", dots: "Dots", checker: "Checker" }, fallback: "grid" },
-  wall: { label: "Wall", options: { stepped: "Stepped", bevel: "Bevel", hatched: "Hatched", merged: "Merged", raised: "Raised", square: "Raised square" }, fallback: "raised" },
   vision: { label: "Vision", options: { normal: "Normal", protanopia: "Protanopia", deuteranopia: "Deuteranopia", tritanopia: "Tritanopia" }, fallback: "normal" },
 };
 

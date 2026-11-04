@@ -35,7 +35,7 @@ const GROUND_MAPS = [
 const groundRows = ({ rows, paint }) => rows.map((row, y) => [...row].map((char, x) => paint[`${x},${y}`] ?? char).join(""));
 
 SECTIONS.push(["Floor and walls", () => `
-  <p>The tabs <b>Floor</b> and <b>Wall</b> change the ground. <b>Merged</b> and <b>Raised</b> join the walls into one mass, drawn by the map, with rounded outer corners; <b>Raised</b> adds a darker lip above the floor, and <b>Raised square</b> keeps it with square corners.</p>
+  <p>A grid of thin lines on the floor, to count the cells; the walls are slate cells that meet as one mass, with a darker edge above the floor.</p>
   <div class="page-row">${GROUND_MAPS.map(map => `
     <div class="page-slot"><span>${map.title}</span>${appMap(groundRows(map), map.extras, 48, map.links)}
       <div style="height:12px"></div>${appMap(groundRows(map), map.extras, 32, map.links)}</div>`).join("")}

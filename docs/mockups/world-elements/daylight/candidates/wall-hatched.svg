@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
-  <defs><pattern id="wall-hatch" patternUnits="userSpaceOnUse" width="8" height="8">
-    <path d="M-2 2 L2 -2 M0 8 L8 0 M6 10 L10 6" stroke="#6f7b8f" stroke-width="2"/></pattern></defs>
-  <rect x="0" y="0" width="64" height="64" fill="#5d687a"/>
-  <rect x="0" y="0" width="64" height="64" fill="url(#wall-hatch)"/>
-</svg>
