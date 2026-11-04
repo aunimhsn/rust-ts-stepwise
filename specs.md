@@ -149,7 +149,7 @@ The errors that depend on the values (a wall in front, a division by zero, a con
 | Screen | Content |
 |---|---|
 | Home | The chapters and their levels, each locked, open or done; the sandbox; the manual; the settings. |
-| Level | The goal of the level, the map, the code editor, the controls, the console and the variables panel. |
+| Level | The goal of the level, the map with its legend, the code editor, the controls, the console and the variables panel. |
 | Sandbox | The level screen without goal, on an open map. |
 | Manual | The manual of the language. |
 
@@ -180,6 +180,7 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
   - given cells have given paints (and, when the level says so, no other cell is painted);
   - items lie on given cells;
   - the robot carries an item, or carries none.
+- **New elements**: each element of the map (see [Map](#map)) is introduced by the first level that uses it: the goal of this level names it, links to the section **The map** of the manual, and the legend of the level marks it as new. There is no tutorial level showing every element at once: a chapter brings one idea, and an element waits for the chapter that needs it.
 - When the program ends and every goal is met, the variant passes; once every variant has, a success panel offers the next level. When a goal isn't met, the console says which one, and the cells concerned are marked on the map.
 
 ### Code editor
@@ -245,6 +246,7 @@ The manual of the Stepwise language, on its own page, reachable from every scree
 7. **Functions**: `function`, the parameters, `return`, why a function is defined before it is called.
 8. **Conventions**: the `snake_case` names, choosing a clear name, the four spaces, one idea per function, the comments; what Stepwise checks and what is only good practice.
 9. **Errors**: how to read an error message, with the most common ones and how to fix them.
+10. **The map**: every element of the world with its drawing and one sentence: the floor, the wall, the paints, the item, the goal marks, the flag of a goal not met, the robot.
 
 The manual is searchable (a search field filters its sections and commands), and each section has its own address, so that a level, the command menu and an error message can link to it.
 
@@ -270,6 +272,7 @@ The interface is in English. Every text of the interface, the error messages and
 - One kind of item in version 1 (its look comes from the sheet of the world elements).
 - The goal cells of a level are marked on the map (where to stand, which color where, where to put the items), so that the learner sees the target before writing code.
 - Outside the grid counts as a wall.
+- **Legend**: a button next to the map opens the legend of the level: only the elements present on its map, each with its drawing and one sentence, the new ones marked as new, and a link to the section **The map** of the manual.
 
 ## Local files
 
