@@ -217,6 +217,9 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
 - A program that never ends (an infinite loop) keeps running, visibly, until **Stop**: the robot keeps moving or turning, the highlighted line keeps changing, and a step counter next to the controls keeps rising, even for a loop that doesn't move the robot. The page never freezes, even at **Instant**.
 - A breakpoint pauses the program before it runs that line.
 - The robot's actions are animated at the chosen speed: moving, turning, painting, picking up, dropping, and a bump against a wall that stops the program.
+- The robot picks up and drops an item with a pincer that comes out of its front, then goes back in; the item it carries lies in the bay at its back.
+- At the end of a run, the robot shows the result: when every goal is met, its eyes light up in yellow and it hops; when a goal isn't met, its eyes dim, it shakes its head, and the cells of the goals not met get a red flag (see [Levels and progression](#levels-and-progression)).
+- **Sounds**, when the setting is on: a short, soft sound when a run succeeds, another when it fails (never scolding), and one when the robot bumps into a wall; none at each step. The browser plays them only after a click, such as **Run**.
 - The keyboard shortcuts of the controls are decided with the mock-up.
 
 ### Console
@@ -258,6 +261,7 @@ An open map with a few walls, paints and items, without goal. The code is saved 
 
 - **Unlock all levels**: on or off (off by default).
 - **Suggest while typing**: the command menu opens by itself while typing (on by default).
+- **Sounds**: on or off (off by default, so that a classroom stays quiet).
 - **Reset progress**: clears the levels done, the code and the breakpoints of every level, after a confirmation.
 
 ### Interface language
