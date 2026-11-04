@@ -32,8 +32,10 @@ function appGoalPaint(color, around = []) {
 // `missed` marks a goal not met once the program has ended.
 // `wallEdge` adds the darker edge at the bottom of a wall above a floor cell, a flat hint of height.
 function appCell({ wall = false, wallEdge = true, paint, around = [], goalPaint, goalAround = [], goalItem = false, item = false, goalStand = false, robot, carrying = false, missed = false } = {}, size = 48) {
-  const images = [`<img src="${element(wall ? "wall" : "floor")}" alt="">`];
-  if (wall && wallEdge) images.push(`<img src="${element("wall-edge")}" alt="">`);
+  const wood = chosen.wall === "slate" ? "" : `candidates/`;
+  const suffix = chosen.wall === "slate" ? "" : `-${chosen.wall}`;
+  const images = [`<img src="${element(wall ? `${wood}wall${suffix}` : "floor")}" alt="">`];
+  if (wall && wallEdge) images.push(`<img src="${element(`${wood}wall-edge${suffix}`)}" alt="">`);
   if (paint) images.push(appPaint(paint, around));
   // A goal met hides its mark: the paint alone shows that the cell is done.
   if (goalPaint && goalPaint !== paint) images.push(appGoalPaint(goalPaint, goalAround));
