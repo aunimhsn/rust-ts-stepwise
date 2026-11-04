@@ -85,7 +85,7 @@ The `html-mockups` skill (`.claude/skills/`) carries out this phase, from a star
    ```
 
    then open `http://127.0.0.1:8765/docs/mockups/<file>.html`, and reload after each change.
-6. Claude Code checks its own changes with headless screenshots (`firefox --headless --screenshot`) before asking for a review, and exports one large PNG per style to `outputs/` to compare them at a glance.
+6. Claude Code checks its own changes with headless screenshots before asking for a review, and exports one large PNG per style to `outputs/` to compare them at a glance. The screenshots use **Playwright** and its own Chromium, installed once outside the projects (see the `html-mockups` skill): it sees the real page with its scripts, reports the errors of the browser console, and works even when Claude Code runs in a sandbox that doesn't see the browsers of the system (VS Code as a Flatpak). Firefox headless remains the fallback.
 
 ## 5. Design system
 
@@ -143,3 +143,4 @@ After the release, or after any phase that went badly:
 | rust-exile-market | One tab group per open decision, removed once decided, turned about a hundred small decisions into quick on-screen comparisons. |
 | rust-exile-market | Pixel offsets measured on headless screenshots were wrong on the owner's scaled screen: tune them by eye with a tab of values. |
 | rust-exile-market | The wireframe and mock-up phases worked so well that they became the `excalidraw-wireframes` and `html-mockups` skills, with their scripts. |
+| stepwise | Claude Code in VS Code installed as a Flatpak couldn't see Firefox, so the SVG were checked without their page; Playwright and its own Chromium now take the screenshots and report the errors of the browser console. |

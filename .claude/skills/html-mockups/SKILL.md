@@ -33,7 +33,14 @@ python3 -m http.server 8765 --bind 127.0.0.1
 
 The owner opens `http://127.0.0.1:8765/docs/mockups/<name>.html` and reloads after each change.
 
-Before asking for a review, check each change with a headless screenshot (`scripts/screenshot.sh <url> <output.png> [width] [height]`, Firefox normal or Flatpak) and look at it. To compare the styles at a glance, export one large PNG per style to `outputs/`.
+Before asking for a review, check each change with a headless screenshot (`scripts/screenshot.sh <url> <output.png> [width] [height | full]`) and look at it. To compare the styles at a glance, export one large PNG per style to `outputs/`.
+
+The script uses **Playwright** and its own Chromium when installed, otherwise Firefox (normal or Flatpak). Prefer Playwright: it captures the whole page (`full`), and it prints the errors of the browser console (scripts, missing files) and fails on them, which a screenshot alone doesn't show. It is also the only choice when Claude Code runs in a sandbox that doesn't see the browsers of the system, such as VS Code installed as a Flatpak. Install it once, outside the projects (about 150 MB):
+
+```sh
+mkdir -p ~/.local/share/mockup-tools && cd ~/.local/share/mockup-tools
+npm init -y && npm install playwright && npx playwright install chromium
+```
 
 ## 3. Iterate with the owner
 
