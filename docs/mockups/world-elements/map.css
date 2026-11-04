@@ -1,6 +1,6 @@
 /* A cell of the map: its layers stacked, each an SVG file of the chosen style. */
 .app-cell { position: relative; width: var(--cell, 48px); height: var(--cell, 48px); }
-.app-cell img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.app-cell img, .app-cell svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .app-cell .is-east { transform: rotate(90deg); }
 .app-cell .is-south { transform: rotate(180deg); }
 .app-cell .is-west { transform: rotate(270deg); }

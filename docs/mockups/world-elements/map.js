@@ -2,16 +2,39 @@
 
 const element = name => `world-elements/${chosen.theme}/${name}.svg`;
 
+// The paint of a cell, drawn as the "Paint" tab says: its own SVG file per cell, the whole
+// cell, or joined over the edges to the neighbors of the same color (`around` lists them:
+// n, e, s, w and the corners ne, se, sw, nw), so that a painted area reads as one stroke.
+function appPaint(color, around = []) {
+  if (chosen.paint === "cell") return `<img src="${element(`paint-${color}`)}" alt="">`;
+  const has = direction => around.includes(direction);
+  const shapes = chosen.paint === "full" ? [[0, 0, 64, 64]] : [
+    [5, 5, 54, 54, 7],
+    ...[["n", 5, 0, 54, 12], ["s", 5, 52, 54, 12], ["w", 0, 5, 12, 54], ["e", 52, 5, 12, 54]]
+      .filter(([direction]) => has(direction)).map(([, ...box]) => box),
+    ...[["nw", 0, 0], ["ne", 52, 0], ["se", 52, 52], ["sw", 0, 52]]
+      .filter(([corner]) => has(corner) && has(corner[0]) && has(corner[1])).map(([, x, y]) => [x, y, 12, 12]),
+  ];
+  const shade = THEMES[chosen.theme].paints[color];
+  // "Joined + seams": the edges between two painted cells stay visible, faintly, to count them.
+  // Each cell draws half of the line, on its own side of the edge.
+  const seams = chosen.paint !== "seams" ? "" : [["n", "M0 0 L64 0"], ["e", "M64 0 L64 64"], ["s", "M0 64 L64 64"], ["w", "M0 0 L0 64"]]
+    .filter(([direction]) => has(direction))
+    .map(([, line]) => `<path d="${line}" stroke="#ffffff" stroke-opacity=".5" stroke-width="2"/>`).join("");
+  return `<svg viewBox="0 0 64 64" aria-hidden="true">${shapes.map(([x, y, width, height, radius = 0]) =>
+    `<rect x="${x}" y="${y}" width="${width}" height="${height}" rx="${radius}" fill="${shade}"/>`).join("")}${seams}</svg>`;
+}
+
 // A cell: its ground (floor or wall), then the paint, the goal marks, the item and the robot.
 // `robot` is a direction (north, east, south, west), `carrying` adds the item on its back.
-function appCell({ wall = false, paint, goalPaint, goalItem = false, item = false, goalStand = false, robot, carrying = false } = {}, size = 48) {
+function appCell({ wall = false, paint, around, goalPaint, goalItem = false, item = false, goalStand = false, robot, carrying = false } = {}, size = 48) {
   const layers = [wall ? "wall" : "floor"];
-  if (paint) layers.push(`paint-${paint}`);
   if (goalPaint) layers.push(`goal-paint-${goalPaint}`);
   if (goalItem) layers.push("goal-item");
   if (item) layers.push("item");
   if (goalStand) layers.push("goal-stand");
   const images = layers.map(name => `<img src="${element(name)}" alt="">`);
+  if (paint) images.splice(1, 0, appPaint(paint, around));
   if (robot) images.push(`<img class="is-${robot}" src="${element(carrying ? "robot-carrying" : "robot")}" alt="">`);
   return `<div class="app-cell" style="--cell:${size}px">${images.join("")}</div>`;
 }
@@ -20,8 +43,14 @@ function appCell({ wall = false, paint, goalPaint, goalItem = false, item = fals
 // `extras` adds the goal marks, the items and the robot, keyed by "x,y".
 function appMap(rows, extras = {}, size = 48) {
   const paints = { r: "red", y: "yellow", b: "blue" };
-  const cells = rows.flatMap((row, y) => [...row].map((char, x) =>
-    appCell({ wall: char === "#", paint: paints[char], ...extras[`${x},${y}`] }, size)));
+  const offsets = { n: [0, -1], ne: [1, -1], e: [1, 0], se: [1, 1], s: [0, 1], sw: [-1, 1], w: [-1, 0], nw: [-1, -1] };
+  const cells = rows.flatMap((row, y) => [...row].map((char, x) => {
+    const around = Object.keys(offsets).filter(direction => {
+      const [dx, dy] = offsets[direction];
+      return paints[char] && rows[y + dy]?.[x + dx] === char;
+    });
+    return appCell({ wall: char === "#", paint: paints[char], around, ...extras[`${x},${y}`] }, size);
+  }));
   return `<div class="app-map" style="--columns:${rows[0].length};--cell:${size}px">${cells.join("")}</div>`;
 }
 

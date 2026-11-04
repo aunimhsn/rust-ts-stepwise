@@ -13,6 +13,7 @@ The ideas, polish and edge cases found along the way that the current step doesn
 - The French translation of the interface, the levels and the manual.
 - The description of a built-in function on hover in the editor.
 - A phone or tablet layout.
+- A dark mode: an idea to discuss, not a plan. A learner used to it would read the map projected in class differently, since in the dark palette tried on the sheet of the world elements (Ink, in the history of `docs/mockups/world-elements/`) the walls are lighter than the floor, the opposite of the light one.
 
 ## Content
 

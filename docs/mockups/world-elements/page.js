@@ -1,8 +1,9 @@
-// The tabs of the page and its sections. The address keeps the choices (?theme=toy&vision=…).
+// The tabs of the page and its sections. The address keeps the choices (?paint=joined&vision=…).
 
 // One group of tabs per open decision; `fallback` is the choice shown by default.
 const VARIANTS = {
-  theme: { label: "Style", options: Object.fromEntries(Object.entries(THEMES).map(([key, theme]) => [key, theme.title])), fallback: "blueprint" },
+  theme: { label: "Style", options: Object.fromEntries(Object.entries(THEMES).map(([key, theme]) => [key, theme.title])), fallback: Object.keys(THEMES)[0] },
+  paint: { label: "Paint", options: { cell: "Per cell", full: "Full cell", joined: "Joined", seams: "Joined + seams" }, fallback: "joined" },
   vision: { label: "Vision", options: { normal: "Normal", protanopia: "Protanopia", deuteranopia: "Deuteranopia", tritanopia: "Tritanopia" }, fallback: "normal" },
 };
 
@@ -15,7 +16,8 @@ const SECTIONS = [];
 
 function render() {
   for (const key of Object.keys(VARIANTS)) document.documentElement.dataset[key] = chosen[key];
-  document.getElementById("tabs").innerHTML = Object.entries(VARIANTS).map(([key, variant]) =>
+  // A group with a single option is decided: it isn't shown.
+  document.getElementById("tabs").innerHTML = Object.entries(VARIANTS).filter(([, variant]) => Object.keys(variant.options).length > 1).map(([key, variant]) =>
     `<div class="group"><span>${variant.label}</span>${Object.entries(variant.options).map(([value, label]) =>
       `<button type="button" data-variant="${key}" data-value="${value}" aria-pressed="${chosen[key] === value}">${label}</button>`).join("")}</div>`).join("");
   const theme = THEMES[chosen.theme];
