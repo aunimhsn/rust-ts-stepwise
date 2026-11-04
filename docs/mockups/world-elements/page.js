@@ -10,6 +10,8 @@ const VARIANTS = {
   // letters; the slider moves it by a fraction of a pixel, at the size of 44 px.
   nameAlign: { label: "Center on", options: { cap: "Capitals", lower: "Lowercase" }, fallback: "cap" },
   nameOffset: { label: "Offset", range: { min: -3, max: 3, step: 0.5 }, fallback: "0" },
+  // The gap between the head of the robot and the name, in % of the font size.
+  nameGap: { label: "Gap", range: { min: 0, max: 30, step: 1 }, fallback: "14" },
   vision: { label: "Vision", options: { normal: "Normal", protanopia: "Protanopia", deuteranopia: "Deuteranopia", tritanopia: "Tritanopia" }, fallback: "normal" },
 };
 
