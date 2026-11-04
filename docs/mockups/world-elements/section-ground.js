@@ -35,7 +35,7 @@ const GROUND_MAPS = [
 const groundRows = ({ rows, paint }) => rows.map((row, y) => [...row].map((char, x) => paint[`${x},${y}`] ?? char).join(""));
 
 SECTIONS.push(["Floor and walls", () => `
-  <p>A grid of thin lines on the floor, to count the cells; the walls are slate cells that meet as one mass, with a darker edge above the floor.</p>
+  <p>A grid of thin lines on the floor, to count the cells; the walls are slate cells that meet as one mass, with a light rim below the floor and a darker edge above it.</p>
   <div class="page-row">${GROUND_MAPS.map(map => `
     <div class="page-slot"><span>${map.title}</span>${appMap(groundRows(map), map.extras, 48, map.links)}
       <div style="height:12px"></div>${appMap(groundRows(map), map.extras, 32, map.links)}</div>`).join("")}

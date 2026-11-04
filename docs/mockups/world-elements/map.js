@@ -30,10 +30,11 @@ function appGoalPaint(color, around = []) {
 // `robot` is a direction (north, east, south, west), `carrying` adds the item on its back.
 // `around` and `goalAround` list the sides where the stroke of the paint and of the goal go on.
 // `missed` marks a goal not met once the program has ended.
-// `wallEdge` adds the darker edge at the bottom of a wall above a floor cell, a flat hint of height.
+// `wallEdge` adds the darker edge at the bottom of a wall above a floor cell, and `wallRim` the light
+// rim at the top of a wall below a floor cell: a flat hint of height.
 function appCell({ wall = false, wallEdge = true, wallRim = true, paint, around = [], goalPaint, goalAround = [], goalItem = false, item = false, goalStand = false, robot, carrying = false, missed = false } = {}, size = 48) {
-  const images = [`<img src="${element(wall ? (chosen.wall === "blocks" ? "candidates/wall-blocks" : "wall") : "floor")}" alt="">`];
-  if (wall && wallRim && chosen.wall === "rim") images.push(`<img src="${element("candidates/wall-rim")}" alt="">`);
+  const images = [`<img src="${element(wall ? "wall" : "floor")}" alt="">`];
+  if (wall && wallRim) images.push(`<img src="${element("wall-rim")}" alt="">`);
   if (wall && wallEdge) images.push(`<img src="${element("wall-edge")}" alt="">`);
   if (paint) images.push(appPaint(paint, around));
   // A goal met hides its mark: the paint alone shows that the cell is done.
@@ -65,7 +66,7 @@ function appMap(rows, extras = {}, size = 48, links) {
   const cells = rows.flatMap((row, y) => [...row].map((char, x) => {
     const paint = paintAt(x, y);
     const goal = goalAt(x, y);
-    // Outside the grid counts as a wall: a wall on the bottom row has no edge.
+    // Outside the grid counts as a wall: a wall on the bottom row has no edge, on the top row no rim.
     const floorAt = (nx, ny) => rows[ny]?.[nx] !== undefined && rows[ny][nx] !== "#";
     return appCell({
       wall: char === "#",
