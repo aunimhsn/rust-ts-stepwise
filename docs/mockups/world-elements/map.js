@@ -51,7 +51,9 @@ function appCell({ wall = false, paint, around = [], goalPaint, goalAround = [],
 
 // A map from rows of characters: `#` a wall, `.` a floor, `r` `y` `b` a paint.
 // `extras` adds the goal marks, the items and the robot, keyed by "x,y".
-function appMap(rows, extras = {}, size = 48) {
+// `links`, when given, lists the passages painted by the robot ("x,y x,y"): the stroke joins two
+// cells only there. Without it, the stroke joins every neighbor of the same color.
+function appMap(rows, extras = {}, size = 48, links) {
   const paints = { r: "red", y: "yellow", b: "blue" };
   const offsets = { n: [0, -1], e: [1, 0], s: [0, 1], w: [-1, 0] };
   const paintAt = (x, y) => paints[rows[y]?.[x]];
@@ -63,7 +65,8 @@ function appMap(rows, extras = {}, size = 48) {
     return appCell({
       wall: char === "#",
       paint,
-      around: paint ? sides(x, y, (nx, ny) => paintAt(nx, ny) === paint) : [],
+      around: paint ? sides(x, y, (nx, ny) => paintAt(nx, ny) === paint
+        && (!links || links.includes(`${x},${y} ${nx},${ny}`) || links.includes(`${nx},${ny} ${x},${y}`))) : [],
       // The goal stroke goes on to the goals and to the paints of its color, as the finished drawing would.
       goalAround: goal ? sides(x, y, (nx, ny) => goalAt(nx, ny) === goal || paintAt(nx, ny) === goal) : [],
       ...extras[`${x},${y}`],

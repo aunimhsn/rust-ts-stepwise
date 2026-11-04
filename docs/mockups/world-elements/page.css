@@ -14,6 +14,7 @@ body { margin: 0; background: #2a2d31; color: #e9ecef; font: 14px/1.4 system-ui,
 .page-row { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
 .page-slot > span { display: block; margin-bottom: 6px; color: #adb5bd; font-size: 12px; }
 .page-slot code { color: #dee2e6; }
+.page-code { margin: 0; padding: 10px 14px; background: #1b1d20; border-radius: 4px; color: #dee2e6; font: 13px/1.5 ui-monospace, monospace; }
 .page-warning { margin: 0; padding: 10px 16px; background: #8a6a10; color: #fff; }
 .page-filters { position: absolute; width: 0; height: 0; }
 
