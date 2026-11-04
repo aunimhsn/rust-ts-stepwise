@@ -25,9 +25,10 @@ A small language of our own. It reads like Python, but it isn't Python: `else if
 ```
 # Paint a square of side 3
 function paint_side(length):
+    start_painting(red)
     repeat length:
-        paint(red)
         forward()
+    stop_painting()
 
 let sides = 0
 while sides < 4:
@@ -65,7 +66,7 @@ else:
 | Whole number | `0`, `42`, `-7` | 64-bit; a result beyond that range stops the program with an error. No decimal numbers in version 1. |
 | Boolean | `true`, `false` | The only values a condition accepts: `if 3:` is an error, there is no "truthy" value. |
 | Text | `"I am stuck"` | Double quotes, on one line; `\"`, `\\` and `\n` inside. Used by `print`. |
-| Color | `red`, `yellow`, `green`, `blue`, `purple` | The five paints of the world (their final names and shades come from the sheet of the world elements). |
+| Color | `red`, `yellow`, `blue` | The three paints of the world: enough for the sensors to tell three cases apart (four with an unpainted cell), few enough to read at a glance and to stay distinct with a red-green color blindness. Their shades come from the sheet of the world elements. |
 
 Lists and decimal numbers come later (see the [backlog](docs/backlog.md)).
 
@@ -110,14 +111,16 @@ Lists and decimal numbers come later (see the [backlog](docs/backlog.md)).
 
 ### Built-in functions
 
-The robot stands on one cell and faces one of the four directions. It can carry one item at a time.
+The robot stands on one cell and faces one of the four directions. It can carry one item at a time. It holds a brush and an eraser, each up or down, as modes: once down, the tool works on every cell the robot moves into, until it is lifted. At most one of them is down: putting one down lifts the other. Turning on its cell paints or erases nothing more.
 
 | Category | Function | What it does | Error when |
 |---|---|---|---|
 | Move | `forward()` | Moves one cell in front. | A wall or the edge of the map is in front: the robot bumps and the program stops. |
 | Move | `turn_left()`, `turn_right()` | Turns a quarter turn on its cell. | Never. |
-| Paint | `paint(color)` | Paints its cell with the color, over any paint already there. | Never. |
-| Paint | `erase()` | Removes the paint of its cell. | Never (an unpainted cell stays unpainted). |
+| Paint | `start_painting(color)` | Puts the brush down with the color: paints its cell at once, then every cell it moves into and the passage it crosses, over any paint already there. Called while painting, it changes the color. | Never. |
+| Paint | `stop_painting()` | Lifts the brush: the robot moves on without painting. | Never (nothing happens when the brush is already up). |
+| Paint | `start_erasing()` | Puts the eraser down: removes the paint of its cell at once, then of every cell it moves into, with the painted passages of these cells. | Never (an unpainted cell stays unpainted). |
+| Paint | `stop_erasing()` | Lifts the eraser. | Never (nothing happens when the eraser is already up). |
 | Carry | `pick_up()` | Picks up the item of its cell. | No item on the cell, or the robot already carries one. |
 | Carry | `drop()` | Drops the item it carries on its cell. | The robot carries nothing, or the cell already has an item. |
 | Sense | `front_is_clear()`, `left_is_clear()`, `right_is_clear()` | `true` when the cell in that direction is a floor cell of the map. | Never. |
@@ -125,6 +128,7 @@ The robot stands on one cell and faces one of the four directions. It can carry 
 | Sense | `front_is(color)`, `left_is(color)`, `right_is(color)` | `true` when the cell in that direction has that paint (`false` for a wall). | Never. |
 | Sense | `item_here()`, `item_in_front()` | `true` when its cell, or the cell in front, has an item. | Never. |
 | Sense | `is_carrying()` | `true` when the robot carries an item. | Never. |
+| Sense | `is_painting()`, `is_erasing()` | `true` when the brush, or the eraser, is down. | Never. |
 | Write | `print(value, …)` | Writes its values to the console, separated by spaces, on one line. | Never. |
 
 ### Checks before running
@@ -161,7 +165,7 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
   |---|---|---|
   | First steps | `forward()`, `turn_left()`, `turn_right()`, the order of the instructions | 3 |
   | Repeat | `repeat` and its block, the indentation | 3 |
-  | Paint | `paint()`, `erase()`, the colors | 2 |
+  | Paint | the brush and the eraser as modes (`start_painting()`, `stop_painting()`, `start_erasing()`, `stop_erasing()`), the colors | 2 |
   | Decide | `if`, `else if`, `else`, the sensors | 3 |
   | Loop until | `while`, `not`, `break` | 2 |
   | Carry | `pick_up()`, `drop()`, `is_carrying()` | 2 |
@@ -192,7 +196,7 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
 **Ctrl+Space** in the editor opens a menu at the cursor, to find a command without knowing its name by heart:
 
 - the commands grouped by category: **Move**, **Paint**, **Carry**, **Sense**, **Write** (the built-in functions), **Colors**, **Control** (`if`, `else if`, `else`, `while`, `repeat`, `break`), **Variables** (`let`), **Functions** (`function`, `return`), and **Your names** (the variables and functions of the program that can be used at the cursor);
-- typing filters the list (`pai` keeps `paint()`); the arrow keys move in it, Enter or a click inserts the command, Escape closes it;
+- typing filters the list (`paint` keeps `start_painting()`, `stop_painting()` and `is_painting()`); the arrow keys move in it, Enter or a click inserts the command, Escape closes it;
 - next to the chosen command, its one-line description and an example from the manual;
 - a statement that opens a block (`if`, `while`, `repeat`, `function`) is inserted with its `:` and its first indented line, the cursor on what to fill in (`if |:`);
 - the same menu opens by itself after two letters of a name, and only on Ctrl+Space when the setting **Suggest while typing** is off.
@@ -261,7 +265,8 @@ The interface is in English. Every text of the interface, the error messages and
 ## Map
 
 - A grid of cells, at most 16 columns and 12 rows. The coordinates start at the top left cell, `x` growing to the right and `y` downward.
-- A cell is a **wall** or a **floor**. A floor cell may hold one paint (one of the five colors) and one item.
+- A cell is a **wall** or a **floor**. A floor cell may hold one paint (one of the three colors) and one item.
+- The paint also lies on the **passages** between two cells: a passage is painted when the robot moves from one cell to the other with its brush down, and loses its paint when the eraser passes on one of its cells. The map draws the paint as a stroke through the centers of the cells, joining two cells only along a painted passage, so that the stroke follows the path of the robot; it stops, rounded, in the middle of the cells at its ends. The sensors and the goals only look at the cells.
 - One kind of item in version 1 (its look comes from the sheet of the world elements).
 - The goal cells of a level are marked on the map (where to stand, which color where, where to put the items), so that the learner sees the target before writing code.
 - Outside the grid counts as a wall.
