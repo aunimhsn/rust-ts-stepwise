@@ -1,14 +1,13 @@
-// The tabs of the page and its sections. The address keeps the choices (?paint=stroke&width=34…).
+// The tabs of the page and its sections. The address keeps the choices (?goalPaint=ghost&vision=…).
 
 // One group of tabs per open decision; `fallback` is the choice shown by default.
 // A group with a `range` instead of `options` is a slider, for a value tuned by eye.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(THEMES).map(([key, theme]) => [key, theme.title])), fallback: Object.keys(THEMES)[0] },
-  paint: { label: "Paint", options: { cell: "Per cell", full: "Full cell", joined: "Joined", seams: "Joined + seams", stroke: "Stroke" }, fallback: "stroke" },
+  // The goal "this color here", in the shape of the stroke to paint.
+  goalPaint: { label: "Goal paint", options: { ghost: "Ghost", outline: "Outline" }, fallback: "ghost" },
   // How the color under the robot stays visible when the robot covers the stroke.
   onPaint: { label: "Robot on paint", options: { hidden: "Hidden", sensor: "Sensor", front: "Sensor, item in front", visor: "Visor", halo: "Halo" }, fallback: "visor" },
-  // The width of the stroke, out of 64 for a cell; the robot is 42 wide with its tracks, 32 without.
-  width: { label: "Stroke width", range: { min: 16, max: 64, step: 1 }, fallback: "34" },
   vision: { label: "Vision", options: { normal: "Normal", protanopia: "Protanopia", deuteranopia: "Deuteranopia", tritanopia: "Tritanopia" }, fallback: "normal" },
 };
 
