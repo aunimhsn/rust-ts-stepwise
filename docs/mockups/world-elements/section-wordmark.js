@@ -27,7 +27,7 @@ function appWordmark(fontSize, ink) {
   const middleOfHead = (1 - (HEAD_TOP + HEAD_BOTTOM) / 2) * size;
   const lift = middleOfText - middleOfHead + NAME_OFFSET * fontSize;
   return `<div style="color:${ink};font:600 ${fontSize}px/1.4 Fredoka, sans-serif;white-space:nowrap">
-    <img src="${element("logo")}" width="${size.toFixed(1)}" height="${size.toFixed(1)}" alt="" style="vertical-align:${lift.toFixed(2)}px;margin-right:${(fontSize * NAME_GAP - HEAD_RIGHT_MARGIN * size).toFixed(1)}px">stepwise</div>`;
+    <img src="${logoFile()}" width="${size.toFixed(1)}" height="${size.toFixed(1)}" alt="" style="vertical-align:${lift.toFixed(2)}px;margin-right:${(fontSize * NAME_GAP - HEAD_RIGHT_MARGIN * size).toFixed(1)}px">stepwise</div>`;
 }
 
 SECTIONS.push(["Name", () => `
