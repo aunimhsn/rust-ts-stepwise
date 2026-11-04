@@ -8,6 +8,16 @@ const element = name => `world-elements/${chosen.theme}/${name}.svg`;
 function appPaint(color, around = []) {
   if (chosen.paint === "cell") return `<img src="${element(`paint-${color}`)}" alt="">`;
   const has = direction => around.includes(direction);
+  const shade = THEMES[chosen.theme].paints[color];
+  if (chosen.paint === "stroke") {
+    // A brush stroke through the centers: it crosses the edge to a painted neighbor of the same
+    // color, and stops in the middle of the cell, rounded, at the ends of the painted area.
+    const half = Number(chosen.width) / 2;
+    const ends = { n: [32, 0], e: [64, 32], s: [32, 64], w: [0, 32] };
+    const lines = Object.entries(ends).filter(([direction]) => has(direction)).map(([, [x, y]]) =>
+      `<path d="M32 32 L${x} ${y}" stroke="${shade}" stroke-width="${half * 2}"/>`).join("");
+    return `<svg viewBox="0 0 64 64" aria-hidden="true">${lines}<circle cx="32" cy="32" r="${half}" fill="${shade}"/></svg>`;
+  }
   const shapes = chosen.paint === "full" ? [[0, 0, 64, 64]] : [
     [5, 5, 54, 54, 7],
     ...[["n", 5, 0, 54, 12], ["s", 5, 52, 54, 12], ["w", 0, 5, 12, 54], ["e", 52, 5, 12, 54]]
@@ -15,7 +25,6 @@ function appPaint(color, around = []) {
     ...[["nw", 0, 0], ["ne", 52, 0], ["se", 52, 52], ["sw", 0, 52]]
       .filter(([corner]) => has(corner) && has(corner[0]) && has(corner[1])).map(([, x, y]) => [x, y, 12, 12]),
   ];
-  const shade = THEMES[chosen.theme].paints[color];
   // "Joined + seams": the edges between two painted cells stay visible, faintly, to count them.
   // Each cell draws half of the line, on its own side of the edge.
   const seams = chosen.paint !== "seams" ? "" : [["n", "M0 0 L64 0"], ["e", "M64 0 L64 64"], ["s", "M0 64 L64 64"], ["w", "M0 0 L0 64"]]
