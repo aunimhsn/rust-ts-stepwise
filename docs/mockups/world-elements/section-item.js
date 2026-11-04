@@ -20,9 +20,9 @@ const ITEM_EXTRAS = {
 };
 
 SECTIONS.push(["Item", () => `
-  <p>The tabs <b>Item</b> and <b>Item color</b> change the item; its slot (the goal "put an item here") follows its shape. On the map: an item, an empty slot, a full slot, the robot carrying an item in three directions, and items on the three paints.</p>
+  <p>A hexagon, its slot (the goal "put an item here") of the same shape, and the robot carrying it in its bay; the tab <b>Item color</b> changes its color. On the map: an item, an empty slot, a full slot, the robot carrying an item in three directions, and items on the three paints.</p>
   <div class="page-row">${appMap(ITEM_ROWS, ITEM_EXTRAS, 56)}</div>
-  <h3>Carrying an item, in the four directions (tab <b>Carry</b>)</h3>
+  <h3>Carrying an item, in the four directions</h3>
   <div class="page-row" id="carry-row">${[64, 32].map(size => `<div class="page-row" style="gap:8px">${["north", "east", "south", "west"].map(robot =>
     appCell({ robot, carrying: true }, size)).join("")}</div>`).join("")}</div>
   <div class="page-row" style="margin-top:16px">${PAINTS_VISIONS.map(vision => `

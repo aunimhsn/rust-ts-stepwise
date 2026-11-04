@@ -5,9 +5,9 @@ const element = name => `world-elements/${chosen.theme}/${name}.svg`;
 // The shade of a paint, as its group of tabs says.
 const paintShade = color => PAINT_SHADES[color];
 
-// The item and its slot, as the tabs "Item" and "Item color" say.
-const appItem = () => `<svg viewBox="0 0 64 64" aria-hidden="true">${ITEM_SHAPES[chosen.itemShape].item(ITEM_COLORS[chosen.itemColor])}</svg>`;
-const appItemSlot = () => `<svg viewBox="0 0 64 64" aria-hidden="true">${ITEM_SHAPES[chosen.itemShape].slot}</svg>`;
+// The item and its slot, in the color of the "Item color" tab.
+const appItem = () => `<svg viewBox="0 0 64 64" aria-hidden="true">${ITEM_SHAPES.hexagon.item(ITEM_COLORS[chosen.itemColor])}</svg>`;
+const appItemSlot = () => `<svg viewBox="0 0 64 64" aria-hidden="true">${ITEM_SHAPES.hexagon.slot}</svg>`;
 
 // The width of the paint stroke, out of 64 for a cell (the robot is 42 wide with its tracks).
 const STROKE = 28;
@@ -34,7 +34,7 @@ function appGoalPaint(color, around = []) {
 }
 
 // A cell: its ground (floor or wall), then the paint, the goal marks, the item and the robot.
-// `robot` is a direction (north, east, south, west), `carrying` adds the item on its back.
+// `robot` is a direction (north, east, south, west), `carrying` adds the item in its bay.
 // `around` and `goalAround` list the sides where the stroke of the paint and of the goal go on.
 // `missed` marks a goal not met once the program has ended.
 // `wallEdge` adds the darker edge at the bottom of a wall above a floor cell, and `wallRim` the light
@@ -50,16 +50,9 @@ function appCell({ wall = false, wallEdge = true, wallRim = true, paint, around 
   if (item) images.push(appItem());
   if (goalStand) images.push(`<img src="${element("goal-stand")}" alt="">`);
   // The robot covers the paint of its cell: the learner follows it through the code.
-  // The item it carries lies on its back, smaller, and turns with it.
-  // Held in front, the item overlaps the front of the robot a little; the larger, the further out.
-  // With grippers, two arms come out of the front corners of the robot and hold it.
-  const held = ["front", "grippers"].includes(chosen.carry);
-  const front = held ? ` style="transform: translateY(${(17 - chosen.frontSize * 0.1 - 32) / 64 * 100}%) scale(${chosen.frontSize / 100})"` : "";
-  const carried = carrying ? `<div class="is-carried is-${held ? "front" : chosen.carry}"${front}>${appItem()}</div>` : "";
-  const reach = 9 + chosen.frontSize * 0.07;
-  const grippers = carrying && chosen.carry === "grippers" ? `<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M21 17 L21 ${20 - reach} Q21 ${17 - reach} 25 ${17 - reach}
-    M43 17 L43 ${20 - reach} Q43 ${17 - reach} 39 ${17 - reach}" fill="none" stroke="${INK}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>` : "";
-  if (robot) images.push(`<div class="app-robot is-${robot}"><img src="${element("robot")}" alt="">${carried}${grippers}</div>`);
+  // The item it carries lies in its bay, the light panel at its back, and turns with it.
+  const carried = carrying ? `<div class="is-carried">${appItem()}</div>` : "";
+  if (robot) images.push(`<div class="app-robot is-${robot}"><img src="${element("robot")}" alt="">${carried}</div>`);
   // A goal not met: a small red flag planted in the corner of its cell, over the robot. Its red,
   // distinct from the red paint, may follow the error color of the design system (step 4).
   if (missed) images.push(`<img src="${element("goal-missed")}" alt="">`);

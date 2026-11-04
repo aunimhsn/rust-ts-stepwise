@@ -4,12 +4,7 @@
 // A group with a `range` instead of `options` is a slider, for a value tuned by eye.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(THEMES).map(([key, theme]) => [key, theme.title])), fallback: Object.keys(THEMES)[0] },
-  // The item: its shape (with its slot) and its color.
-  itemShape: { label: "Item", options: { hexagon: "Hexagon", cell: "Energy cell", gem: "Gem", orb: "Orb" }, fallback: "hexagon" },
-  // How the robot carries the item, so that its eyes, and so its direction, stay visible.
-  carry: { label: "Carry", options: { back: "On its back", bay: "In the bay", front: "Held in front", grippers: "Front, with grippers" }, fallback: "grippers" },
-  // The size of the item held in front (with or without grippers), in % of the item on the floor.
-  frontSize: { label: "Front size", range: { min: 40, max: 75, step: 1 }, fallback: "58" },
+  // The color of the item, a hexagon carried in the bay of the robot.
   itemColor: { label: "Item color", options: { teal: "Teal", ivory: "Ivory", violet: "Violet" }, fallback: "teal" },
   vision: { label: "Vision", options: { normal: "Normal", protanopia: "Protanopia", deuteranopia: "Deuteranopia", tritanopia: "Tritanopia" }, fallback: "normal" },
 };
