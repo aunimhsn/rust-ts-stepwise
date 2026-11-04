@@ -1,14 +1,11 @@
-// The tabs of the page and its sections. The address keeps the choices (?goalPaint=ghost&vision=…).
+// The tabs of the page and its sections. The address keeps the choices (?goalStand=slot&vision=…).
 
 // One group of tabs per open decision; `fallback` is the choice shown by default.
 // A group with a `range` instead of `options` is a slider, for a value tuned by eye.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(THEMES).map(([key, theme]) => [key, theme.title])), fallback: Object.keys(THEMES)[0] },
-  // The goal "this color here", in the shape of the stroke to paint.
-  goalPaint: { label: "Goal paint", options: { ghost: "Ghost", outline: "Outline", dashed: "Dashed", hatched: "Hatched" }, fallback: "ghost" },
-  // The goal "stand here" and "put an item here": candidate files in daylight/candidates/.
-  goalStand: { label: "Goal stand", options: { corners: "Corners", target: "Target", dashed: "Dashed", footprint: "Footprint" }, fallback: "corners" },
-  goalItem: { label: "Goal item", options: { dashed: "Dashed", ghost: "Ghost", slot: "Slot", outline: "Outline" }, fallback: "dashed" },
+  // The goal "stand here": candidate files in daylight/candidates/.
+  goalStand: { label: "Goal stand", options: { corners: "Corners", target: "Target", slot: "Slot" }, fallback: "slot" },
   vision: { label: "Vision", options: { normal: "Normal", protanopia: "Protanopia", deuteranopia: "Deuteranopia", tritanopia: "Tritanopia" }, fallback: "normal" },
 };
 

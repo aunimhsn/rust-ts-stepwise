@@ -19,25 +19,11 @@ function appPaint(color, around = []) {
   return `<svg viewBox="0 0 64 64" aria-hidden="true">${strokeShape(around, STROKE, THEMES[chosen.theme].paints[color])}</svg>`;
 }
 
-// The goal "this color here", in the shape of the stroke to paint, as the "Goal paint" tab says:
-// the stroke in transparency (ghost), its outline, its outline broken by stripes (dashed), or the
-// stroke in diagonal stripes (hatched). A mask cuts the shape, so that a paint already on the cell
-// stays visible through it. The stripes repeat every 8 units, so that they meet from cell to cell.
-let maskCount = 0;
+// The goal "this color here": the stroke to paint, in transparency. A paint already on the cell
+// stays visible through it.
 function appGoalPaint(color, around = []) {
   const shade = THEMES[chosen.theme].paints[color];
-  if (chosen.goalPaint === "ghost") {
-    return `<svg viewBox="0 0 64 64" aria-hidden="true"><g opacity=".35">${strokeShape(around, STROKE, shade)}</g></svg>`;
-  }
-  const id = `goal-mask-${maskCount += 1}`;
-  const ring = `${strokeShape(around, STROKE + 2, "#fff")}${strokeShape(around, STROKE - 5, "#000")}`;
-  const shape = chosen.goalPaint === "hatched" ? strokeShape(around, STROKE, "#fff") : ring;
-  const fill = chosen.goalPaint === "outline" ? shade : `url(#${id}-stripes)`;
-  return `<svg viewBox="0 0 64 64" aria-hidden="true">
-    <pattern id="${id}-stripes" patternUnits="userSpaceOnUse" width="8" height="8">
-      <path d="M-2 2 L2 -2 M0 8 L8 0 M6 10 L10 6" stroke="${shade}" stroke-width="${chosen.goalPaint === "hatched" ? 2.5 : 3.5}"/></pattern>
-    <mask id="${id}" maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="64">${shape}</mask>
-    <rect width="64" height="64" fill="${fill}" mask="url(#${id})"/></svg>`;
+  return `<svg viewBox="0 0 64 64" aria-hidden="true"><g opacity=".35">${strokeShape(around, STROKE, shade)}</g></svg>`;
 }
 
 // A cell: its ground (floor or wall), then the paint, the goal marks, the item and the robot.
@@ -48,7 +34,7 @@ function appCell({ wall = false, paint, around = [], goalPaint, goalAround = [],
   if (paint) images.push(appPaint(paint, around));
   // A goal met hides its mark: the paint alone shows that the cell is done.
   if (goalPaint && goalPaint !== paint) images.push(appGoalPaint(goalPaint, goalAround));
-  for (const [shown, name] of [[goalItem, `candidates/goal-item-${chosen.goalItem}`], [item, "item"], [goalStand, `candidates/goal-stand-${chosen.goalStand}`]]) {
+  for (const [shown, name] of [[goalItem, "goal-item"], [item, "item"], [goalStand, `candidates/goal-stand-${chosen.goalStand}`]]) {
     if (shown) images.push(`<img src="${element(name)}" alt="">`);
   }
   // The robot covers the paint of its cell: the learner follows it through the code.

@@ -37,7 +37,7 @@ const GOAL_STAGES = [
 ];
 
 SECTIONS.push(["Goal marks in a level", () => `
-  <p>Paint the blue L, put the item on its mark, then stand in the bottom left corner. The tabs <b>Goal paint</b>, <b>Goal stand</b> and <b>Goal item</b> change the marks.</p>
+  <p>Paint the blue L, put the item on its mark, then stand in the bottom left corner. The paint to do is a ghost of the stroke, the item goes in a slot; the tab <b>Goal stand</b> changes the mark where to stand.</p>
   <div class="page-row">${GOAL_STAGES.map(({ title, painted, links, done, extras }) => `
     <div class="page-slot"><span>${title}</span>${appMap(paintedRows(painted), goalExtras(done, extras), 48, links)}</div>`).join("")}
   </div>`]);
