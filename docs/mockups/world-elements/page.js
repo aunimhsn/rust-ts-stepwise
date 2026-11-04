@@ -4,8 +4,6 @@
 // A group with a `range` instead of `options` is a slider, for a value tuned by eye.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(THEMES).map(([key, theme]) => [key, theme.title])), fallback: Object.keys(THEMES)[0] },
-  // The color of the item, a hexagon carried in the bay of the robot.
-  itemColor: { label: "Item color", options: { teal: "Teal", ivory: "Ivory", violet: "Violet" }, fallback: "teal" },
   vision: { label: "Vision", options: { normal: "Normal", protanopia: "Protanopia", deuteranopia: "Deuteranopia", tritanopia: "Tritanopia" }, fallback: "normal" },
 };
 

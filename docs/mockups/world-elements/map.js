@@ -2,12 +2,8 @@
 
 const element = name => `world-elements/${chosen.theme}/${name}.svg`;
 
-// The shade of a paint, as its group of tabs says.
+// The shade of a paint, decided in step 1b (themes.js).
 const paintShade = color => PAINT_SHADES[color];
-
-// The item and its slot, in the color of the "Item color" tab.
-const appItem = () => `<svg viewBox="0 0 64 64" aria-hidden="true">${ITEM_SHAPES.hexagon.item(ITEM_COLORS[chosen.itemColor])}</svg>`;
-const appItemSlot = () => `<svg viewBox="0 0 64 64" aria-hidden="true">${ITEM_SHAPES.hexagon.slot}</svg>`;
 
 // The width of the paint stroke, out of 64 for a cell (the robot is 42 wide with its tracks).
 const STROKE = 28;
@@ -46,12 +42,12 @@ function appCell({ wall = false, wallEdge = true, wallRim = true, paint, around 
   if (paint) images.push(appPaint(paint, around));
   // A goal met hides its mark: the paint alone shows that the cell is done.
   if (goalPaint && goalPaint !== paint) images.push(appGoalPaint(goalPaint, goalAround));
-  if (goalItem) images.push(appItemSlot());
-  if (item) images.push(appItem());
-  if (goalStand) images.push(`<img src="${element("goal-stand")}" alt="">`);
+  for (const [shown, name] of [[goalItem, "goal-item"], [item, "item"], [goalStand, "goal-stand"]]) {
+    if (shown) images.push(`<img src="${element(name)}" alt="">`);
+  }
   // The robot covers the paint of its cell: the learner follows it through the code.
   // The item it carries lies in its bay, the light panel at its back, and turns with it.
-  const carried = carrying ? `<div class="is-carried">${appItem()}</div>` : "";
+  const carried = carrying ? `<img class="is-carried" src="${element("item")}" alt="">` : "";
   if (robot) images.push(`<div class="app-robot is-${robot}"><img src="${element("robot")}" alt="">${carried}</div>`);
   // A goal not met: a small red flag planted in the corner of its cell, over the robot. Its red,
   // distinct from the red paint, may follow the error color of the design system (step 4).
