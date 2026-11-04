@@ -21,7 +21,7 @@ const PAINTS_EXTRAS = {
 const PAINTS_VISIONS = ["normal", "protanopia", "deuteranopia", "tritanopia"];
 
 SECTIONS.push(["Paints", () => `
-  <p>The groups <b>red</b>, <b>yellow</b> and <b>blue</b> change the shade of each paint; the maps show it in the four visions at once. The three paints must stay apart in each one, the red apart from the red flag, the yellow visible on the floor.</p>
+  <p>Scarlet, bright amber and cobalt: the red darker and the yellow lighter, so that they stay apart in a red-green color blindness. The maps show them in the four visions at once.</p>
   ${appSwatches()}
   <div class="page-row" style="margin-top:16px">${PAINTS_VISIONS.map(vision => `
     <div class="page-slot is-vision-${vision}"><span>${vision[0].toUpperCase() + vision.slice(1)}</span>${appMap(PAINTS_MAP, PAINTS_EXTRAS, 32)}</div>`).join("")}

@@ -1,15 +1,12 @@
 // The tabs of the page and its sections. The address keeps the choices (?vision=…).
 
-const SHADE_LABELS = { bright: "Bright amber" };
-
 // One group of tabs per open decision; `fallback` is the choice shown by default.
 // A group with a `range` instead of `options` is a slider, for a value tuned by eye.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(THEMES).map(([key, theme]) => [key, theme.title])), fallback: Object.keys(THEMES)[0] },
-  // The shade of each paint (a group with one shade is decided, and hidden).
-  ...Object.fromEntries(Object.entries(PAINT_SHADES).map(([color, shades]) => [color, {
-    label: color, options: Object.fromEntries(Object.keys(shades).map(name => [name, SHADE_LABELS[name] ?? name[0].toUpperCase() + name.slice(1)])), fallback: Object.keys(shades)[0],
-  }])),
+  // The item: its shape (with its slot) and its color.
+  itemShape: { label: "Item", options: { hexagon: "Hexagon", cell: "Energy cell", gem: "Gem", orb: "Orb" }, fallback: "hexagon" },
+  itemColor: { label: "Item color", options: { teal: "Teal", ivory: "Ivory", violet: "Violet" }, fallback: "teal" },
   vision: { label: "Vision", options: { normal: "Normal", protanopia: "Protanopia", deuteranopia: "Deuteranopia", tritanopia: "Tritanopia" }, fallback: "normal" },
 };
 
