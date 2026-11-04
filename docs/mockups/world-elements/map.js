@@ -48,7 +48,7 @@ function appCell({ wall = false, wallEdge = true, wallRim = true, paint, around 
   // The robot covers the paint of its cell: the learner follows it through the code.
   // The item it carries lies in its bay, the light panel at its back, and turns with it.
   const carried = carrying ? `<img class="is-carried" src="${element("item")}" alt="">` : "";
-  if (robot) images.push(`<div class="app-robot is-${robot}"><img src="${element("robot")}" alt="">${carried}</div>`);
+  if (robot) images.push(`<div class="app-robot is-${robot}"><img src="${element(`candidates/robot-${chosen.grippers}`)}" alt="">${carried}</div>`);
   // A goal not met: a small red flag planted in the corner of its cell, over the robot. Its red,
   // distinct from the red paint, may follow the error color of the design system (step 4).
   if (missed) images.push(`<img src="${element("goal-missed")}" alt="">`);

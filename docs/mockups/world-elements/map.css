@@ -2,8 +2,8 @@
 .app-cell { position: relative; width: var(--cell, 48px); height: var(--cell, 48px); }
 .app-cell img, .app-cell svg, .app-robot, .is-carried { position: absolute; inset: 0; width: 100%; height: 100%; }
 /* The item carried by the robot, in its bay: the light panel at its back (out of 64: centered at
-   32, 40, at 38 %). Step 1b enlarges the bay with the robot. */
-.is-carried { transform: translateY(12.5%) scale(.38); }
+   32, 39.5, at 50 %). */
+.is-carried { transform: translateY(11.7%) scale(.5); }
 .app-cell .is-east { transform: rotate(90deg); }
 .app-cell .is-south { transform: rotate(180deg); }
 .app-cell .is-west { transform: rotate(270deg); }
