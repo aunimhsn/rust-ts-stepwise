@@ -32,5 +32,5 @@ const missedStages = () => [
 SECTIONS.push(["Goals not met", () => `
   <p>When the program ends without meeting every goal, the cells of the goals not met are marked. The tab <b>Goal not met</b> changes the mark. Its color is a stand-in: the error color comes with the design system (step 4).</p>
   <div class="page-row">${missedStages().map(({ title, text, painted, links, done, extras }) => `
-    <div class="page-slot"><span>${title}</span>${appMap(paintedRows(painted), goalExtras(done, extras), 48, links)}<span style="margin-top:6px;max-width:336px">${text}</span></div>`).join("")}
+    <div class="page-slot"><span>${title}</span>${appMap(paintedRows(painted), goalExtras(done, extras), 48, links)}<div style="height:12px"></div>${appMap(paintedRows(painted), goalExtras(done, extras), 32, links)}<span style="margin-top:6px;max-width:336px">At 48 and 32 px. ${text}</span></div>`).join("")}
   </div>`]);

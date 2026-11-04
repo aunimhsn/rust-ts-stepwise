@@ -27,13 +27,22 @@ function appGoalPaint(color, around = []) {
 }
 
 // The mark of a goal not met, over everything else on its cell, as the "Goal not met" tab says:
-// a frame, a badge in the corner, a frame that pulses, or a frame with the other cells dimmed.
+// a frame, a badge in the corner with "!" or "?", or a small flag planted in the corner, an object
+// of the world rather than an alert of the application.
 // Its shade, distinct from the red paint, waits for the error color of the design system (step 4).
 const MISSED = "#c2255c";
 function appMissed() {
+  const badge = sign => `<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="51" cy="13" r="11" fill="${MISSED}" stroke="#fff" stroke-width="2"/>${sign}</svg>`;
   if (chosen.goalMissed === "badge") {
-    return `<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="51" cy="13" r="10" fill="${MISSED}" stroke="#fff" stroke-width="2"/>
-      <path d="M51 7.5 L51 14" stroke="#fff" stroke-width="3" stroke-linecap="round"/><circle cx="51" cy="18.5" r="1.8" fill="#fff"/></svg>`;
+    return badge(`<path d="M51 7 L51 14" stroke="#fff" stroke-width="3" stroke-linecap="round"/><circle cx="51" cy="19" r="1.9" fill="#fff"/>`);
+  }
+  if (chosen.goalMissed === "question") {
+    return badge(`<path d="M47.4 9.6 A3.8 3.8 0 1 1 52.6 13.2 Q51 14 51 15.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/><circle cx="51" cy="19.3" r="1.8" fill="#fff"/>`);
+  }
+  if (chosen.goalMissed === "flag") {
+    return `<svg viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="47" cy="27" rx="4" ry="1.6" fill="#222935" opacity=".3"/>
+      <path d="M47 27 L47 4" stroke="#222935" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M47.5 4.5 L60 9 L47.5 13.5 Z" fill="${MISSED}" stroke="#222935" stroke-width="1.2" stroke-linejoin="round"/></svg>`;
   }
   return `<svg viewBox="0 0 64 64" aria-hidden="true"><rect x="3" y="3" width="58" height="58" rx="8" fill="none" stroke="${MISSED}" stroke-width="4"/></svg>`;
 }
@@ -41,9 +50,8 @@ function appMissed() {
 // A cell: its ground (floor or wall), then the paint, the goal marks, the item and the robot.
 // `robot` is a direction (north, east, south, west), `carrying` adds the item on its back.
 // `around` and `goalAround` list the sides where the stroke of the paint and of the goal go on.
-// `missed` marks a goal not met once the program has ended, `dimmed` a cell left in the shade
-// around it (the "Spotlight" choice of the "Goal not met" tab).
-function appCell({ wall = false, paint, around = [], goalPaint, goalAround = [], goalItem = false, item = false, goalStand = false, robot, carrying = false, missed = false, dimmed = false } = {}, size = 48) {
+// `missed` marks a goal not met once the program has ended.
+function appCell({ wall = false, paint, around = [], goalPaint, goalAround = [], goalItem = false, item = false, goalStand = false, robot, carrying = false, missed = false } = {}, size = 48) {
   const images = [`<img src="${element(wall ? "wall" : "floor")}" alt="">`];
   if (paint) images.push(appPaint(paint, around));
   // A goal met hides its mark: the paint alone shows that the cell is done.
@@ -54,8 +62,7 @@ function appCell({ wall = false, paint, around = [], goalPaint, goalAround = [],
   // The robot covers the paint of its cell: the learner follows it through the code.
   if (robot) images.push(`<img class="is-${robot}" src="${element(carrying ? "robot-carrying" : "robot")}" alt="">`);
   if (missed) images.push(appMissed());
-  if (dimmed) images.push(`<svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" fill="#1b2029" opacity=".5"/></svg>`);
-  return `<div class="app-cell${missed ? ` is-missed is-${chosen.goalMissed}` : ""}" style="--cell:${size}px">${images.join("")}</div>`;
+  return `<div class="app-cell" style="--cell:${size}px">${images.join("")}</div>`;
 }
 
 // The passages of a path through the cells, from a list of "x,y" points.
@@ -71,7 +78,6 @@ function appMap(rows, extras = {}, size = 48, links) {
   const paintAt = (x, y) => paints[rows[y]?.[x]];
   const goalAt = (x, y) => extras[`${x},${y}`]?.goalPaint;
   const sides = (x, y, matches) => Object.keys(offsets).filter(side => matches(x + offsets[side][0], y + offsets[side][1]));
-  const spotlight = chosen.goalMissed === "spotlight" && Object.values(extras).some(extra => extra.missed);
   const cells = rows.flatMap((row, y) => [...row].map((char, x) => {
     const paint = paintAt(x, y);
     const goal = goalAt(x, y);
@@ -82,7 +88,6 @@ function appMap(rows, extras = {}, size = 48, links) {
         && (!links || links.includes(`${x},${y} ${nx},${ny}`) || links.includes(`${nx},${ny} ${x},${y}`))) : [],
       // The goal stroke goes on to the goals and to the paints of its color, as the finished drawing would.
       goalAround: goal ? sides(x, y, (nx, ny) => goalAt(nx, ny) === goal || paintAt(nx, ny) === goal) : [],
-      dimmed: spotlight && !extras[`${x},${y}`]?.missed,
       ...extras[`${x},${y}`],
     }, size);
   }));
