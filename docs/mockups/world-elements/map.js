@@ -2,6 +2,9 @@
 
 const element = name => `world-elements/${chosen.theme}/${name}.svg`;
 
+// The shade of a paint, as its group of tabs says.
+const paintShade = color => PAINT_SHADES[color][chosen[color]];
+
 // The width of the paint stroke, out of 64 for a cell (the robot is 42 wide with its tracks).
 const STROKE = 28;
 const SIDES = { n: [32, 0], e: [64, 32], s: [32, 64], w: [0, 32] };
@@ -16,13 +19,13 @@ const strokeShape = (around, width, color) =>
 // The paint of a cell: a brush stroke through the centers, which crosses the edge to a painted
 // neighbor of the same color and stops, rounded, in the middle of the cell at the ends.
 function appPaint(color, around = []) {
-  return `<svg viewBox="0 0 64 64" aria-hidden="true">${strokeShape(around, STROKE, THEMES[chosen.theme].paints[color])}</svg>`;
+  return `<svg viewBox="0 0 64 64" aria-hidden="true">${strokeShape(around, STROKE, paintShade(color))}</svg>`;
 }
 
 // The goal "this color here": the stroke to paint, in transparency. A paint already on the cell
 // stays visible through it.
 function appGoalPaint(color, around = []) {
-  const shade = THEMES[chosen.theme].paints[color];
+  const shade = paintShade(color);
   return `<svg viewBox="0 0 64 64" aria-hidden="true"><g opacity=".35">${strokeShape(around, STROKE, shade)}</g></svg>`;
 }
 
@@ -83,5 +86,15 @@ function appMap(rows, extras = {}, size = 48, links) {
   return `<div class="app-map" style="--columns:${rows[0].length};--cell:${size}px">${cells.join("")}</div>`;
 }
 
-const appSwatches = () => `<div class="page-row">${Object.entries(THEMES[chosen.theme].paints).map(([name, shade]) =>
-  `<span class="app-swatch"><i style="background:${shade}"></i><code>${name}</code> ${shade}</span>`).join("")}</div>`;
+// The contrast ratio of a shade against the floor (WCAG), to check that a paint stands out.
+const luminance = hex => [1, 3, 5].map(index => parseInt(hex.slice(index, index + 2), 16) / 255)
+  .map(value => value <= 0.03928 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4)
+  .reduce((sum, value, index) => sum + value * [0.2126, 0.7152, 0.0722][index], 0);
+const contrast = (first, second) => {
+  const [light, dark] = [luminance(first), luminance(second)].sort((a, b) => b - a);
+  return ((light + 0.05) / (dark + 0.05)).toFixed(1);
+};
+const FLOOR = "#e1e5ea";
+
+const appSwatches = () => `<div class="page-row">${Object.keys(PAINT_SHADES).map(color =>
+  `<span class="app-swatch"><i style="background:${paintShade(color)}"></i><code>${color}</code> ${paintShade(color)} · ${contrast(paintShade(color), FLOOR)}:1 on the floor</span>`).join("")}</div>`;

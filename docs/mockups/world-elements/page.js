@@ -4,6 +4,10 @@
 // A group with a `range` instead of `options` is a slider, for a value tuned by eye.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(THEMES).map(([key, theme]) => [key, theme.title])), fallback: Object.keys(THEMES)[0] },
+  // The shade of each paint.
+  ...Object.fromEntries(Object.entries(PAINT_SHADES).map(([color, shades]) => [color, {
+    label: color, options: Object.fromEntries(Object.keys(shades).map(name => [name, name[0].toUpperCase() + name.slice(1)])), fallback: Object.keys(shades)[0],
+  }])),
   vision: { label: "Vision", options: { normal: "Normal", protanopia: "Protanopia", deuteranopia: "Deuteranopia", tritanopia: "Tritanopia" }, fallback: "normal" },
 };
 
