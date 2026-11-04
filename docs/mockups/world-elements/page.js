@@ -4,9 +4,6 @@
 // A group with a `range` instead of `options` is a slider, for a value tuned by eye.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(THEMES).map(([key, theme]) => [key, theme.title])), fallback: Object.keys(THEMES)[0] },
-  // The robot at the end of a run: lit in yellow when every goal is met, and how it looks when not.
-  success: { label: "Success", options: { glow: "Glow and eyes", eyes: "Eyes only", halo: "Halo only" }, fallback: "glow" },
-  failure: { label: "Failure", options: { dim: "Dim eyes", flat: "Flat eyes", unchanged: "Unchanged" }, fallback: "flat" },
   vision: { label: "Vision", options: { normal: "Normal", protanopia: "Protanopia", deuteranopia: "Deuteranopia", tritanopia: "Tritanopia" }, fallback: "normal" },
 };
 

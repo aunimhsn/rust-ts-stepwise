@@ -1,5 +1,5 @@
-// Section: the robot at the end of a run, lit in yellow on success; on failure, the flags of the
-// goals not met. The level is the one of section-goal-marks.js; the motion comes in step 3.
+// Section: the robot at the end of a run, its eyes lit in yellow on success, dimmed on failure with
+// the flags of the goals not met. The level is the one of section-goal-marks.js; the motion comes in step 3.
 
 const endStages = () => [
   {
@@ -19,7 +19,7 @@ const endStages = () => [
 ];
 
 SECTIONS.push(["End of a run", () => `
-  <p>The robot lights up in yellow when every goal is met (it will hop too, in step 3); when a goal isn't met, it shakes its head and the flags appear. The tabs <b>Success</b> and <b>Failure</b> change its look at rest.</p>
+  <p>When every goal is met, the eyes of the robot light up in yellow (it will hop too, in step 3); when a goal isn't met, they dim, it shakes its head and the flags appear.</p>
   <div class="page-row">${endStages().map(({ title, painted, links, done, extras }) => `
     <div class="page-slot"><span>${title}</span>${appMap(paintedRows(painted), goalExtras(done, extras), 64, links)}<div style="height:12px"></div>${appMap(paintedRows(painted), goalExtras(done, extras), 32, links)}</div>`).join("")}
     <div class="page-slot"><span>Alone</span><div class="page-row" style="gap:8px">${appCell({ robot: "north", lit: "success" }, 96)}${appCell({ robot: "north", lit: "failure" }, 96)}</div></div>

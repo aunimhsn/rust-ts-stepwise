@@ -29,29 +29,10 @@ function appGoalPaint(color, around = []) {
   return `<svg viewBox="0 0 64 64" aria-hidden="true"><g opacity=".35">${strokeShape(around, STROKE, shade)}</g></svg>`;
 }
 
-// The robot at the end of a run (`lit`): "success" when every goal is met, "failure" when not, as
-// the tabs "Success" and "Failure" say. The eyes are drawn over those of robot.svg.
-const LIGHT = "#ffd23f";
-const EYES = [26.5, 37.5];
-function appLit(lit) {
-  if (lit === "success" && chosen.success !== "halo") {
-    return `<svg viewBox="0 0 64 64" aria-hidden="true">${EYES.map(x => `<circle cx="${x}" cy="23.5" r="3.4" fill="${LIGHT}"/>`).join("")}</svg>`;
-  }
-  if (lit === "failure" && chosen.failure !== "unchanged") {
-    const eye = x => chosen.failure === "dim"
-      ? `<circle cx="${x}" cy="23.5" r="2.8" fill="#7d8798"/>`
-      : `<circle cx="${x}" cy="23.5" r="3.2" fill="${"#222935"}"/><path d="M${x - 2.6} 24.5 L${x + 2.6} 24.5" stroke="#7d8798" stroke-width="2.2" stroke-linecap="round"/>`;
-    return `<svg viewBox="0 0 64 64" aria-hidden="true">${EYES.map(eye).join("")}</svg>`;
-  }
-  return "";
-}
-const appHalo = () => `<svg viewBox="0 0 64 64" aria-hidden="true" style="overflow:visible"><defs><radialGradient id="halo">
-  <stop offset=".4" stop-color="${LIGHT}" stop-opacity=".8"/><stop offset="1" stop-color="${LIGHT}" stop-opacity="0"/></radialGradient></defs>
-  <circle cx="32" cy="32" r="50" fill="url(#halo)"/></svg>`;
-
 // A cell: its ground (floor or wall), then the paint, the goal marks, the item and the robot.
 // `robot` is a direction (north, east, south, west), `carrying` adds the item in its bay, `pincer`
-// its pincer, out only while it picks up or drops an item.
+// its pincer, out only while it picks up or drops an item. `lit` is the end of a run: its eyes lit
+// in yellow on "success", dimmed on "failure".
 // `around` and `goalAround` list the sides where the stroke of the paint and of the goal go on.
 // `missed` marks a goal not met once the program has ended.
 // `wallEdge` adds the darker edge at the bottom of a wall above a floor cell, and `wallRim` the light
@@ -69,14 +50,11 @@ function appCell({ wall = false, wallEdge = true, wallRim = true, paint, around 
   // The robot covers the paint of its cell: the learner follows it through the code.
   // The item it carries lies in its bay, the light panel at its back, and turns with it.
   const carried = carrying ? `<img class="is-carried" src="${element("item")}" alt="">` : "";
-  // Its yellow light spreads on the floor around it, under it.
-  if (robot && lit === "success" && chosen.success !== "eyes") images.push(appHalo());
-  if (robot) images.push(`<div class="app-robot is-${robot}"><img src="${element("robot")}" alt="">${pincer ? `<img src="${element("pincer")}" alt="">` : ""}${carried}${appLit(lit)}</div>`);
+  if (robot) images.push(`<div class="app-robot is-${robot}"><img src="${element("robot")}" alt="">${pincer ? `<img src="${element("pincer")}" alt="">` : ""}${carried}${lit ? `<img src="${element(lit === "success" ? "eyes-lit" : "eyes-dim")}" alt="">` : ""}</div>`);
   // A goal not met: a small red flag planted in the corner of its cell, over the robot. Its red,
   // distinct from the red paint, may follow the error color of the design system (step 4).
   if (missed) images.push(`<img src="${element("goal-missed")}" alt="">`);
-  // A lit cell lies over its neighbors, so that its light spreads on them.
-  return `<div class="app-cell${lit === "success" ? " is-lit" : ""}" style="--cell:${size}px">${images.join("")}</div>`;
+  return `<div class="app-cell" style="--cell:${size}px">${images.join("")}</div>`;
 }
 
 // The passages of a path through the cells, from a list of "x,y" points.
