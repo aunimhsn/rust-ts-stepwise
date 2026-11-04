@@ -7,7 +7,7 @@ Implementation steps of the features described in [specs.md](specs.md). Each ste
 Read only by the steps that need them:
 
 - [Technical choices](docs/technical-choices.md): the libraries, the services and the main designs, with their reasons.
-- `docs/roadmap-archive.md`: the detail of the steps done, moved there once their pull request is merged.
+- [Roadmap archive](docs/roadmap-archive.md): the detail of the steps done, moved there once their pull request is merged.
 - [Backlog](docs/backlog.md): the ideas, polish and edge cases found along the way, until the owner makes them a step.
 - [GitHub Pages usage](docs/github-pages-usage.md): the limits and rules of the host of the website.
 
@@ -17,7 +17,7 @@ Design first (phases 3 to 5 of [process.md](process.md), with a sheet of the wor
 
 - [x] **0. Specifications** (#2)
 - [ ] **1. Sheet of the world elements**: in `docs/mockups/`, each element of the map drawn alone in SVG, inspired by the clarity of Shapez 2; then all of them on a small map. Done when the owner has chosen a style and approved every element; the shades of the colors written in `specs.md`.
-  - [x] **1a. Styles compared**: ten styles tried; Daylight chosen (a light gray floor, slate walls, the clearest for learning and on a projector), the paint drawn as a stroke of 28 through the centers of the cells along the path of the robot, the paint under the robot left hidden.
+  - [x] **1a. Styles compared** (#4)
   - [ ] **1b. Daylight refined**: the goal marks (the paint to do as a ghost or an outline of the stroke, where to stand, where to put an item), every element reviewed one by one with a group of tabs per open decision, one final SVG file per element (the stroke drawn by the map), the robot and the logo (its head), the shades written in `specs.md`.
 - [ ] **2. Wireframes**: Excalidraw, in `docs/wireframes/`: the level screen (goal, map with its variant tabs, editor, controls, console, variables panel), the home screen, the manual, the sandbox, the success panel, the command menu, the settings; then the states (running, paused, error, goal not met, storage refused, window too narrow). Done when the owner has approved the layout, written in `specs.md`.
 - [ ] **3. Mock-up**: the HTML mock-up of every screen and state, in the style of step 1, with real sample code and errors; the keyboard shortcuts of the controls decided. Done when every scenario looks right at 1280 × 720 and on a large screen.
