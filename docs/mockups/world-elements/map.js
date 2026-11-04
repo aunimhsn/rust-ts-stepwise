@@ -26,12 +26,31 @@ function appGoalPaint(color, around = []) {
   return `<svg viewBox="0 0 64 64" aria-hidden="true"><g opacity=".35">${strokeShape(around, STROKE, shade)}</g></svg>`;
 }
 
+// A wall merged with its neighbors (the "Merged" and "Raised" choices of the "Wall" tab): one
+// slate mass, rounded only at its outer corners, where the two sides around the corner are floor.
+// "Raised" adds a darker lip where the cell below is floor, a flat hint of height.
+const WALL_RADIUS = 12;
+let clipCount = 0;
+function appMergedWall(corners, lip) {
+  const r = corner => corners.includes(corner) ? WALL_RADIUS : 0;
+  const [nw, ne, se, sw] = ["nw", "ne", "se", "sw"].map(r);
+  const path = `M${nw} 0 L${64 - ne} 0 A${ne} ${ne} 0 0 1 64 ${ne} L64 ${64 - se} A${se} ${se} 0 0 1 ${64 - se} 64
+    L${sw} 64 A${sw} ${sw} 0 0 1 0 ${64 - sw} L0 ${nw} A${nw} ${nw} 0 0 1 ${nw} 0 Z`;
+  if (chosen.wall === "merged" || !lip) return `<svg viewBox="0 0 64 64" aria-hidden="true"><path d="${path}" fill="#5d687a"/></svg>`;
+  const id = `wall-clip-${clipCount += 1}`;
+  return `<svg viewBox="0 0 64 64" aria-hidden="true"><clipPath id="${id}"><rect width="64" height="55"/></clipPath>
+    <path d="${path}" fill="#3f4857"/><path d="${path}" fill="#5d687a" clip-path="url(#${id})"/></svg>`;
+}
 // A cell: its ground (floor or wall), then the paint, the goal marks, the item and the robot.
 // `robot` is a direction (north, east, south, west), `carrying` adds the item on its back.
 // `around` and `goalAround` list the sides where the stroke of the paint and of the goal go on.
 // `missed` marks a goal not met once the program has ended.
-function appCell({ wall = false, paint, around = [], goalPaint, goalAround = [], goalItem = false, item = false, goalStand = false, robot, carrying = false, missed = false } = {}, size = 48) {
-  const images = [`<img src="${element(wall ? "wall" : "floor")}" alt="">`];
+// `parity` picks the shade of a checkered floor; `wallCorners` and `wallLip` shape a merged wall.
+function appCell({ wall = false, parity = 0, wallCorners = ["nw", "ne", "se", "sw"], wallLip = true, paint, around = [], goalPaint, goalAround = [], goalItem = false, item = false, goalStand = false, robot, carrying = false, missed = false } = {}, size = 48) {
+  const floor = chosen.floor === "checker" ? `checker-${parity ? "odd" : "even"}` : chosen.floor;
+  const merged = wall && (chosen.wall === "merged" || chosen.wall === "raised");
+  const images = [`<img src="${element(`candidates/${wall && !merged ? `wall-${chosen.wall}` : `floor-${floor}`}`)}" alt="">`];
+  if (merged) images.push(appMergedWall(wallCorners, wallLip));
   if (paint) images.push(appPaint(paint, around));
   // A goal met hides its mark: the paint alone shows that the cell is done.
   if (goalPaint && goalPaint !== paint) images.push(appGoalPaint(goalPaint, goalAround));
@@ -62,8 +81,14 @@ function appMap(rows, extras = {}, size = 48, links) {
   const cells = rows.flatMap((row, y) => [...row].map((char, x) => {
     const paint = paintAt(x, y);
     const goal = goalAt(x, y);
+    // Outside the grid counts as a wall: a merged wall stays square along the edge of the map.
+    const floorAt = (nx, ny) => rows[ny]?.[nx] !== undefined && rows[ny][nx] !== "#";
+    const outer = ([dx, dy]) => floorAt(x + dx, y) && floorAt(x, y + dy);
     return appCell({
       wall: char === "#",
+      parity: (x + y) % 2,
+      wallCorners: Object.entries({ nw: [-1, -1], ne: [1, -1], se: [1, 1], sw: [-1, 1] }).filter(([, offset]) => outer(offset)).map(([corner]) => corner),
+      wallLip: floorAt(x, y + 1),
       paint,
       around: paint ? sides(x, y, (nx, ny) => paintAt(nx, ny) === paint
         && (!links || links.includes(`${x},${y} ${nx},${ny}`) || links.includes(`${nx},${ny} ${x},${y}`))) : [],
