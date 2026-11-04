@@ -65,7 +65,7 @@ else:
 | Whole number | `0`, `42`, `-7` | 64-bit; a result beyond that range stops the program with an error. No decimal numbers in version 1. |
 | Boolean | `true`, `false` | The only values a condition accepts: `if 3:` is an error, there is no "truthy" value. |
 | Text | `"I am stuck"` | Double quotes, on one line; `\"`, `\\` and `\n` inside. Used by `print`. |
-| Color | `red`, `yellow`, `green`, `blue`, `purple` | The five paints of the world (their final names and shades come from the sheet of the world elements). |
+| Color | `red`, `yellow`, `blue` | The three paints of the world: enough for the sensors to tell three cases apart (four with an unpainted cell), few enough to read at a glance and to stay distinct with a red-green color blindness. Their shades come from the sheet of the world elements. |
 
 Lists and decimal numbers come later (see the [backlog](docs/backlog.md)).
 
@@ -261,7 +261,7 @@ The interface is in English. Every text of the interface, the error messages and
 ## Map
 
 - A grid of cells, at most 16 columns and 12 rows. The coordinates start at the top left cell, `x` growing to the right and `y` downward.
-- A cell is a **wall** or a **floor**. A floor cell may hold one paint (one of the five colors) and one item.
+- A cell is a **wall** or a **floor**. A floor cell may hold one paint (one of the three colors) and one item.
 - One kind of item in version 1 (its look comes from the sheet of the world elements).
 - The goal cells of a level are marked on the map (where to stand, which color where, where to put the items), so that the learner sees the target before writing code.
 - Outside the grid counts as a wall.

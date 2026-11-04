@@ -19,3 +19,4 @@ The ideas, polish and edge cases found along the way that the current step doesn
 - Editing the map of the sandbox.
 - A level editor, and sharing a level as a file.
 - More kinds of items, and elements such as doors or switches.
+- More paints than `red`, `yellow` and `blue`, if a level needs them.
