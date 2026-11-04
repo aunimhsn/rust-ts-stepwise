@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
-  <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-  <g filter="url(#glow)">
-  <path d="M32.0 20.0 L42.4 26.0 L42.4 38.0 L32.0 44.0 L21.6 38.0 L21.6 26.0 Z" fill="#1c0a2e" stroke="#f4eaff" stroke-width="2.5" stroke-linejoin="round"/>
-  <path d="M32.0 27.0 L36.3 29.5 L36.3 34.5 L32.0 37.0 L27.7 34.5 L27.7 29.5 Z" fill="#f4eaff"/>
-  </g>
-</svg>
