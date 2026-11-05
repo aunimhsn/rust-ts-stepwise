@@ -195,7 +195,7 @@ The previous and the next level are only in the menu, so that a click by mistake
 
 **Goal**: a bubble under the place of the level, which doesn't block the screen: the learner can keep it open while typing, and Escape or a click elsewhere closes it. It shows the title, the goal, the elements new on the map, **Show hint**, the links to the manual, and **Let's go**, which closes it. It opens by itself the first time the learner opens the level.
 
-The window needs at least 1280 × 720 pixels: below, a message replaces the screen (*"Stepwise needs a window at least 1280 pixels wide."*) and goes away once the window is wide enough again, without losing anything.
+The window needs at least 1280 × 720 pixels: below, a message replaces the screen (see [Error handling](#error-handling)) and goes away once the window is large enough again, without losing anything.
 
 ### Levels and progression
 
@@ -374,14 +374,17 @@ The levels and the manual are files of the website, written in the repository.
 
 ## Error handling
 
+The messages are drawn in the wireframe [`docs/wireframes/states.excalidraw`](docs/wireframes/states.excalidraw), section *Messages*.
+
 | Situation | Behavior |
 |---|---|
 | A syntax or check error in the program | Underlined in the editor, listed in the console with its line and column; **Run** doesn't start. |
 | An error while the program runs | The program stops; the error is shown in the console with its line, the line is marked in the editor, by a mark of its own in the margin (✕ in the wireframe [`docs/wireframes/states.excalidraw`](docs/wireframes/states.excalidraw); its look is decided with the mock-up), distinct from the next line (▶), a breakpoint (●) and the errors underlined before running; the variables panel shows the state at that moment. The code can be changed at once, without **Reset**. |
 | An infinite loop | The program keeps running visibly until **Pause** or **Reset**; the page stays responsive. |
 | A recursion that never ends | Stopped at 200 nested calls with an error. |
-| The browser refuses `localStorage` (private browsing, storage full or blocked) | Stepwise works; a banner says *"Your progress can't be saved in this browser."* |
+| The browser refuses `localStorage` (private browsing, storage full or blocked) | Stepwise works; a banner of one line across the whole width, under the header of every screen, says *"Your progress can't be saved in this browser and will be lost when this tab closes. Note the code of each level to come back to it."* It takes its height from the content (on the level screen, from the editor and the console; the map keeps its size). **×** hides it until the next visit. When the storage fills up during a visit, the banner appears at the first save that fails. Its color is decided with the mock-up. |
 | Saved data that can't be read (damaged, or of an unknown version) | Ignored: the defaults are used, without error; the bad data stays until the next save replaces it. |
 | A level file that isn't valid | The level is shown as unavailable in its chapter; the other levels work. The tests check every level file, so this shouldn't reach the website. |
-| The WebAssembly module can't load (very old browser) | A message replaces the screen: *"Stepwise needs a recent browser."* |
-| A window narrower than 1280 pixels | A message replaces the screen until the window is wide enough. |
+| The browser can't run WebAssembly (a very old browser) | A message replaces the screen, under the logo: *"Stepwise needs a recent browser"*, *"This browser can't run it. Update it, or open Stepwise in a recent Firefox, Chrome, Edge or Safari."* and the address `stepwise.sylent.art`. It is written in the page itself, not by the application, so that it shows in any browser, even without JavaScript. |
+| The files of Stepwise can't be downloaded (offline, a network error), in a browser that can run them | A message replaces the screen, under the logo: *"Stepwise couldn't load"*, *"The connection seems to be lost. Check it, then try again."* and **Try again**, which reloads the page. It is written in the page itself, as the message of an old browser. |
+| A window smaller than 1280 × 720 pixels | A message replaces the screen, under the logo: *"Stepwise needs a larger window"*, *"At least 1280 × 720 pixels. This one is 1024 × 640."* (the size of the window, following it as it changes), *"Widen the window, or zoom out with Ctrl and −."* (the zoom of the browser counts: at 125 %, a window of 1280 pixels has 1024), and *"Nothing is lost: the screen comes back as it was once the window is large enough."* The state stays in memory, a run is paused. Below 800 pixels wide (a phone), it says instead *"Stepwise needs a computer"*, *"It is made for a large window and a keyboard to write code."*, *"Open it on a computer:"* and the address `stepwise.sylent.art`. |
