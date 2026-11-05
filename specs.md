@@ -149,11 +149,35 @@ The errors that depend on the values (a wall in front, a division by zero, a con
 | Screen | Content |
 |---|---|
 | Home | The chapters and their levels, each locked, open or done; the sandbox; the manual; the settings. |
-| Level | The goal of the level, the map with its legend, the code editor, the controls, the console and the variables panel. |
+| Level | The code editor with its controls, the map, the console and the variables panel; the goal and the legend open from the header (see [Level screen](#level-screen)). |
 | Sandbox | The level screen without goal, on an open map. |
 | Manual | The manual of the language. |
 
-The layout of each screen is decided with the wireframes, then the mock-up.
+The layout of each screen is decided with the wireframes, then the mock-up. The wireframes, in [`docs/wireframes/`](docs/wireframes/), only fixed the first layout: once the mock-up is approved, it becomes the reference.
+
+### Level screen
+
+Wireframe: [`docs/wireframes/level-screen.excalidraw`](docs/wireframes/level-screen.excalidraw). The code on the left, the world on the right, under a header of one line:
+
+- **Header**: the logo and the name; the menus **Level**, **Edit**, **Run**, **Help**; in the middle, the place of the level (`◎ Functions › 18. Paint a square`), a button that opens its goal; on the right, the maps of the level (see [Variants](#levels-and-progression)). A thin bar along the bottom of the header fills with the levels done; on hover, a discreet *"17 of 20 levels done"*.
+- **Editor**, on the left, on the whole height: the code with its line numbers and breakpoints; three square buttons fixed in its bottom right corner, which don't scroll with the code: **Run** / **Pause** / **Resume** (one button, ▶ or ⏸), **Step** (an arrow down onto a dot, as the *step into* of the developer tools) and **Reset** (↻). They have no text: each one names itself, with its shortcut, on hover. They grow pale while the learner types and come back as soon as the mouse moves; the code can scroll past its last line so that no line stays under them.
+- **Status bar**, under the code, as in VS Code: the state of the program (`Ready`, `Running`, `Paused at line 5 · Reset to edit`, `Error at line 3`), the number of errors when there are some (a click shows the first one in the console), the steps run (`47 steps`), the speed (five small squares to click), the position of the cursor (`Ln 7, Col 12`).
+- **Map**, on the right, on top: the whole map, always; its cells grow or shrink to fill the block, up to a maximum size (about 64 pixels, tuned with the mock-up), the map centered in its block. No zoom, no scrolling.
+- **Console** and **Variables**, under the map, about 250 pixels high: two tabs; from about 1600 pixels wide, side by side without tabs.
+- **Widths**: the editor takes half the window, and stops growing at about 80 characters (about two fifths of a 1920-pixel screen); the map and the panels take the rest. The text keeps its size on a large screen, where more lines show; the zoom of the browser enlarges everything for a projector.
+
+The menus give every command of the screen, with its shortcut, so that the learner meets the shortcuts of a code editor:
+
+| Menu | Commands |
+|---|---|
+| **Level** | Goal, Previous level, Next level (greyed until the level is done), All levels (the home screen), Reset code…, Settings. |
+| **Edit** | Undo, Redo, Commands (the command menu), Toggle breakpoint, Remove all breakpoints. |
+| **Run** | Run / Pause / Resume, Step, Reset, Speed. |
+| **Help** | Manual, Legend of the map, Keyboard shortcuts. |
+
+The previous and the next level are only in the menu, so that a click by mistake never changes the level.
+
+**Goal**: a bubble under the place of the level, which doesn't block the screen: the learner can keep it open while typing, and Escape or a click elsewhere closes it. It shows the title, the goal, the elements new on the map, **Show hint**, the links to the manual, and **Let's go**, which closes it. It opens by itself the first time the learner opens the level.
 
 The window needs at least 1280 × 720 pixels: below, a message replaces the screen (*"Stepwise needs a window at least 1280 pixels wide."*) and goes away once the window is wide enough again, without losing anything.
 
@@ -173,7 +197,8 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
   | Functions | `function`, parameters, `return` | 3 |
 
 - A level has a title, a goal written in a few sentences, its map, the code it starts with, and an optional hint, hidden until the learner asks for it. Each level links to the sections of the manual it needs.
-- **Variants**: a level may have up to three maps, the same task on different ground (a wall further away, another number of items), so that a program written for one map only doesn't pass. The learner switches between them with tabs above the map; **Run** runs the shown variant. Each variant passed is marked; the level is done once every variant has passed with the same code. Changing the code clears the marks.
+- **Variants**: a level may have up to three maps, the same task on different ground (a wall further away, another number of items), so that a program written for one map only doesn't pass. The learner switches between them with the buttons **1**, **2**, **3** on the right of the header, above the map, hidden when the level has one map; the shown map has a full background. **Run** runs the shown variant. A bar under each number turns green once its variant has passed, and stays grey until then; the level is done once every variant has passed with the same code. Changing the code turns the bars grey again.
+- The levels are numbered from the first to the last, across the chapters (`18. Paint a square`). The number is computed from their order, never saved: the progress is saved under a stable name of each level, so that a level added later doesn't mix it up.
 - The levels open in order: a level done opens the next one. A done level stays playable. The setting **Unlock all levels**, for a teacher or a learner who already knows, opens every level.
 - **Goals** of a level, all checked when the program ends without error:
   - the robot stands on a given cell;
@@ -189,8 +214,9 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
 - Syntax highlighting of the keywords, the names, the numbers, the texts, the colors and the comments.
 - Tab inserts four spaces; a new line after a line ending with `:` is indented four spaces more; Backspace at the start of an indentation removes four spaces.
 - Errors underlined, with their message on hover (see [Checks before running](#checks-before-running)).
+- A thin vertical line at the 80th column. A longer line is underlined with dots, as advice and not as an error, with *"Lines are easier to read under 80 characters."* on hover; the program still runs. The manual explains it in **Conventions**.
 - **Breakpoints**: a click in the margin, left of a line number, sets or removes a breakpoint on that line. They are saved with the code of the level.
-- While a program runs or is paused, the editor can't be changed: a message says *"Stop the program to edit your code."*
+- While a program runs or is paused, the editor can't be changed: the status bar says so, and when the learner tries to type, it lights up briefly with *"Reset the program to edit your code."*
 
 ### Command menu
 
@@ -208,18 +234,18 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
 |---|---|
 | **Run** | Checks the program, puts the map back to its starting state, then runs the program at the chosen speed. |
 | **Pause** / **Resume** | Pauses the program before its next step; resumes it. |
-| **Step** | Runs one step, then pauses. Available when paused or stopped (from stopped, it starts the program paused on its first step). |
-| **Stop** | Ends the program at once. The map stays as the program left it. |
-| **Reset** | Puts the map back to its starting state. |
-| **Speed** | Five speeds, from one step per second to **Instant**, which runs as many steps as the browser allows without animation. Kept between sessions. |
+| **Step** | Runs one step, then pauses: it goes into the functions called (the *step into* of the debuggers; there is no *step over* or *step out*). Available when paused or stopped (from stopped, it starts the program paused on its first step). |
+| **Reset** | Ends the program if it runs or is paused, and puts the map back to its starting state. The editor can be changed again. |
+| **Speed** | In the status bar. Five speeds, from one step per second to **Instant**, which runs as many steps as the browser allows without animation. Kept between sessions. |
 
 - A **step** is one line run: a statement, the condition of a loop checked again, a call entered. The line of the next step is highlighted in the editor.
-- A program that never ends (an infinite loop) keeps running, visibly, until **Stop**: the robot keeps moving or turning, the highlighted line keeps changing, and a step counter next to the controls keeps rising, even for a loop that doesn't move the robot. The page never freezes, even at **Instant**.
+- A program that never ends (an infinite loop) keeps running, visibly, until **Pause** or **Reset**: the robot keeps moving or turning, the highlighted line keeps changing, and the step counter of the status bar keeps rising, even for a loop that doesn't move the robot. The page never freezes, even at **Instant**.
 - A breakpoint pauses the program before it runs that line.
 - The robot's actions are animated at the chosen speed: moving, turning, painting, picking up, dropping, and a bump against a wall that stops the program.
 - The robot picks up and drops an item with a pincer that comes out of its front, then goes back in; the item it carries lies in the bay at its back.
 - At the end of a run, the robot shows the result: when every goal is met, its eyes light up in yellow and it hops; when a goal isn't met, its eyes dim, it shakes its head, and the cells of the goals not met get a red flag (see [Levels and progression](#levels-and-progression)).
 - **Sounds**, when the setting is on: a short, soft sound when a run succeeds, another when it fails (never scolding), and one when the robot bumps into a wall; none at each step. The browser plays them only after a click, such as **Run**.
+- There is no **Stop**: **Pause** freezes the program to look at the map and the variables, **Reset** ends it.
 - The keyboard shortcuts of the controls are decided with the mock-up.
 
 ### Console
@@ -228,10 +254,11 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
 - The errors, before running or while running, with their line and column: a click on an error puts the cursor on its position in the editor.
 - The messages of the level: the goals not met, the success.
 - Cleared at each **Run**.
+- **Run** shows the console tab.
 
 ### Variables panel
 
-Shown while the program is paused (by **Pause**, **Step** or a breakpoint) and after it stops on an error:
+Its tab opens by itself when the program pauses (by **Pause**, **Step** or a breakpoint). When the program stops on an error, the console stays shown, with the error, and a dot on the tab **Variables** says that it holds the state at that moment. Otherwise, the tab says *"Pause the program to see its variables."* It shows:
 
 - the variables of the function being run (or of the main program), with their values; the ones changed by the last step stand out;
 - the calls in progress, from the main program to the current function, each with its line; a click on one shows its variables.
@@ -276,7 +303,7 @@ The interface is in English. Every text of the interface, the error messages and
 - One kind of item in version 1 (its look comes from the sheet of the world elements).
 - The goal cells of a level are marked on the map (where to stand, which color where, where to put the items), so that the learner sees the target before writing code.
 - Outside the grid counts as a wall.
-- **Legend**: a button next to the map opens the legend of the level: only the elements present on its map, each with its drawing and one sentence, the new ones marked as new, and a link to the section **The map** of the manual.
+- **Legend**: **Help › Legend of the map** opens the legend of the level: only the elements present on its map, each with its drawing and one sentence, the new ones marked as new, and a link to the section **The map** of the manual.
 
 ### Look of the world
 
@@ -314,7 +341,7 @@ The levels and the manual are files of the website, written in the repository.
 |---|---|
 | A syntax or check error in the program | Underlined in the editor, listed in the console with its line and column; **Run** doesn't start. |
 | An error while the program runs | The program stops; the error is shown in the console with its line, the line is marked in the editor, the variables panel shows the state at that moment. |
-| An infinite loop | The program keeps running visibly until **Stop**; the page stays responsive. |
+| An infinite loop | The program keeps running visibly until **Pause** or **Reset**; the page stays responsive. |
 | A recursion that never ends | Stopped at 200 nested calls with an error. |
 | The browser refuses `localStorage` (private browsing, storage full or blocked) | Stepwise works; a banner says *"Your progress can't be saved in this browser."* |
 | Saved data that can't be read (damaged, or of an unknown version) | Ignored: the defaults are used, without error; the bad data stays until the next save replaces it. |
