@@ -149,7 +149,7 @@ The errors that depend on the values (a wall in front, a division by zero, a con
 | Screen | Content |
 |---|---|
 | Home | The path through the levels, grouped by chapter, each locked, open or done; the level chosen; the sandbox, the manual and the settings (see [Home screen](#home-screen)). |
-| Level | The code editor with its controls, the map, the console and the variables panel; the goal and the legend open from the header (see [Level screen](#level-screen)). |
+| Level | The code editor with its controls, the map, the console and the variables panel; the goal opens from the header, the legend from a button on the map (see [Level screen](#level-screen)). |
 | Sandbox | The level screen without goal, on an open map. |
 | Manual | The manual of the language. |
 
@@ -177,7 +177,7 @@ Wireframe: [`docs/wireframes/level-screen.excalidraw`](docs/wireframes/level-scr
 - **Header**: the logo and the name; the menus **Level**, **Edit**, **Run**, **Help**; in the middle, the place of the level (`◎ Functions › 18. Paint a square`), a button that opens its goal; on the right, the maps of the level (see [Variants](#levels-and-progression)). A thin bar along the bottom of the header fills with the levels done; on hover, a discreet *"17 of 20 levels done"*.
 - **Editor**, on the left, on the whole height: the code with its line numbers and breakpoints; three square buttons fixed in its bottom right corner, which don't scroll with the code: **Run** / **Pause** / **Resume** (one button, ▶ or ⏸), **Step** (an arrow down onto a dot, as the *step into* of the developer tools) and **Reset** (↻). They have no text: each one names itself, with its shortcut, on hover. They grow pale while the learner types and come back as soon as the mouse moves; the code can scroll past its last line so that no line stays under them.
 - **Status bar**, under the code, as in VS Code: the state of the program (`Ready`, `Running`, `Paused at line 5 · Reset to edit`, `Error at line 3`), the number of errors when there are some (a click shows the first one in the console), the steps run (`47 steps`), the speed (five small squares to click), the position of the cursor (`Ln 7, Col 12`).
-- **Map**, on the right, on top: the whole map, always; its cells grow or shrink to fill the block, up to a maximum size (about 64 pixels, tuned with the mock-up), the map centered in its block. No zoom, no scrolling.
+- **Map**, on the right, on top: the whole map, always; its cells grow or shrink to fill the block, up to a maximum size (about 64 pixels, tuned with the mock-up), the map centered in its block. No zoom, no scrolling. The button **Legend** sits in its top right corner (see [Map](#map)).
 - **Console** and **Variables**, under the map, about 250 pixels high: two tabs; from about 1600 pixels wide, side by side without tabs.
 - **Widths**: the editor takes half the window, and stops growing at about 80 characters (about two fifths of a 1920-pixel screen); the map and the panels take the rest. The text keeps its size on a large screen, where more lines show; the zoom of the browser enlarges everything for a projector.
 
@@ -330,7 +330,7 @@ The interface is in English. Every text of the interface, the error messages and
 - One kind of item in version 1 (its look comes from the sheet of the world elements).
 - The goal cells of a level are marked on the map (where to stand, which color where, where to put the items), so that the learner sees the target before writing code.
 - Outside the grid counts as a wall.
-- **Legend**: **Help › Legend of the map** opens the legend of the level: only the elements present on its map, each with its drawing and one sentence, the new ones marked as new, and a link to the section **The map** of the manual.
+- **Legend**: the button **Legend**, in the top right corner of the map, or **Help › Legend of the map** opens the legend of the level in a bubble under the button (wireframe: [`docs/wireframes/overlays.excalidraw`](docs/wireframes/overlays.excalidraw)), which blocks nothing, like the goal: Escape, **×** or a click elsewhere closes it. The button carries a dot while the map has new elements not yet seen in the legend. The legend shows only the elements present on its map, each with its drawing and one sentence, the new ones marked as new, and a link to the section **The map** of the manual.
 
 ### Look of the world
 
