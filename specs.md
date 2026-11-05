@@ -186,7 +186,7 @@ The menus give every command of the screen, with its shortcut, so that the learn
 
 | Menu | Commands |
 |---|---|
-| **Level** | Goal, Previous level, Next level (greyed until the level is done), All levels (the home screen), Sandbox, Reset code…, Settings. |
+| **Level** | Goal, Previous level, Next level (greyed until the level is done), All levels (the home screen), Sandbox, Restore starting code…, Settings. |
 | **Edit** | Undo, Redo, Commands (the command menu), Toggle breakpoint, Remove all breakpoints. |
 | **Run** | Run / Pause / Resume, Step, Reset, Speed. |
 | **Help** | Manual, Look up in the manual (F1, the word at the cursor), Legend of the map, Keyboard shortcuts. |
@@ -228,7 +228,7 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
 
 ### Code editor
 
-- The code of each level is saved in the browser as the learner types, and comes back when they return to the level. **Reset code** puts the level back in its first state, after a confirmation: the starting code, and no breakpoint (a breakpoint belongs to a line of the code, which no longer exists). The confirmations of **Reset code** and **Reset progress** are small panels in the middle of the screen, over a veil (wireframe: [`docs/wireframes/overlays.excalidraw`](docs/wireframes/overlays.excalidraw)): the question, what is lost, *"This can't be undone."*, then **Cancel** and the action, which is the main button: Enter confirms, Escape cancels, as everywhere. Its message doesn't name the breakpoints: *"Your code will be replaced by the starting code of the level, as the first time. This can't be undone."*
+- The code of each level is saved in the browser as the learner types, and comes back when they return to the level. **Level › Restore starting code…** puts the level back in its first state, after a confirmation: the starting code, and no breakpoint (a breakpoint belongs to a line of the code, which no longer exists). The confirmations of **Restore starting code** and **Reset progress** are small panels in the middle of the screen, over a veil (wireframe: [`docs/wireframes/overlays.excalidraw`](docs/wireframes/overlays.excalidraw)): the question, what is lost, *"This can't be undone."*, then **Cancel** and the action, which is the main button: Enter confirms, Escape cancels, as everywhere. Its message doesn't name the breakpoints: *"Your code will be replaced by the starting code of the level, as the first time. This can't be undone."*
 - Syntax highlighting of the keywords, the names, the numbers, the texts, the colors and the comments.
 - Tab inserts four spaces; a new line after a line ending with `:` is indented four spaces more; Backspace at the start of an indentation removes four spaces.
 - Errors underlined, with their message on hover (see [Checks before running](#checks-before-running)).
@@ -253,7 +253,7 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
 | **Run** | Checks the program, puts the map back to its starting state, then runs the program at the chosen speed. |
 | **Pause** / **Resume** | Pauses the program before its next step; resumes it. |
 | **Step** | Runs one step, then pauses: it goes into the functions called (the *step into* of the debuggers; there is no *step over* or *step out*). Available when paused or stopped (from stopped, it starts the program paused on its first step). |
-| **Reset** | Ends the program if it runs or is paused, and puts the map back to its starting state. The editor can be changed again. |
+| **Reset** | Ends the program if it runs or is paused, and puts the map back to its starting state. The editor can be changed again. The code stays as it is: its hover says *"Puts the map back. Your code stays."* It is the only command named **Reset** near the code, so that it is never confused with **Restore starting code…**, which replaces the code. |
 | **Speed** | In the status bar. Five speeds, from one step per second to **Instant**, which runs as many steps as the browser allows without animation. Kept between sessions. |
 
 - A **step** is one line run: a statement, the condition of a loop checked again, a call entered. The line of the next step is highlighted in the editor.
@@ -311,14 +311,14 @@ Wireframe: [`docs/wireframes/manual.excalidraw`](docs/wireframes/manual.excalidr
 
 ### Sandbox
 
-An open map with a few walls, paints and items, without goal. The code is saved like a level's; **Run**, the console and the variables panel work the same way. Wireframe: the frame *Sandbox* of [`docs/wireframes/level-screen.excalidraw`](docs/wireframes/level-screen.excalidraw). It is the level screen without what belongs to a goal: in the middle of the header, *"◇ Sandbox"*, which isn't a button; no maps on the right of the header, no progress bar; no goal marks on the map; the menu **Level** keeps **All levels**, **Sandbox** (the current screen), **Reset code…** and **Settings**. Editing the map of the sandbox, and a level editor, come later (see the [backlog](docs/backlog.md)).
+An open map with a few walls, paints and items, without goal. The code is saved like a level's; **Run**, the console and the variables panel work the same way. Wireframe: the frame *Sandbox* of [`docs/wireframes/level-screen.excalidraw`](docs/wireframes/level-screen.excalidraw). It is the level screen without what belongs to a goal: in the middle of the header, *"◇ Sandbox"*, which isn't a button; no maps on the right of the header, no progress bar; no goal marks on the map; the menu **Level** keeps **All levels**, **Sandbox** (the current screen), **Restore starting code…** and **Settings**. Editing the map of the sandbox, and a level editor, come later (see the [backlog](docs/backlog.md)).
 
 ### Settings
 
 A panel in the middle of the screen, over a veil, opened from the header of the home screen or **Level › Settings** (wireframe: [`docs/wireframes/overlays.excalidraw`](docs/wireframes/overlays.excalidraw)). A change applies at once and is saved, without a **Save** button; Escape, **×** or a click on the veil closes it.
 
 - **Sounds**: on or off (off by default, so that a classroom stays quiet).
-- **Reset progress**: puts every level back in its first state (as **Reset code**, its breakpoints with its code) and clears the levels done and the levels opened by a code, after a confirmation; the settings stay. The messages only say *"the levels done and the code of every level"*: the breakpoints go with the code, without being named.
+- **Reset progress**: puts every level back in its first state (as **Restore starting code**, its breakpoints with its code) and clears the levels done and the levels opened by a code, after a confirmation; the settings stay. The messages only say *"the levels done and the code of every level"*: the breakpoints go with the code, without being named.
 
 ### Interface language
 
