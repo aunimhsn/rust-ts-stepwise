@@ -168,6 +168,7 @@ Wireframe: [`docs/wireframes/home-screen.excalidraw`](docs/wireframes/home-scree
   - **Level done**: the learner's own program replayed on its first map; **Play again**.
   - **Level locked**: the starting map, still, and *"Finish 18. Paint a square to open this level."*; under it, *"Have a code?"*, a field and **Open** (see [Level codes](#levels-and-progression)); the button is greyed.
   - The panel of a level open or done shows its code (*"Code of this level: BLUE-FOX"*).
+- **Large screen**: the path and the panel keep their size, centered in the window; the room left serves the levels added later before the path scrolls.
 - **More levels**: the path is laid out from the list of levels, so that adding levels or chapters needs no new design; when they no longer fit, the path scrolls.
 
 ### Level screen
@@ -227,7 +228,7 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
 
 ### Code editor
 
-- The code of each level is saved in the browser as the learner types, and comes back when they return to the level. **Reset code** puts the level back in its first state, after a confirmation: the starting code, and no breakpoint (a breakpoint belongs to a line of the code, which no longer exists). Its message doesn't name the breakpoints: *"Your code will be replaced by the starting code of the level, as the first time. This can't be undone."*
+- The code of each level is saved in the browser as the learner types, and comes back when they return to the level. **Reset code** puts the level back in its first state, after a confirmation: the starting code, and no breakpoint (a breakpoint belongs to a line of the code, which no longer exists). The confirmations of **Reset code** and **Reset progress** are small panels in the middle of the screen, over a veil (wireframe: [`docs/wireframes/overlays.excalidraw`](docs/wireframes/overlays.excalidraw)): the question, what is lost, *"This can't be undone."*, then **Cancel** and the action, which is the main button: Enter confirms, Escape cancels, as everywhere. Its message doesn't name the breakpoints: *"Your code will be replaced by the starting code of the level, as the first time. This can't be undone."*
 - Syntax highlighting of the keywords, the names, the numbers, the texts, the colors and the comments.
 - Tab inserts four spaces; a new line after a line ending with `:` is indented four spaces more; Backspace at the start of an indentation removes four spaces.
 - Errors underlined, with their message on hover (see [Checks before running](#checks-before-running)).
@@ -304,6 +305,7 @@ Wireframe: [`docs/wireframes/manual.excalidraw`](docs/wireframes/manual.excalidr
 - **Search**: typing filters the list on the left into results grouped by section and category (`paint` keeps *Commands › Paint* with `start_painting(color)`, `stop_painting()` and `is_painting()`, *Commands › Colors* and *The map › Paints*), with their number; the arrow keys move in them, Enter opens the chosen one, Escape clears the search.
 - **Content**, in the middle: the section, then each command with what it does, an example with **Copy**, and a small map where the example plays.
 - **On this page**, on the right: the categories or the headings of the section; a click scrolls smoothly to its anchor, and the one in view is marked while scrolling.
+- **Large screen**: the column of text stays under about 760 pixels wide, to stay readable; the sections on the left and **On this page** on the right stay beside it, the whole centered in the window.
 - **From a level**: every link to the manual (the goal, **Help › Manual**, **Read more** in the command menu, an error) opens it in a tab of its own, always the same one, at the right section, so that the code and the map stay open in the tab of the level. **Back to 18. Paint a square** closes that tab and brings the level back.
 - **Drawer**: in the editor, Ctrl+click (Cmd+click on a Mac) on a built-in function or a keyword, or F1 on the word at the cursor, opens the entry of the manual in a drawer on the right of the level screen, over the map and the panels, the code still in view: the search, the place in the manual (*Manual › 2. Commands › Move*), the entry, and **Full page**, which opens the page above in its tab. Escape, **×** or **Run** closes it, so that the map shows while the program runs.
 
