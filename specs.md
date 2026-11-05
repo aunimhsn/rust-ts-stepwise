@@ -294,6 +294,15 @@ The manual of the Stepwise language, on its own page, reachable from every scree
 
 The manual is searchable (a search field filters its sections and commands), and each section has its own address, so that a level, the command menu and an error message can link to it.
 
+Wireframe: [`docs/wireframes/manual.excalidraw`](docs/wireframes/manual.excalidraw). A page of documentation, laid out as the usual ones of programming languages, so that the learner also learns to read them:
+
+- **Header**: the logo and the name, then *"› Manual"*; on the right, when the manual was opened from a level, **Back to 18. Paint a square**. There is no menu bar.
+- **Sections**, on the left: the search field, then the ten sections; the open one is marked, with its categories under it (*Move*, *Paint*…).
+- **Search**: typing filters the list on the left into results grouped by section and category (`paint` keeps *Commands › Paint* with `start_painting(color)`, `stop_painting()` and `is_painting()`, *Commands › Colors* and *The map › Paints*), with their number; the arrow keys move in them, Enter opens the chosen one, Escape clears the search.
+- **Content**, in the middle: the section, then each command with what it does, an example with **Copy**, and a small map where the example plays.
+- **On this page**, on the right: the categories or the headings of the section; a click scrolls smoothly to its anchor, and the one in view is marked while scrolling.
+- **From a level**: every link to the manual (the goal, **Help › Manual**, the command menu, an error) opens it in a tab of its own, always the same one, at the right section, so that the code and the map stay open in the tab of the level. **Back to 18. Paint a square** closes that tab and brings the level back.
+
 ### Sandbox
 
 An open map with a few walls, paints and items, without goal. The code is saved like a level's; **Run**, the console and the variables panel work the same way. Editing the map of the sandbox, and a level editor, come later (see the [backlog](docs/backlog.md)).
