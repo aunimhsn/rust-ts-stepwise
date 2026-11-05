@@ -186,7 +186,7 @@ The menus give every command of the screen, with its shortcut, so that the learn
 
 | Menu | Commands |
 |---|---|
-| **Level** | Goal, Previous level, Next level (greyed until the level is done), All levels (the home screen), Reset code…, Settings. |
+| **Level** | Goal, Previous level, Next level (greyed until the level is done), All levels (the home screen), Sandbox, Reset code…, Settings. |
 | **Edit** | Undo, Redo, Commands (the command menu), Toggle breakpoint, Remove all breakpoints. |
 | **Run** | Run / Pause / Resume, Step, Reset, Speed. |
 | **Help** | Manual, Look up in the manual (F1, the word at the cursor), Legend of the map, Keyboard shortcuts. |
@@ -311,7 +311,7 @@ Wireframe: [`docs/wireframes/manual.excalidraw`](docs/wireframes/manual.excalidr
 
 ### Sandbox
 
-An open map with a few walls, paints and items, without goal. The code is saved like a level's; **Run**, the console and the variables panel work the same way. Wireframe: the frame *Sandbox* of [`docs/wireframes/level-screen.excalidraw`](docs/wireframes/level-screen.excalidraw). It is the level screen without what belongs to a goal: in the middle of the header, *"◇ Sandbox"*, which isn't a button; no maps on the right of the header, no progress bar; no goal marks on the map; the menu **Level** keeps **All levels**, **Reset code…** and **Settings**. Editing the map of the sandbox, and a level editor, come later (see the [backlog](docs/backlog.md)).
+An open map with a few walls, paints and items, without goal. The code is saved like a level's; **Run**, the console and the variables panel work the same way. Wireframe: the frame *Sandbox* of [`docs/wireframes/level-screen.excalidraw`](docs/wireframes/level-screen.excalidraw). It is the level screen without what belongs to a goal: in the middle of the header, *"◇ Sandbox"*, which isn't a button; no maps on the right of the header, no progress bar; no goal marks on the map; the menu **Level** keeps **All levels**, **Sandbox** (the current screen), **Reset code…** and **Settings**. Editing the map of the sandbox, and a level editor, come later (see the [backlog](docs/backlog.md)).
 
 ### Settings
 
