@@ -187,7 +187,7 @@ The menus give every command of the screen, with its shortcut, so that the learn
 | **Level** | Goal, Previous level, Next level (greyed until the level is done), All levels (the home screen), Reset code…, Settings. |
 | **Edit** | Undo, Redo, Commands (the command menu), Toggle breakpoint, Remove all breakpoints. |
 | **Run** | Run / Pause / Resume, Step, Reset, Speed. |
-| **Help** | Manual, Legend of the map, Keyboard shortcuts. |
+| **Help** | Manual, Look up in the manual (F1, the word at the cursor), Legend of the map, Keyboard shortcuts. |
 
 The previous and the next level are only in the menu, so that a click by mistake never changes the level.
 
@@ -228,6 +228,7 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
 - Syntax highlighting of the keywords, the names, the numbers, the texts, the colors and the comments.
 - Tab inserts four spaces; a new line after a line ending with `:` is indented four spaces more; Backspace at the start of an indentation removes four spaces.
 - Errors underlined, with their message on hover (see [Checks before running](#checks-before-running)).
+- **Ctrl+click** (Cmd+click on a Mac), as in a code editor: holding Ctrl underlines the name under the mouse; a click on a built-in function or a keyword opens its entry of the manual in a drawer (see [Manual](#manual)), and a click on a function of the program puts the cursor on its definition. **F1** does the same for the word at the cursor, for the keyboard. **Help › Keyboard shortcuts** and the section **Your first program** of the manual mention it.
 - A thin vertical line at the 80th column. A longer line is underlined with dots, as advice and not as an error, with *"Lines are easier to read under 80 characters."* on hover; the program still runs. The manual explains it in **Conventions**.
 - **Breakpoints**: a click in the margin, left of a line number, sets or removes a breakpoint on that line. They are saved with the code of the level.
 - While a program runs or is paused, the editor can't be changed: the status bar says so, and when the learner tries to type, it lights up briefly with *"Reset the program to edit your code."*
@@ -238,7 +239,7 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
 
 - the commands grouped by category: **Move**, **Paint**, **Carry**, **Sense**, **Write** (the built-in functions), **Colors**, **Control** (`if`, `else if`, `else`, `while`, `repeat`, `break`), **Variables** (`let`), **Functions** (`function`, `return`), and **Your names** (the variables and functions of the program that can be used at the cursor);
 - typing filters the list (`paint` keeps `start_painting()`, `stop_painting()` and `is_painting()`); the arrow keys move in it, Enter or a click inserts the command, Escape closes it;
-- next to the chosen command, its one-line description and an example from the manual;
+- next to the chosen command, its one-line description, an example from the manual and **Read more**, which opens its entry of the manual;
 - a statement that opens a block (`if`, `while`, `repeat`, `function`) is inserted with its `:` and its first indented line, the cursor on what to fill in (`if |:`);
 - the same menu opens by itself after two letters of a name, and only on Ctrl+Space when the setting **Suggest while typing** is off.
 
@@ -301,7 +302,8 @@ Wireframe: [`docs/wireframes/manual.excalidraw`](docs/wireframes/manual.excalidr
 - **Search**: typing filters the list on the left into results grouped by section and category (`paint` keeps *Commands › Paint* with `start_painting(color)`, `stop_painting()` and `is_painting()`, *Commands › Colors* and *The map › Paints*), with their number; the arrow keys move in them, Enter opens the chosen one, Escape clears the search.
 - **Content**, in the middle: the section, then each command with what it does, an example with **Copy**, and a small map where the example plays.
 - **On this page**, on the right: the categories or the headings of the section; a click scrolls smoothly to its anchor, and the one in view is marked while scrolling.
-- **From a level**: every link to the manual (the goal, **Help › Manual**, the command menu, an error) opens it in a tab of its own, always the same one, at the right section, so that the code and the map stay open in the tab of the level. **Back to 18. Paint a square** closes that tab and brings the level back.
+- **From a level**: every link to the manual (the goal, **Help › Manual**, **Read more** in the command menu, an error) opens it in a tab of its own, always the same one, at the right section, so that the code and the map stay open in the tab of the level. **Back to 18. Paint a square** closes that tab and brings the level back.
+- **Drawer**: in the editor, Ctrl+click (Cmd+click on a Mac) on a built-in function or a keyword, or F1 on the word at the cursor, opens the entry of the manual in a drawer on the right of the level screen, over the map and the panels, the code still in view: the search, the place in the manual (*Manual › 2. Commands › Move*), the entry, and **Full page**, which opens the page above in its tab. Escape, **×** or **Run** closes it, so that the map shows while the program runs.
 
 ### Sandbox
 
