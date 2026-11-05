@@ -15,6 +15,7 @@ The ideas, polish and edge cases found along the way that the current step doesn
 - A phone or tablet layout.
 - The robot as a mascot in the interface, with expressions (a smile, a wink, a level up, a graduation cap) on the success panel, the home screen or the end of a chapter; drafts in the history of step 1b of `docs/mockups/world-elements/`.
 - A setting that draws a pattern inside each paint stroke (dots, stripes…), for learners with a color blindness.
+- A divider to drag between the code and the map, as in VS Code: interesting, but it needs a design of its own (limits, double-click to reset, the size saved) and its integration in every screen.
 - A dark mode: an idea to discuss, not a plan. A learner used to it would read the map projected in class differently, since in the dark palette tried on the sheet of the world elements (Ink, in the history of `docs/mockups/world-elements/`) the walls are lighter than the floor, the opposite of the light one.
 
 ## Content
