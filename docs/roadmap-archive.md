@@ -17,3 +17,7 @@ The goal marks (a ghost of the stroke, slots, a red flag when not met), the floo
 ### 2a. Level screen (#6)
 
 Four layouts compared, layout B (code left, map right) refined: a menu bar, the goal in a bubble, three floating controls, a status bar, the maps in the header, the large screen.
+
+### 2b. Other screens (#7)
+
+The home screen (a path of stones in rows, the chapters as bands, the level chosen on the right with **Play**), the manual (sections, search, content, *On this page*, a drawer from Ctrl+click), the sandbox as the level screen without goal, and what opens over a screen: the success panel, the legend, the command menu in three columns, the settings, the confirmations.

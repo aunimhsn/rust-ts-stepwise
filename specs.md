@@ -177,7 +177,7 @@ Wireframe: [`docs/wireframes/level-screen.excalidraw`](docs/wireframes/level-scr
 
 - **Header**: the logo and the name; the menus **Level**, **Edit**, **Run**, **Help**; in the middle, the place of the level (`◎ Functions › 18. Paint a square`), a button that opens its goal; on the right, the maps of the level (see [Variants](#levels-and-progression)). A thin bar along the bottom of the header fills with the levels done; on hover, a discreet *"17 of 20 levels done"*.
 - **Editor**, on the left, on the whole height: the code with its line numbers and breakpoints; three square buttons fixed in its bottom right corner, which don't scroll with the code: **Run** / **Pause** / **Resume** (one button, ▶ or ⏸), **Step** (an arrow down onto a dot, as the *step into* of the developer tools) and **Reset** (↻). They have no text: each one names itself, with its shortcut, on hover. They grow pale while the learner types and come back as soon as the mouse moves; the code can scroll past its last line so that no line stays under them.
-- **Status bar**, under the code, as in VS Code: the state of the program (`Ready`, `Running`, `Paused at line 5 · Reset to edit`, `Error at line 3`), the number of errors when there are some (a click shows the first one in the console), the steps run (`47 steps`), the speed (five small squares to click), the position of the cursor (`Ln 7, Col 12`).
+- **Status bar**, under the code, as in VS Code: the state of the program (`Ready`, `Running`, `Paused at line 5 · Reset to edit`, `Error at line 3`, and once it ends without error `Ended · goal not met`, `Ended · map 1 passed`, `Ended · level done`, or `Ended` in the sandbox, so that the learner knows that the map shows the end of the run and not its start; the code can be changed, and **Run** puts the map back), the number of errors when there are some (a click shows the first one in the console), the steps run (`47 steps`), the speed (five small squares to click), the position of the cursor (`Ln 7, Col 12`).
 - **Map**, on the right, on top: the whole map, always; its cells grow or shrink to fill the block, up to a maximum size (about 64 pixels, tuned with the mock-up), the map centered in its block. No zoom, no scrolling. The button **Legend** sits in its top right corner (see [Map](#map)).
 - **Console** and **Variables**, under the map, about 250 pixels high: two tabs; from about 1600 pixels wide, side by side without tabs.
 - **Widths**: the editor takes half the window, and stops growing at about 80 characters (about two fifths of a 1920-pixel screen); the map and the panels take the rest. The text keeps its size on a large screen, where more lines show; the zoom of the browser enlarges everything for a projector.
@@ -186,7 +186,7 @@ The menus give every command of the screen, with its shortcut, so that the learn
 
 | Menu | Commands |
 |---|---|
-| **Level** | Goal, Previous level, Next level (greyed until the level is done), All levels (the home screen), Reset code…, Settings. |
+| **Level** | Goal, Previous level, Next level (greyed until the level is done), All levels (the home screen), Sandbox, Restore starting code…, Settings. |
 | **Edit** | Undo, Redo, Commands (the command menu), Toggle breakpoint, Remove all breakpoints. |
 | **Run** | Run / Pause / Resume, Step, Reset, Speed. |
 | **Help** | Manual, Look up in the manual (F1, the word at the cursor), Legend of the map, Keyboard shortcuts. |
@@ -228,14 +228,14 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
 
 ### Code editor
 
-- The code of each level is saved in the browser as the learner types, and comes back when they return to the level. **Reset code** puts the level back in its first state, after a confirmation: the starting code, and no breakpoint (a breakpoint belongs to a line of the code, which no longer exists). The confirmations of **Reset code** and **Reset progress** are small panels in the middle of the screen, over a veil (wireframe: [`docs/wireframes/overlays.excalidraw`](docs/wireframes/overlays.excalidraw)): the question, what is lost, *"This can't be undone."*, then **Cancel** and the action, which is the main button: Enter confirms, Escape cancels, as everywhere. Its message doesn't name the breakpoints: *"Your code will be replaced by the starting code of the level, as the first time. This can't be undone."*
+- The code of each level is saved in the browser as the learner types, and comes back when they return to the level. **Level › Restore starting code…** puts the level back in its first state, after a confirmation: the starting code, and no breakpoint (a breakpoint belongs to a line of the code, which no longer exists). The confirmations of **Restore starting code** and **Clear all progress** are small panels in the middle of the screen, over a veil (wireframe: [`docs/wireframes/overlays.excalidraw`](docs/wireframes/overlays.excalidraw)): the question, what is lost, *"This can't be undone."*, then **Cancel** and the action, which is the main button: Enter confirms, Escape cancels, as everywhere. Its message doesn't name the breakpoints: *"Your code will be replaced by the starting code of the level, as the first time. This can't be undone."*
 - Syntax highlighting of the keywords, the names, the numbers, the texts, the colors and the comments.
 - Tab inserts four spaces; a new line after a line ending with `:` is indented four spaces more; Backspace at the start of an indentation removes four spaces.
 - Errors underlined, with their message on hover (see [Checks before running](#checks-before-running)).
 - **Ctrl+click** (Cmd+click on a Mac), as in a code editor: holding Ctrl underlines the name under the mouse; a click on a built-in function or a keyword opens its entry of the manual in a drawer (see [Manual](#manual)), and a click on a function of the program puts the cursor on its definition. **F1** does the same for the word at the cursor, for the keyboard. **Help › Keyboard shortcuts** and the section **Your first program** of the manual mention it.
 - A thin vertical line at the 80th column. A longer line is underlined with dots, as advice and not as an error, with *"Lines are easier to read under 80 characters."* on hover; the program still runs. The manual explains it in **Conventions**.
 - **Breakpoints**: a click in the margin, left of a line number, sets or removes a breakpoint on that line. They are saved with the code of the level.
-- While a program runs or is paused, the editor can't be changed: the status bar says so, and when the learner tries to type, it lights up briefly with *"Reset the program to edit your code."*
+- While a program runs or is paused, the editor can't be changed: the status bar says so, and when the learner tries to type, it lights up briefly with *"Reset the program to edit your code."* A program stopped by an error has ended: the editor can be changed at once, without **Reset**, so that the learner fixes the line of the error; the map and the variables panel keep the state at the error until the next **Run** or **Reset**.
 
 ### Command menu
 
@@ -253,7 +253,7 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
 | **Run** | Checks the program, puts the map back to its starting state, then runs the program at the chosen speed. |
 | **Pause** / **Resume** | Pauses the program before its next step; resumes it. |
 | **Step** | Runs one step, then pauses: it goes into the functions called (the *step into* of the debuggers; there is no *step over* or *step out*). Available when paused or stopped (from stopped, it starts the program paused on its first step). |
-| **Reset** | Ends the program if it runs or is paused, and puts the map back to its starting state. The editor can be changed again. |
+| **Reset** | Ends the program if it runs or is paused, and puts the map back to its starting state. The editor can be changed again. The code stays as it is: its hover says *"Puts the map back. Your code stays."* It is the only command named **Reset** near the code, so that it is never confused with **Restore starting code…**, which replaces the code. |
 | **Speed** | In the status bar. Five speeds, from one step per second to **Instant**, which runs as many steps as the browser allows without animation. Kept between sessions. |
 
 - A **step** is one line run: a statement, the condition of a loop checked again, a call entered. The line of the next step is highlighted in the editor.
@@ -265,6 +265,14 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
 - **Sounds**, when the setting is on: a short, soft sound when a run succeeds, another when it fails (never scolding), and one when the robot bumps into a wall; none at each step. The browser plays them only after a click, such as **Run**.
 - There is no **Stop**: **Pause** freezes the program to look at the map and the variables, **Reset** ends it.
 - The keyboard shortcuts of the controls are decided with the mock-up.
+
+**States of a run** (wireframe: [`docs/wireframes/states.excalidraw`](docs/wireframes/states.excalidraw)), on the level screen, whose blocks never move:
+
+- **Running**: the first control is **Pause** (⏸), **Step** is greyed, the next line is highlighted, the step counter rises; the console is shown. When the learner types, the code doesn't change and the status bar lights up briefly with *"Reset the program to edit your code."*
+- **Paused on a breakpoint**: the breakpoint and the highlighted line together; the first control is **Resume** (▶); the variables panel opens by itself.
+- **Errors before running**: the words underlined, their message on hover; *"2 errors"* in the status bar; **Run** lists them in the console, each with its place (*"Line 5, col 9"*), which puts the cursor on it; the map stays at its start.
+- **Error while running**: the line of the error marked in the margin, the map as it was at the error (the robot against the wall), the error in the console, a dot on the tab **Variables**; the status bar says `Error at line 5`.
+- **Goal not met**: a flag on each cell of a goal not met, the eyes of the robot dimmed; the console says which goal (*"The goal isn't met: 7 cells of the square aren't red."*); the bar of the map stays grey; the status bar says `Ended · goal not met`.
 
 ### Console
 
@@ -311,14 +319,14 @@ Wireframe: [`docs/wireframes/manual.excalidraw`](docs/wireframes/manual.excalidr
 
 ### Sandbox
 
-An open map with a few walls, paints and items, without goal. The code is saved like a level's; **Run**, the console and the variables panel work the same way. Wireframe: the frame *Sandbox* of [`docs/wireframes/level-screen.excalidraw`](docs/wireframes/level-screen.excalidraw). It is the level screen without what belongs to a goal: in the middle of the header, *"◇ Sandbox"*, which isn't a button; no maps on the right of the header, no progress bar; no goal marks on the map; the menu **Level** keeps **All levels**, **Reset code…** and **Settings**. Editing the map of the sandbox, and a level editor, come later (see the [backlog](docs/backlog.md)).
+An open map with a few walls, paints and items, without goal. The code is saved like a level's; **Run**, the console and the variables panel work the same way. Wireframe: the frame *Sandbox* of [`docs/wireframes/level-screen.excalidraw`](docs/wireframes/level-screen.excalidraw). It is the level screen without what belongs to a goal: in the middle of the header, *"◇ Sandbox"*, which isn't a button; no maps on the right of the header, no progress bar; no goal marks on the map; the menu **Level** keeps **All levels**, **Sandbox** (the current screen), **Restore starting code…** and **Settings**. Editing the map of the sandbox, and a level editor, come later (see the [backlog](docs/backlog.md)).
 
 ### Settings
 
 A panel in the middle of the screen, over a veil, opened from the header of the home screen or **Level › Settings** (wireframe: [`docs/wireframes/overlays.excalidraw`](docs/wireframes/overlays.excalidraw)). A change applies at once and is saved, without a **Save** button; Escape, **×** or a click on the veil closes it.
 
 - **Sounds**: on or off (off by default, so that a classroom stays quiet).
-- **Reset progress**: puts every level back in its first state (as **Reset code**, its breakpoints with its code) and clears the levels done and the levels opened by a code, after a confirmation; the settings stay. The messages only say *"the levels done and the code of every level"*: the breakpoints go with the code, without being named.
+- **Clear all progress…**: puts every level back in its first state (as **Restore starting code**, its breakpoints with its code) and clears the levels done and the levels opened by a code, after a confirmation; the settings stay. The messages only say *"the levels done and the code of every level"*: the breakpoints go with the code, without being named.
 
 ### Interface language
 
@@ -369,7 +377,7 @@ The levels and the manual are files of the website, written in the repository.
 | Situation | Behavior |
 |---|---|
 | A syntax or check error in the program | Underlined in the editor, listed in the console with its line and column; **Run** doesn't start. |
-| An error while the program runs | The program stops; the error is shown in the console with its line, the line is marked in the editor, the variables panel shows the state at that moment. |
+| An error while the program runs | The program stops; the error is shown in the console with its line, the line is marked in the editor, by a mark of its own in the margin (✕ in the wireframe [`docs/wireframes/states.excalidraw`](docs/wireframes/states.excalidraw); its look is decided with the mock-up), distinct from the next line (▶), a breakpoint (●) and the errors underlined before running; the variables panel shows the state at that moment. The code can be changed at once, without **Reset**. |
 | An infinite loop | The program keeps running visibly until **Pause** or **Reset**; the page stays responsive. |
 | A recursion that never ends | Stopped at 200 nested calls with an error. |
 | The browser refuses `localStorage` (private browsing, storage full or blocked) | Stepwise works; a banner says *"Your progress can't be saved in this browser."* |
