@@ -235,13 +235,12 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
 
 ### Command menu
 
-**Ctrl+Space** in the editor opens a menu at the cursor, to find a command without knowing its name by heart:
+**Ctrl+Space** in the editor opens a menu at the cursor, to find a command without knowing its name by heart. It opens only on Ctrl+Space, never by itself while typing, so that the learner takes the habit of asking for it. Wireframe: [`docs/wireframes/command-menu.excalidraw`](docs/wireframes/command-menu.excalidraw): one list grouped under the names of the categories, the details of the chosen command beside it.
 
 - the commands grouped by category: **Move**, **Paint**, **Carry**, **Sense**, **Write** (the built-in functions), **Colors**, **Control** (`if`, `else if`, `else`, `while`, `repeat`, `break`), **Variables** (`let`), **Functions** (`function`, `return`), and **Your names** (the variables and functions of the program that can be used at the cursor);
-- typing filters the list (`paint` keeps `start_painting()`, `stop_painting()` and `is_painting()`); the arrow keys move in it, Enter or a click inserts the command, Escape closes it;
+- typing filters the list (`paint` keeps `start_painting()`, `stop_painting()` and `is_painting()`); the headings of the categories stay above their results; the arrow keys move in it, Tab, Enter or a click inserts the command and closes the menu, Escape closes it (Tab inserts four spaces only when the menu is closed);
 - next to the chosen command, its one-line description, an example from the manual and **Read more**, which opens its entry of the manual;
 - a statement that opens a block (`if`, `while`, `repeat`, `function`) is inserted with its `:` and its first indented line, the cursor on what to fill in (`if |:`);
-- the same menu opens by itself after two letters of a name, and only on Ctrl+Space when the setting **Suggest while typing** is off.
 
 ### Running a program
 
@@ -312,7 +311,6 @@ An open map with a few walls, paints and items, without goal. The code is saved 
 ### Settings
 
 - **Unlock all levels**: on or off (off by default).
-- **Suggest while typing**: the command menu opens by itself while typing (on by default).
 - **Sounds**: on or off (off by default, so that a classroom stays quiet).
 - **Reset progress**: clears the levels done, the code and the breakpoints of every level, after a confirmation.
 
@@ -356,7 +354,7 @@ Stepwise has no files of its own on the learner's computer: everything is kept i
 |---|---|
 | Progress | The levels done, and the variants passed with their code. |
 | Code | The code and the breakpoints of each level and of the sandbox. |
-| Settings | The speed, **Unlock all levels**, **Suggest while typing**. |
+| Settings | The speed, **Unlock all levels**, **Sounds**. |
 
 The levels and the manual are files of the website, written in the repository.
 
