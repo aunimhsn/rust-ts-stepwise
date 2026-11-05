@@ -228,7 +228,7 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
 
 ### Code editor
 
-- The code of each level is saved in the browser as the learner types, and comes back when they return to the level. **Level › Restore starting code…** puts the level back in its first state, after a confirmation: the starting code, and no breakpoint (a breakpoint belongs to a line of the code, which no longer exists). The confirmations of **Restore starting code** and **Reset progress** are small panels in the middle of the screen, over a veil (wireframe: [`docs/wireframes/overlays.excalidraw`](docs/wireframes/overlays.excalidraw)): the question, what is lost, *"This can't be undone."*, then **Cancel** and the action, which is the main button: Enter confirms, Escape cancels, as everywhere. Its message doesn't name the breakpoints: *"Your code will be replaced by the starting code of the level, as the first time. This can't be undone."*
+- The code of each level is saved in the browser as the learner types, and comes back when they return to the level. **Level › Restore starting code…** puts the level back in its first state, after a confirmation: the starting code, and no breakpoint (a breakpoint belongs to a line of the code, which no longer exists). The confirmations of **Restore starting code** and **Clear all progress** are small panels in the middle of the screen, over a veil (wireframe: [`docs/wireframes/overlays.excalidraw`](docs/wireframes/overlays.excalidraw)): the question, what is lost, *"This can't be undone."*, then **Cancel** and the action, which is the main button: Enter confirms, Escape cancels, as everywhere. Its message doesn't name the breakpoints: *"Your code will be replaced by the starting code of the level, as the first time. This can't be undone."*
 - Syntax highlighting of the keywords, the names, the numbers, the texts, the colors and the comments.
 - Tab inserts four spaces; a new line after a line ending with `:` is indented four spaces more; Backspace at the start of an indentation removes four spaces.
 - Errors underlined, with their message on hover (see [Checks before running](#checks-before-running)).
@@ -318,7 +318,7 @@ An open map with a few walls, paints and items, without goal. The code is saved 
 A panel in the middle of the screen, over a veil, opened from the header of the home screen or **Level › Settings** (wireframe: [`docs/wireframes/overlays.excalidraw`](docs/wireframes/overlays.excalidraw)). A change applies at once and is saved, without a **Save** button; Escape, **×** or a click on the veil closes it.
 
 - **Sounds**: on or off (off by default, so that a classroom stays quiet).
-- **Reset progress**: puts every level back in its first state (as **Restore starting code**, its breakpoints with its code) and clears the levels done and the levels opened by a code, after a confirmation; the settings stay. The messages only say *"the levels done and the code of every level"*: the breakpoints go with the code, without being named.
+- **Clear all progress…**: puts every level back in its first state (as **Restore starting code**, its breakpoints with its code) and clears the levels done and the levels opened by a code, after a confirmation; the settings stay. The messages only say *"the levels done and the code of every level"*: the breakpoints go with the code, without being named.
 
 ### Interface language
 

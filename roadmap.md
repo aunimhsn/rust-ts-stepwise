@@ -38,7 +38,7 @@ Design first (phases 3 to 5 of [process.md](process.md), with a sheet of the wor
 - [ ] **16. Sounds**: the sounds of the end of a run (success, failure) and of the robot bumping into a wall, synthesized or CC0 as chosen by ear in step 3, played in time with the animations at every speed and never at each step; the setting **Sounds**, off by default.
 - [ ] **17. Breakpoints and variables**: the breakpoints in the margin, saved with the code; the variables panel and the calls in progress.
 - [ ] **18. Command menu**: Ctrl+Space, the categories, the filter, the descriptions and examples, the snippets of the blocks, Tab and Enter to insert.
-- [ ] **19. Levels**: the home screen with the chapters, the levels opening in order and their codes (and the guide of the codes for the teachers), the goal and the hint, the variants and their marks, the goals not met shown on the map, the legend of the map with its new elements, the success panel, **Reset progress**.
+- [ ] **19. Levels**: the home screen with the chapters, the levels opening in order and their codes (and the guide of the codes for the teachers), the goal and the hint, the variants and their marks, the goals not met shown on the map, the legend of the map with its new elements, the success panel, **Clear all progress**.
 - [ ] **20. Manual**: its Markdown sections, its search, the section of the map with the drawing of each element, the addresses of its sections and the links from the levels, the command menu and the errors; its examples checked by the tests.
 - [ ] **21. Levels of chapters 1 to 4**: First steps, Repeat, Paint, Decide; designed with the owner, each variant solved by a test.
 - [ ] **22. Levels of chapters 5 to 8**: Loop until, Carry, Remember, Functions.
