@@ -19,7 +19,7 @@ Design first (phases 3 to 5 of [process.md](process.md), with a sheet of the wor
 - [x] **1. Sheet of the world elements** (#4, #5)
 - [ ] **2. Wireframes**: Excalidraw, in `docs/wireframes/`, at 1280 × 720 and on a large screen; each sub-step writes the layout it agreed in `specs.md`.
   - [x] **2a. Level screen** (#6)
-  - [x] **2b. Other screens**: the home screen, the manual, the sandbox, and what opens over a screen (the success panel, the legend, the command menu, the settings, the confirmations).
+  - [x] **2b. Other screens** (#7): the home screen, the manual, the sandbox, and what opens over a screen (the success panel, the legend, the command menu, the settings, the confirmations).
   - [ ] **2c. States**: running, paused on a breakpoint, an error before and while running, a goal not met, the storage refused, the window too narrow, the browser too old.
 - [ ] **3. Mock-up**: the HTML mock-up of every screen and state, in the style of step 1, with real sample code and errors; the keyboard shortcuts of the controls decided; the animations of the map as mini-scenes to replay and tune, at every speed (each action of the robot, `pick_up()` with its pincer, the end of a run that succeeds or fails), with their sounds, synthesized and CC0 compared by ear. Done when every scenario looks right at 1280 × 720 and on a large screen.
 - [ ] **4. Design system**: the tokens (colors, spacing, radii, typography, motion) in `specs.md`, the fonts and their licenses, the tone of the messages; the mock-up updated to use exactly these tokens; an entry in `design-journal.md`.
