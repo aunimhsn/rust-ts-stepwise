@@ -18,8 +18,8 @@ Design first (phases 3 to 5 of [process.md](process.md), with a sheet of the wor
 - [x] **0. Specifications** (#2)
 - [x] **1. Sheet of the world elements** (#4, #5)
 - [ ] **2. Wireframes**: Excalidraw, in `docs/wireframes/`, at 1280 × 720 and on a large screen; each sub-step writes the layout it agreed in `specs.md`.
-  - [x] **2a. Level screen**: four layouts compared, layout B (code left, map right) refined: a menu bar, the goal in a bubble, three floating controls, a status bar, the maps in the header, the large screen.
-  - [ ] **2b. Other screens**: the home screen, the manual, the sandbox, and what opens over a screen (the success panel, the legend, the command menu, the settings, the confirmations).
+  - [x] **2a. Level screen** (#6)
+  - [x] **2b. Other screens** (#7): the home screen, the manual, the sandbox, and what opens over a screen (the success panel, the legend, the command menu, the settings, the confirmations).
   - [ ] **2c. States**: running, paused on a breakpoint, an error before and while running, a goal not met, the storage refused, the window too narrow, the browser too old.
 - [ ] **3. Mock-up**: the HTML mock-up of every screen and state, in the style of step 1, with real sample code and errors; the keyboard shortcuts of the controls decided; the animations of the map as mini-scenes to replay and tune, at every speed (each action of the robot, `pick_up()` with its pincer, the end of a run that succeeds or fails), with their sounds, synthesized and CC0 compared by ear. Done when every scenario looks right at 1280 × 720 and on a large screen.
 - [ ] **4. Design system**: the tokens (colors, spacing, radii, typography, motion) in `specs.md`, the fonts and their licenses, the tone of the messages; the mock-up updated to use exactly these tokens; an entry in `design-journal.md`.
@@ -36,8 +36,8 @@ Design first (phases 3 to 5 of [process.md](process.md), with a sheet of the wor
 - [ ] **15. Running**: **Run**, **Pause**, **Step**, **Reset**, the five speeds, the status bar, the current line, the step counter, the infinite loops that keep running without freezing the page; the console with the printed lines, the errors and their click to the editor.
 - [ ] **16. Sounds**: the sounds of the end of a run (success, failure) and of the robot bumping into a wall, synthesized or CC0 as chosen by ear in step 3, played in time with the animations at every speed and never at each step; the setting **Sounds**, off by default.
 - [ ] **17. Breakpoints and variables**: the breakpoints in the margin, saved with the code; the variables panel and the calls in progress.
-- [ ] **18. Command menu**: Ctrl+Space, the categories, the filter, the descriptions and examples, the snippets of the blocks, **Suggest while typing**.
-- [ ] **19. Levels**: the home screen with the chapters, the levels opening in order and **Unlock all levels**, the goal and the hint, the variants and their marks, the goals not met shown on the map, the legend of the map with its new elements, the success panel, **Reset progress**.
+- [ ] **18. Command menu**: Ctrl+Space, the categories, the filter, the descriptions and examples, the snippets of the blocks, Tab and Enter to insert.
+- [ ] **19. Levels**: the home screen with the chapters, the levels opening in order and their codes (and the guide of the codes for the teachers), the goal and the hint, the variants and their marks, the goals not met shown on the map, the legend of the map with its new elements, the success panel, **Reset progress**.
 - [ ] **20. Manual**: its Markdown sections, its search, the section of the map with the drawing of each element, the addresses of its sections and the links from the levels, the command menu and the errors; its examples checked by the tests.
 - [ ] **21. Levels of chapters 1 to 4**: First steps, Repeat, Paint, Decide; designed with the owner, each variant solved by a test.
 - [ ] **22. Levels of chapters 5 to 8**: Loop until, Carry, Remember, Functions.

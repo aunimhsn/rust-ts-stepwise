@@ -148,12 +148,28 @@ The errors that depend on the values (a wall in front, a division by zero, a con
 
 | Screen | Content |
 |---|---|
-| Home | The chapters and their levels, each locked, open or done; the sandbox; the manual; the settings. |
-| Level | The code editor with its controls, the map, the console and the variables panel; the goal and the legend open from the header (see [Level screen](#level-screen)). |
+| Home | The path through the levels, grouped by chapter, each locked, open or done; the level chosen; the sandbox, the manual and the settings (see [Home screen](#home-screen)). |
+| Level | The code editor with its controls, the map, the console and the variables panel; the goal opens from the header, the legend from a button on the map (see [Level screen](#level-screen)). |
 | Sandbox | The level screen without goal, on an open map. |
 | Manual | The manual of the language. |
 
 The layout of each screen is decided with the wireframes, then the mock-up. The wireframes, in [`docs/wireframes/`](docs/wireframes/), only fixed the first layout: once the mock-up is approved, it becomes the reference.
+
+### Home screen
+
+Wireframe: [`docs/wireframes/home-screen.excalidraw`](docs/wireframes/home-screen.excalidraw). A path through every level on the left, the level chosen on the right, under a header of one line:
+
+- **Header**: the logo and the name; in the middle, *"17 of 20 levels done"*; on the right, **Sandbox**, **Manual** and **Settings**. The same thin bar as on the level screen fills along its bottom with the levels done.
+- **Path**, on the left: one stone per level, numbered, linked by a path that runs in rows, left to right then back, with a rounded half-turn at the end of each row. The path is painted up to the level to play and drawn as a ghost after it. A stone is filled when its level is done, bold when it is the level to play, dashed when it is locked. The robot stands on the level chosen, astride the top of its stone, and moves to the stone clicked. Hovering a stone shows its title; a click chooses its level and shows it on the right, and only **Play** opens it, so that the learner reads the goal first.
+- **Chapters**: a light band behind the stones of each chapter, with its name and its idea (*"Loop until · while, not, break"*). A chapter never wraps around a turn of the path.
+- **Maps of a level**: under each stone, one small square per map, astride the bottom of the stone, green once the map has passed, grey until then, with no mark for a map that failed. A done level keeps its squares green, even when its code has changed since.
+- **Level chosen**, on the right: its chapter, its number and title, a scene of its map, its goal, its maps with their state, and one button. The screen opens with the level to play chosen.
+  - **Level to play**: the starting map with its goal marks and the robot waiting (it blinks, looks around), never the solution; **Play**.
+  - **Level done**: the learner's own program replayed on its first map; **Play again**.
+  - **Level locked**: the starting map, still, and *"Finish 18. Paint a square to open this level."*; under it, *"Have a code?"*, a field and **Open** (see [Level codes](#levels-and-progression)); the button is greyed.
+  - The panel of a level open or done shows its code (*"Code of this level: BLUE-FOX"*).
+- **Large screen**: the path and the panel keep their size, centered in the window; the room left serves the levels added later before the path scrolls.
+- **More levels**: the path is laid out from the list of levels, so that adding levels or chapters needs no new design; when they no longer fit, the path scrolls.
 
 ### Level screen
 
@@ -162,7 +178,7 @@ Wireframe: [`docs/wireframes/level-screen.excalidraw`](docs/wireframes/level-scr
 - **Header**: the logo and the name; the menus **Level**, **Edit**, **Run**, **Help**; in the middle, the place of the level (`◎ Functions › 18. Paint a square`), a button that opens its goal; on the right, the maps of the level (see [Variants](#levels-and-progression)). A thin bar along the bottom of the header fills with the levels done; on hover, a discreet *"17 of 20 levels done"*.
 - **Editor**, on the left, on the whole height: the code with its line numbers and breakpoints; three square buttons fixed in its bottom right corner, which don't scroll with the code: **Run** / **Pause** / **Resume** (one button, ▶ or ⏸), **Step** (an arrow down onto a dot, as the *step into* of the developer tools) and **Reset** (↻). They have no text: each one names itself, with its shortcut, on hover. They grow pale while the learner types and come back as soon as the mouse moves; the code can scroll past its last line so that no line stays under them.
 - **Status bar**, under the code, as in VS Code: the state of the program (`Ready`, `Running`, `Paused at line 5 · Reset to edit`, `Error at line 3`), the number of errors when there are some (a click shows the first one in the console), the steps run (`47 steps`), the speed (five small squares to click), the position of the cursor (`Ln 7, Col 12`).
-- **Map**, on the right, on top: the whole map, always; its cells grow or shrink to fill the block, up to a maximum size (about 64 pixels, tuned with the mock-up), the map centered in its block. No zoom, no scrolling.
+- **Map**, on the right, on top: the whole map, always; its cells grow or shrink to fill the block, up to a maximum size (about 64 pixels, tuned with the mock-up), the map centered in its block. No zoom, no scrolling. The button **Legend** sits in its top right corner (see [Map](#map)).
 - **Console** and **Variables**, under the map, about 250 pixels high: two tabs; from about 1600 pixels wide, side by side without tabs.
 - **Widths**: the editor takes half the window, and stops growing at about 80 characters (about two fifths of a 1920-pixel screen); the map and the panels take the rest. The text keeps its size on a large screen, where more lines show; the zoom of the browser enlarges everything for a projector.
 
@@ -173,7 +189,7 @@ The menus give every command of the screen, with its shortcut, so that the learn
 | **Level** | Goal, Previous level, Next level (greyed until the level is done), All levels (the home screen), Reset code…, Settings. |
 | **Edit** | Undo, Redo, Commands (the command menu), Toggle breakpoint, Remove all breakpoints. |
 | **Run** | Run / Pause / Resume, Step, Reset, Speed. |
-| **Help** | Manual, Legend of the map, Keyboard shortcuts. |
+| **Help** | Manual, Look up in the manual (F1, the word at the cursor), Legend of the map, Keyboard shortcuts. |
 
 The previous and the next level are only in the menu, so that a click by mistake never changes the level.
 
@@ -183,7 +199,7 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
 
 ### Levels and progression
 
-- The levels are grouped in chapters, each introducing one idea. The plan below is a starting point; the levels are designed in their own roadmap steps.
+- The levels are grouped in chapters, each introducing one idea. The plan below is a starting point; the levels are designed in their own roadmap steps. About 20 levels in 8 chapters for the first version: a range rather than a fixed number, which follows the ideas found while designing the levels.
 
   | Chapter | Idea | Levels (about) |
   |---|---|---|
@@ -199,7 +215,8 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
 - A level has a title, a goal written in a few sentences, its map, the code it starts with, and an optional hint, hidden until the learner asks for it. Each level links to the sections of the manual it needs.
 - **Variants**: a level may have up to three maps, the same task on different ground (a wall further away, another number of items), so that a program written for one map only doesn't pass. The learner switches between them with the buttons **1**, **2**, **3** on the right of the header, above the map, hidden when the level has one map; the shown map has a full background. **Run** runs the shown variant. A bar under each number turns green once its variant has passed, and stays grey until then; the level is done once every variant has passed with the same code. Changing the code turns the bars grey again.
 - The levels are numbered from the first to the last, across the chapters (`18. Paint a square`). The number is computed from their order, never saved: the progress is saved under a stable name of each level, so that a level added later doesn't mix it up.
-- The levels open in order: a level done opens the next one. A done level stays playable. The setting **Unlock all levels**, for a teacher or a learner who already knows, opens every level.
+- The levels open in order: a level done opens the next one. A done level stays playable. Each level must be earned: there is no setting that unlocks every level; a learner who is stuck has the hint, then the teacher.
+- **Level codes**, as the passwords of the old console games: each level has a code of two English words (`GREEN-OWL`), easy to write and to dictate, unrelated to its title so that it can't be guessed, and tied to the stable name of the level, not to its number, so that a level added later changes no code. Entering the code of a level opens it and every level before it, without marking them done. The success panel gives the code of the next level, so that the learner can go on from another computer (the progress lives in one browser); the home screen shows the code of every level open or done. The teacher gives a code to open a level for the whole class, or the code of the last level for a demonstration; the list of the codes is in a guide for the teachers in `docs/`, readable in the repository: the codes add friction, not security.
 - **Goals** of a level, all checked when the program ends without error:
   - the robot stands on a given cell;
   - given cells have given paints (and, when the level says so, no other cell is painted);
@@ -207,26 +224,27 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
   - the robot carries an item, or carries none.
 - **New elements**: each element of the map (see [Map](#map)) is introduced by the first level that uses it: the goal of this level names it, links to the section **The map** of the manual, and the legend of the level marks it as new. There is no tutorial level showing every element at once: a chapter brings one idea, and an element waits for the chapter that needs it.
 - When the program ends and every goal is met, the variant passes; once every variant has, a success panel offers the next level. When a goal isn't met, the console says which one, and the cells concerned are marked on the map.
+- **Success panel** (wireframe: [`docs/wireframes/success-panel.excalidraw`](docs/wireframes/success-panel.excalidraw)): in the middle of the screen, over a veil, once the robot has hopped (about one second). The robot, *"Level done!"*, *"18. Paint a square · its 3 maps passed"*; what the learner used (*"function, parameters, while"*), the number of lines and of steps, never a score; the code of the next level (*"Code of the next level: GREEN-OWL · Write it down to go on from another computer."*); **Next level: 19. Two squares** (Enter), **Stay on this level** (Escape: back to the code, which can be changed) and **All levels**. When a map passes and others remain, there is no panel: the console says *"Map 1 passed. Try map 2."* and the bar of that map turns green.
 
 ### Code editor
 
-- The code of each level is saved in the browser as the learner types, and comes back when they return to the level. **Reset code** brings back the starting code, after a confirmation.
+- The code of each level is saved in the browser as the learner types, and comes back when they return to the level. **Reset code** puts the level back in its first state, after a confirmation: the starting code, and no breakpoint (a breakpoint belongs to a line of the code, which no longer exists). The confirmations of **Reset code** and **Reset progress** are small panels in the middle of the screen, over a veil (wireframe: [`docs/wireframes/overlays.excalidraw`](docs/wireframes/overlays.excalidraw)): the question, what is lost, *"This can't be undone."*, then **Cancel** and the action, which is the main button: Enter confirms, Escape cancels, as everywhere. Its message doesn't name the breakpoints: *"Your code will be replaced by the starting code of the level, as the first time. This can't be undone."*
 - Syntax highlighting of the keywords, the names, the numbers, the texts, the colors and the comments.
 - Tab inserts four spaces; a new line after a line ending with `:` is indented four spaces more; Backspace at the start of an indentation removes four spaces.
 - Errors underlined, with their message on hover (see [Checks before running](#checks-before-running)).
+- **Ctrl+click** (Cmd+click on a Mac), as in a code editor: holding Ctrl underlines the name under the mouse; a click on a built-in function or a keyword opens its entry of the manual in a drawer (see [Manual](#manual)), and a click on a function of the program puts the cursor on its definition. **F1** does the same for the word at the cursor, for the keyboard. **Help › Keyboard shortcuts** and the section **Your first program** of the manual mention it.
 - A thin vertical line at the 80th column. A longer line is underlined with dots, as advice and not as an error, with *"Lines are easier to read under 80 characters."* on hover; the program still runs. The manual explains it in **Conventions**.
 - **Breakpoints**: a click in the margin, left of a line number, sets or removes a breakpoint on that line. They are saved with the code of the level.
 - While a program runs or is paused, the editor can't be changed: the status bar says so, and when the learner tries to type, it lights up briefly with *"Reset the program to edit your code."*
 
 ### Command menu
 
-**Ctrl+Space** in the editor opens a menu at the cursor, to find a command without knowing its name by heart:
+**Ctrl+Space** in the editor opens a menu at the cursor, to find a command without knowing its name by heart. It opens only on Ctrl+Space, never by itself while typing, so that the learner takes the habit of asking for it. Wireframe: [`docs/wireframes/command-menu.excalidraw`](docs/wireframes/command-menu.excalidraw): one fixed panel of three columns, as the cascade of RoboMind but without submenus: the categories, always in view; the commands of the chosen category; the details of the chosen command.
 
 - the commands grouped by category: **Move**, **Paint**, **Carry**, **Sense**, **Write** (the built-in functions), **Colors**, **Control** (`if`, `else if`, `else`, `while`, `repeat`, `break`), **Variables** (`let`), **Functions** (`function`, `return`), and **Your names** (the variables and functions of the program that can be used at the cursor);
-- typing filters the list (`paint` keeps `start_painting()`, `stop_painting()` and `is_painting()`); the arrow keys move in it, Enter or a click inserts the command, Escape closes it;
-- next to the chosen command, its one-line description and an example from the manual;
+- typing filters the commands (`paint` keeps `start_painting()`, `stop_painting()` and `is_painting()`): the categories without result grow pale, the others show their number of results, and the middle column lists every result under the name of its category; ↑ ↓ move in the commands, ← → change the category, Tab, Enter or a click inserts the command and closes the menu, Escape closes it (Tab inserts four spaces only when the menu is closed);
+- next to the chosen command, its one-line description, an example from the manual and **Read more**, which opens its entry of the manual;
 - a statement that opens a block (`if`, `while`, `repeat`, `function`) is inserted with its `:` and its first indented line, the cursor on what to fill in (`if |:`);
-- the same menu opens by itself after two letters of a name, and only on Ctrl+Space when the setting **Suggest while typing** is off.
 
 ### Running a program
 
@@ -280,16 +298,27 @@ The manual of the Stepwise language, on its own page, reachable from every scree
 
 The manual is searchable (a search field filters its sections and commands), and each section has its own address, so that a level, the command menu and an error message can link to it.
 
+Wireframe: [`docs/wireframes/manual.excalidraw`](docs/wireframes/manual.excalidraw). A page of documentation, laid out as the usual ones of programming languages, so that the learner also learns to read them:
+
+- **Header**: the logo and the name, then *"› Manual"*; on the right, when the manual was opened from a level, **Back to 18. Paint a square**. There is no menu bar.
+- **Sections**, on the left: the search field, then the ten sections; the open one is marked, with its categories under it (*Move*, *Paint*…).
+- **Search**: typing filters the list on the left into results grouped by section and category (`paint` keeps *Commands › Paint* with `start_painting(color)`, `stop_painting()` and `is_painting()`, *Commands › Colors* and *The map › Paints*), with their number; the arrow keys move in them, Enter opens the chosen one, Escape clears the search.
+- **Content**, in the middle: the section, then each command with what it does, an example with **Copy**, and a small map where the example plays.
+- **On this page**, on the right: the categories or the headings of the section; a click scrolls smoothly to its anchor, and the one in view is marked while scrolling.
+- **Large screen**: the column of text stays under about 760 pixels wide, to stay readable; the sections on the left and **On this page** on the right stay beside it, the whole centered in the window.
+- **From a level**: every link to the manual (the goal, **Help › Manual**, **Read more** in the command menu, an error) opens it in a tab of its own, always the same one, at the right section, so that the code and the map stay open in the tab of the level. **Back to 18. Paint a square** closes that tab and brings the level back.
+- **Drawer**: in the editor, Ctrl+click (Cmd+click on a Mac) on a built-in function or a keyword, or F1 on the word at the cursor, opens the entry of the manual in a drawer on the right of the level screen, over the map and the panels, the code still in view: the search, the place in the manual (*Manual › 2. Commands › Move*), the entry, and **Full page**, which opens the page above in its tab. Escape, **×** or **Run** closes it, so that the map shows while the program runs.
+
 ### Sandbox
 
-An open map with a few walls, paints and items, without goal. The code is saved like a level's; **Run**, the console and the variables panel work the same way. Editing the map of the sandbox, and a level editor, come later (see the [backlog](docs/backlog.md)).
+An open map with a few walls, paints and items, without goal. The code is saved like a level's; **Run**, the console and the variables panel work the same way. Wireframe: the frame *Sandbox* of [`docs/wireframes/level-screen.excalidraw`](docs/wireframes/level-screen.excalidraw). It is the level screen without what belongs to a goal: in the middle of the header, *"◇ Sandbox"*, which isn't a button; no maps on the right of the header, no progress bar; no goal marks on the map; the menu **Level** keeps **All levels**, **Reset code…** and **Settings**. Editing the map of the sandbox, and a level editor, come later (see the [backlog](docs/backlog.md)).
 
 ### Settings
 
-- **Unlock all levels**: on or off (off by default).
-- **Suggest while typing**: the command menu opens by itself while typing (on by default).
+A panel in the middle of the screen, over a veil, opened from the header of the home screen or **Level › Settings** (wireframe: [`docs/wireframes/overlays.excalidraw`](docs/wireframes/overlays.excalidraw)). A change applies at once and is saved, without a **Save** button; Escape, **×** or a click on the veil closes it.
+
 - **Sounds**: on or off (off by default, so that a classroom stays quiet).
-- **Reset progress**: clears the levels done, the code and the breakpoints of every level, after a confirmation.
+- **Reset progress**: puts every level back in its first state (as **Reset code**, its breakpoints with its code) and clears the levels done and the levels opened by a code, after a confirmation; the settings stay. The messages only say *"the levels done and the code of every level"*: the breakpoints go with the code, without being named.
 
 ### Interface language
 
@@ -303,7 +332,7 @@ The interface is in English. Every text of the interface, the error messages and
 - One kind of item in version 1 (its look comes from the sheet of the world elements).
 - The goal cells of a level are marked on the map (where to stand, which color where, where to put the items), so that the learner sees the target before writing code.
 - Outside the grid counts as a wall.
-- **Legend**: **Help › Legend of the map** opens the legend of the level: only the elements present on its map, each with its drawing and one sentence, the new ones marked as new, and a link to the section **The map** of the manual.
+- **Legend**: the button **Legend**, in the top right corner of the map, or **Help › Legend of the map** opens the legend of the level in a bubble under the button (wireframe: [`docs/wireframes/overlays.excalidraw`](docs/wireframes/overlays.excalidraw)), which blocks nothing, like the goal: Escape, **×** or a click elsewhere closes it. The button carries a dot while the map has new elements not yet seen in the legend. The legend shows only the elements present on its map, each with its drawing and one sentence, the new ones marked as new, and a link to the section **The map** of the manual.
 
 ### Look of the world
 
@@ -329,9 +358,9 @@ Stepwise has no files of its own on the learner's computer: everything is kept i
 
 | Data | Content |
 |---|---|
-| Progress | The levels done, and the variants passed with their code. |
+| Progress | The levels done, the levels opened by a code, and the variants passed with their code. |
 | Code | The code and the breakpoints of each level and of the sandbox. |
-| Settings | The speed, **Unlock all levels**, **Suggest while typing**. |
+| Settings | The speed, **Sounds**. |
 
 The levels and the manual are files of the website, written in the repository.
 
