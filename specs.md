@@ -235,7 +235,7 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
 - **Ctrl+click** (Cmd+click on a Mac), as in a code editor: holding Ctrl underlines the name under the mouse; a click on a built-in function or a keyword opens its entry of the manual in a drawer (see [Manual](#manual)), and a click on a function of the program puts the cursor on its definition. **F1** does the same for the word at the cursor, for the keyboard. **Help › Keyboard shortcuts** and the section **Your first program** of the manual mention it.
 - A thin vertical line at the 80th column. A longer line is underlined with dots, as advice and not as an error, with *"Lines are easier to read under 80 characters."* on hover; the program still runs. The manual explains it in **Conventions**.
 - **Breakpoints**: a click in the margin, left of a line number, sets or removes a breakpoint on that line. They are saved with the code of the level.
-- While a program runs or is paused, the editor can't be changed: the status bar says so, and when the learner tries to type, it lights up briefly with *"Reset the program to edit your code."*
+- While a program runs or is paused, the editor can't be changed: the status bar says so, and when the learner tries to type, it lights up briefly with *"Reset the program to edit your code."* A program stopped by an error has ended: the editor can be changed at once, without **Reset**, so that the learner fixes the line of the error; the map and the variables panel keep the state at the error until the next **Run** or **Reset**.
 
 ### Command menu
 
@@ -369,7 +369,7 @@ The levels and the manual are files of the website, written in the repository.
 | Situation | Behavior |
 |---|---|
 | A syntax or check error in the program | Underlined in the editor, listed in the console with its line and column; **Run** doesn't start. |
-| An error while the program runs | The program stops; the error is shown in the console with its line, the line is marked in the editor, the variables panel shows the state at that moment. |
+| An error while the program runs | The program stops; the error is shown in the console with its line, the line is marked in the editor, the variables panel shows the state at that moment. The code can be changed at once, without **Reset**. |
 | An infinite loop | The program keeps running visibly until **Pause** or **Reset**; the page stays responsive. |
 | A recursion that never ends | Stopped at 200 nested calls with an error. |
 | The browser refuses `localStorage` (private browsing, storage full or blocked) | Stepwise works; a banner says *"Your progress can't be saved in this browser."* |
