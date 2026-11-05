@@ -316,7 +316,7 @@ An open map with a few walls, paints and items, without goal. The code is saved 
 A panel in the middle of the screen, over a veil, opened from the header of the home screen or **Level › Settings** (wireframe: [`docs/wireframes/overlays.excalidraw`](docs/wireframes/overlays.excalidraw)). A change applies at once and is saved, without a **Save** button; Escape, **×** or a click on the veil closes it.
 
 - **Sounds**: on or off (off by default, so that a classroom stays quiet).
-- **Reset progress**: clears the levels done, the code and the breakpoints of every level, after a confirmation.
+- **Reset progress**: puts every level back in its first state (as **Reset code**, its breakpoints with its code) and clears the levels done and the levels opened by a code, after a confirmation; the settings stay. The messages only say *"the levels done and the code of every level"*: the breakpoints go with the code, without being named.
 
 ### Interface language
 
