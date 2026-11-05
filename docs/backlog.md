@@ -23,6 +23,7 @@ The ideas, polish and edge cases found along the way that the current step doesn
 - A level editor, and sharing a level as a file.
 - More kinds of items, and elements such as doors or switches.
 - More paints than `red`, `yellow` and `blue`, if a level needs them.
+- The same map solved twice, the second time with a constraint (e.g. first with `forward()` written out, then with a loop and at most a given number of lines), so that the learner feels what a control structure brings; close to the challenges of the shortest code.
 
 ## Distribution
 
