@@ -227,7 +227,7 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
 
 ### Code editor
 
-- The code of each level is saved in the browser as the learner types, and comes back when they return to the level. **Reset code** puts the level back in its first state, after a confirmation: the starting code, and no breakpoint (a breakpoint belongs to a line of the code, which no longer exists).
+- The code of each level is saved in the browser as the learner types, and comes back when they return to the level. **Reset code** puts the level back in its first state, after a confirmation: the starting code, and no breakpoint (a breakpoint belongs to a line of the code, which no longer exists). Its message doesn't name the breakpoints: *"Your code will be replaced by the starting code of the level, as the first time. This can't be undone."*
 - Syntax highlighting of the keywords, the names, the numbers, the texts, the colors and the comments.
 - Tab inserts four spaces; a new line after a line ending with `:` is indented four spaces more; Backspace at the start of an indentation removes four spaces.
 - Errors underlined, with their message on hover (see [Checks before running](#checks-before-running)).
