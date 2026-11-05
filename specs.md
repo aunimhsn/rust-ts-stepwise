@@ -166,7 +166,8 @@ Wireframe: [`docs/wireframes/home-screen.excalidraw`](docs/wireframes/home-scree
 - **Level chosen**, on the right: its chapter, its number and title, a scene of its map, its goal, its maps with their state, and one button. The screen opens with the level to play chosen.
   - **Level to play**: the starting map with its goal marks and the robot waiting (it blinks, looks around), never the solution; **Play**.
   - **Level done**: the learner's own program replayed on its first map; **Play again**.
-  - **Level locked**: the starting map, still, and *"Finish 18. Paint a square to open this level."*; the button is greyed.
+  - **Level locked**: the starting map, still, and *"Finish 18. Paint a square to open this level."*; under it, *"Have a code?"*, a field and **Open** (see [Level codes](#levels-and-progression)); the button is greyed.
+  - The panel of a level open or done shows its code (*"Code of this level: BLUE-FOX"*).
 - **More levels**: the path is laid out from the list of levels, so that adding levels or chapters needs no new design; when they no longer fit, the path scrolls.
 
 ### Level screen
@@ -213,7 +214,8 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
 - A level has a title, a goal written in a few sentences, its map, the code it starts with, and an optional hint, hidden until the learner asks for it. Each level links to the sections of the manual it needs.
 - **Variants**: a level may have up to three maps, the same task on different ground (a wall further away, another number of items), so that a program written for one map only doesn't pass. The learner switches between them with the buttons **1**, **2**, **3** on the right of the header, above the map, hidden when the level has one map; the shown map has a full background. **Run** runs the shown variant. A bar under each number turns green once its variant has passed, and stays grey until then; the level is done once every variant has passed with the same code. Changing the code turns the bars grey again.
 - The levels are numbered from the first to the last, across the chapters (`18. Paint a square`). The number is computed from their order, never saved: the progress is saved under a stable name of each level, so that a level added later doesn't mix it up.
-- The levels open in order: a level done opens the next one. A done level stays playable. The setting **Unlock all levels**, for a teacher or a learner who already knows, opens every level.
+- The levels open in order: a level done opens the next one. A done level stays playable. Each level must be earned: there is no setting that unlocks every level; a learner who is stuck has the hint, then the teacher.
+- **Level codes**, as the passwords of the old console games: each level has a code of two English words (`GREEN-OWL`), easy to write and to dictate, unrelated to its title so that it can't be guessed, and tied to the stable name of the level, not to its number, so that a level added later changes no code. Entering the code of a level opens it and every level before it, without marking them done. The success panel gives the code of the next level, so that the learner can go on from another computer (the progress lives in one browser); the home screen shows the code of every level open or done. The teacher gives a code to open a level for the whole class, or the code of the last level for a demonstration; the list of the codes is in a guide for the teachers in `docs/`, readable in the repository: the codes add friction, not security.
 - **Goals** of a level, all checked when the program ends without error:
   - the robot stands on a given cell;
   - given cells have given paints (and, when the level says so, no other cell is painted);
@@ -221,7 +223,7 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
   - the robot carries an item, or carries none.
 - **New elements**: each element of the map (see [Map](#map)) is introduced by the first level that uses it: the goal of this level names it, links to the section **The map** of the manual, and the legend of the level marks it as new. There is no tutorial level showing every element at once: a chapter brings one idea, and an element waits for the chapter that needs it.
 - When the program ends and every goal is met, the variant passes; once every variant has, a success panel offers the next level. When a goal isn't met, the console says which one, and the cells concerned are marked on the map.
-- **Success panel** (wireframe: [`docs/wireframes/success-panel.excalidraw`](docs/wireframes/success-panel.excalidraw)): in the middle of the screen, over a veil, once the robot has hopped (about one second). The robot, *"Level done!"*, *"18. Paint a square · its 3 maps passed"*; what the learner used (*"function, parameters, while"*), the number of lines and of steps, never a score; **Next level: 19. Two squares** (Enter), **Stay on this level** (Escape: back to the code, which can be changed) and **All levels**. When a map passes and others remain, there is no panel: the console says *"Map 1 passed. Try map 2."* and the bar of that map turns green.
+- **Success panel** (wireframe: [`docs/wireframes/success-panel.excalidraw`](docs/wireframes/success-panel.excalidraw)): in the middle of the screen, over a veil, once the robot has hopped (about one second). The robot, *"Level done!"*, *"18. Paint a square · its 3 maps passed"*; what the learner used (*"function, parameters, while"*), the number of lines and of steps, never a score; the code of the next level (*"Code of the next level: GREEN-OWL · Write it down to go on from another computer."*); **Next level: 19. Two squares** (Enter), **Stay on this level** (Escape: back to the code, which can be changed) and **All levels**. When a map passes and others remain, there is no panel: the console says *"Map 1 passed. Try map 2."* and the bar of that map turns green.
 
 ### Code editor
 
@@ -311,7 +313,8 @@ An open map with a few walls, paints and items, without goal. The code is saved 
 
 ### Settings
 
-- **Unlock all levels**: on or off (off by default).
+A panel in the middle of the screen, over a veil, opened from the header of the home screen or **Level › Settings** (wireframe: [`docs/wireframes/overlays.excalidraw`](docs/wireframes/overlays.excalidraw)). A change applies at once and is saved, without a **Save** button; Escape, **×** or a click on the veil closes it.
+
 - **Sounds**: on or off (off by default, so that a classroom stays quiet).
 - **Reset progress**: clears the levels done, the code and the breakpoints of every level, after a confirmation.
 
@@ -353,9 +356,9 @@ Stepwise has no files of its own on the learner's computer: everything is kept i
 
 | Data | Content |
 |---|---|
-| Progress | The levels done, and the variants passed with their code. |
+| Progress | The levels done, the levels opened by a code, and the variants passed with their code. |
 | Code | The code and the breakpoints of each level and of the sandbox. |
-| Settings | The speed, **Unlock all levels**, **Sounds**. |
+| Settings | The speed, **Sounds**. |
 
 The levels and the manual are files of the website, written in the repository.
 
