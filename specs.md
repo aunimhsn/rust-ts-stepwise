@@ -148,12 +148,26 @@ The errors that depend on the values (a wall in front, a division by zero, a con
 
 | Screen | Content |
 |---|---|
-| Home | The chapters and their levels, each locked, open or done; the sandbox; the manual; the settings. |
+| Home | The path through the levels, grouped by chapter, each locked, open or done; the level chosen; the sandbox, the manual and the settings (see [Home screen](#home-screen)). |
 | Level | The code editor with its controls, the map, the console and the variables panel; the goal and the legend open from the header (see [Level screen](#level-screen)). |
 | Sandbox | The level screen without goal, on an open map. |
 | Manual | The manual of the language. |
 
 The layout of each screen is decided with the wireframes, then the mock-up. The wireframes, in [`docs/wireframes/`](docs/wireframes/), only fixed the first layout: once the mock-up is approved, it becomes the reference.
+
+### Home screen
+
+Wireframe: [`docs/wireframes/home-screen.excalidraw`](docs/wireframes/home-screen.excalidraw). A path through every level on the left, the level chosen on the right, under a header of one line:
+
+- **Header**: the logo and the name; in the middle, *"17 of 20 levels done"*; on the right, **Sandbox**, **Manual** and **Settings**. The same thin bar as on the level screen fills along its bottom with the levels done.
+- **Path**, on the left: one stone per level, numbered, linked by a path that runs in rows, left to right then back, with a rounded half-turn at the end of each row. The path is painted up to the level to play and drawn as a ghost after it. A stone is filled when its level is done, bold when it is the level to play, dashed when it is locked; the robot stands on the level to play. Hovering a stone shows its title; a click chooses its level.
+- **Chapters**: a light band behind the stones of each chapter, with its name and its idea (*"Loop until · while, not, break"*). A chapter never wraps around a turn of the path.
+- **Maps of a level**: under each stone, one small square per map, green once the map has passed, grey until then, with no mark for a map that failed. A done level keeps its squares green, even when its code has changed since.
+- **Level chosen**, on the right: its chapter, its number and title, a scene of its map, its goal, its maps with their state, and one button. The screen opens with the level to play chosen.
+  - **Level to play**: the starting map with its goal marks and the robot waiting (it blinks, looks around), never the solution; **Play**.
+  - **Level done**: the learner's own program replayed on its first map; **Play again**.
+  - **Level locked**: the starting map, still, and *"Finish 18. Paint a square to open this level."*; the button is greyed.
+- **More levels**: the path is laid out from the list of levels, so that adding levels or chapters needs no new design; when they no longer fit, the path scrolls.
 
 ### Level screen
 
@@ -183,7 +197,7 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
 
 ### Levels and progression
 
-- The levels are grouped in chapters, each introducing one idea. The plan below is a starting point; the levels are designed in their own roadmap steps.
+- The levels are grouped in chapters, each introducing one idea. The plan below is a starting point; the levels are designed in their own roadmap steps. About 20 levels in 8 chapters for the first version: a range rather than a fixed number, which follows the ideas found while designing the levels.
 
   | Chapter | Idea | Levels (about) |
   |---|---|---|
