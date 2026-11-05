@@ -221,6 +221,7 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
   - the robot carries an item, or carries none.
 - **New elements**: each element of the map (see [Map](#map)) is introduced by the first level that uses it: the goal of this level names it, links to the section **The map** of the manual, and the legend of the level marks it as new. There is no tutorial level showing every element at once: a chapter brings one idea, and an element waits for the chapter that needs it.
 - When the program ends and every goal is met, the variant passes; once every variant has, a success panel offers the next level. When a goal isn't met, the console says which one, and the cells concerned are marked on the map.
+- **Success panel** (wireframe: [`docs/wireframes/success-panel.excalidraw`](docs/wireframes/success-panel.excalidraw)): in the middle of the screen, over a veil, once the robot has hopped (about one second). The robot, *"Level done!"*, *"18. Paint a square · its 3 maps passed"*; what the learner used (*"function, parameters, while"*), the number of lines and of steps, never a score; **Next level: 19. Two squares** (Enter), **Stay on this level** (Escape: back to the code, which can be changed) and **All levels**. When a map passes and others remain, there is no panel: the console says *"Map 1 passed. Try map 2."* and the bar of that map turns green.
 
 ### Code editor
 
