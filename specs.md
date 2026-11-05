@@ -266,6 +266,14 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
 - There is no **Stop**: **Pause** freezes the program to look at the map and the variables, **Reset** ends it.
 - The keyboard shortcuts of the controls are decided with the mock-up.
 
+**States of a run** (wireframe: [`docs/wireframes/states.excalidraw`](docs/wireframes/states.excalidraw)), on the level screen, whose blocks never move:
+
+- **Running**: the first control is **Pause** (⏸), **Step** is greyed, the next line is highlighted, the step counter rises; the console is shown. When the learner types, the code doesn't change and the status bar lights up briefly with *"Reset the program to edit your code."*
+- **Paused on a breakpoint**: the breakpoint and the highlighted line together; the first control is **Resume** (▶); the variables panel opens by itself.
+- **Errors before running**: the words underlined, their message on hover; *"2 errors"* in the status bar; **Run** lists them in the console, each with its place (*"Line 5, col 9"*), which puts the cursor on it; the map stays at its start.
+- **Error while running**: the line of the error marked in the margin, the map as it was at the error (the robot against the wall), the error in the console, a dot on the tab **Variables**; the status bar says `Error at line 5`.
+- **Goal not met**: a flag on each cell of a goal not met, the eyes of the robot dimmed; the console says which goal (*"The goal isn't met: 7 cells of the square aren't red."*); the bar of the map stays grey; the status bar says `Ended · goal not met`.
+
 ### Console
 
 - The lines written by `print`, in order.
