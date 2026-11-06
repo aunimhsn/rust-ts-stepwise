@@ -10,10 +10,9 @@ function appWordmark(fontSize) {
   return `<div class="app-name" style="font-size:${fontSize}px"><img src="world-elements/daylight/logo.svg" height="${height.toFixed(1)}" alt="" style="margin-right:${(fontSize * 0.18).toFixed(1)}px;transform:translateY(${(height / 2 - middleOfText).toFixed(2)}px)"><span>stepwise</span></div>`;
 }
 
-// `shownMap` is the map on the screen (from 1), `passed` the maps that have passed, `menu` the menu
-// open, `goalOpen` the bubble of the goal, and `place` the presentation of the place of the level.
-function appHeader({ shownMap = 1, passed = [], menu, goalOpen = false, place = chosen.place } = {}) {
-  const inSecondBar = place.startsWith("bar-");
+// The first bar: the name, the menus and the way to the settings. `menu` is the menu open; the rest
+// goes to the second bar, under it (block-second-bar.js).
+function appHeader({ shownMap = 1, passed = [], menu, goalOpen = false } = {}) {
   const menus = ["Level", "Edit", "Run", ...(chosen.settings === "view" ? ["View"] : []), "Help"];
   const name = chosen.settings === "name"
     ? `<button type="button" class="app-name-menu ${menu === "Stepwise" ? "is-open" : ""}">${appWordmark(21)}<i>${ICONS.down(11)}</i></button>`
@@ -24,16 +23,7 @@ function appHeader({ shownMap = 1, passed = [], menu, goalOpen = false, place = 
     <nav class="app-menus">${menus.map(item =>
       `<button type="button" class="app-menu ${item === menu ? "is-open" : ""}">${item}</button>`).join("")}</nav>
     ${chosen.settings === "gear-left" ? gear("is-left") : ""}
-    ${inSecondBar ? "" : appPlace(place, goalOpen)}
-    ${inSecondBar ? "" : `<div class="app-maps">${appMapButtons(shownMap, passed)}</div>`}
     ${chosen.settings === "gear" ? gear("is-right") : ""}
-    ${!inSecondBar || place === "bar-tabs" ? appProgress() : ""}
   </header>
-  ${inSecondBar ? appSecondBar(place, { shownMap, passed, goalOpen }) : ""}`;
+  ${appSecondBar({ shownMap, passed, goalOpen })}`;
 }
-
-// The word Map and the buttons of the maps, each with its bar, green once the map has passed.
-const appMapButtons = (shownMap, passed) => `<span>Map</span>${[1, 2, 3].map(number =>
-  `<button type="button" class="app-map-button ${number === shownMap ? "is-shown" : ""} ${passed.includes(number) ? "is-passed" : ""}">${number}</button>`).join("")}`;
-
-const appProgress = () => '<div class="app-progress" title="17 of 20 levels done"><i style="width:85%"></i></div>';

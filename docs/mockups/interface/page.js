@@ -3,9 +3,9 @@
 // One group of tabs per open decision; `fallback` is the choice shown by default.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(INTERFACE_STYLES).map(([key, style]) => [key, style.title])), fallback: Object.keys(INTERFACE_STYLES)[0] },
-  // The place of the level: in the header (1 to 7, block-place.js), or in a second bar under it with
-  // the maps (A to E, block-second-bar.js), each series from the calmest to the boldest.
-  place: { label: "Place", options: { title: "1 Title", stacked: "2 Two lines", field: "3 Field", stone: "4 Stone", path: "5 Path", tag: "6 Tag", robot: "7 Robot", "bar-plain": "A Second bar", "bar-columns": "B Over the columns", "bar-tabs": "C Map tabs", "bar-goal": "D With the goal", "bar-levels": "E All the levels" }, fallback: "bar-plain" },
+  // The texts of the two bars around their center: tuned by eye on the owner's screen.
+  menuOffset: { label: "Menus", options: { up: "-0.5 px", center: "0", down: "+0.5 px", more: "+1 px" }, fallback: "center" },
+  barOffset: { label: "Second bar", options: { up: "-0.5 px", center: "0", down: "+0.5 px", more: "+1 px" }, fallback: "center" },
   mapLabel: { label: "Map label", options: { text: "Text font", name: "Font of the name", all: "With its numbers" }, fallback: "text" },
   // How far the texts of the status bar sit below their place: tuned by eye on the owner's screen.
   statusText: { label: "Status text", options: { none: "0", half: "+0.5 px", one: "+1 px", "one-half": "+1.5 px", two: "+2 px" }, fallback: "none" },
