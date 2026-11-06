@@ -1,5 +1,5 @@
 // Section: the lines every five cells and the shadows of the walls, on a map of the largest size (16 × 12),
-// at the size of its cells on a 1280 × 720 screen, then larger. The tabs change them in every window.
+// at the size of its cells on a 1280 × 720 screen, then larger. The sliders change them in every window.
 const LIFE_ROWS = [
   "....##..........",
   "....##......#...",
