@@ -17,12 +17,12 @@ Design first (phases 3 to 5 of [process.md](process.md), with a sheet of the wor
 
 - [x] **0. Specifications** (#2)
 - [x] **1. Sheet of the world elements** (#4, #5)
-- [x] **2. Wireframes**: Excalidraw, in `docs/wireframes/`, at 1280 × 720 and on a large screen; each sub-step writes the layout it agreed in `specs.md`.
-  - [x] **2a. Level screen** (#6)
-  - [x] **2b. Other screens** (#7)
-  - [x] **2c. States of a run** (#8)
-  - [x] **2d. Messages**: in the same file: the storage refused, the window too narrow, the browser too old.
-- [ ] **3. Mock-up**: the HTML mock-up of every screen and state, in the style of step 1, with real sample code and errors; the keyboard shortcuts of the controls decided; the animations of the map as mini-scenes to replay and tune, at every speed (each action of the robot, `pick_up()` with its pincer, the end of a run that succeeds or fails), with their sounds, synthesized and CC0 compared by ear. Done when every scenario looks right at 1280 × 720 and on a large screen.
+- [x] **2. Wireframes** (#6, #7, #8, #9)
+- [ ] **3. Mock-up**: the HTML mock-up of every screen and state, with real sample code and errors, in `docs/mockups/interface.html`. The world keeps the elements of step 1. Done when every scenario looks right at 1280 × 720 and on a large screen.
+  - [ ] **3a. Style of the interface**: the level screen (paused, an error while running, a menu, the goal) in 3 or 4 styles around the world of step 1; one chosen.
+  - [ ] **3b. Whole level screen**: every state of a run, the menus and the keyboard shortcuts of the controls decided, the goal, the legend, the command menu, the success panel, the confirmations, the sandbox, the large screen.
+  - [ ] **3c. Other screens**: the home screen and its path, the manual, the settings, the messages (the storage refused, the window too small, the browser too old, offline).
+  - [ ] **3d. Animations and sounds**: the animations of the map as mini-scenes to replay and tune, at every speed (each action of the robot, `pick_up()` with its pincer, the end of a run that succeeds or fails), with their sounds, synthesized and CC0 compared by ear.
 - [ ] **4. Design system**: the tokens (colors, spacing, radii, typography, motion) in `specs.md`, the fonts and their licenses, the tone of the messages; the mock-up updated to use exactly these tokens; an entry in `design-journal.md`.
 - [ ] **5. Workspace**: the template adapted to a web application: a Cargo workspace (`crates/core`, a plain library with the lints that forbid panics; `crates/wasm`, its bridge), the SvelteKit application in `web/` with TypeScript strict, Fluent and `locales/en.ftl`, the WebAssembly build script, the CI (Rust and front-end checks, skipped for documentation only), the deployment to GitHub Pages instead of the release workflow, at `stepwise.sylent.art` (the path never hard-coded; the owner adds the DNS records, see [GitHub Pages usage](docs/github-pages-usage.md#address)), `CLAUDE.md` and the README updated (commands, `--workspace`), `main` protected by a ruleset requiring the checks. Done when `https://stepwise.sylent.art/` shows a text computed by Rust.
 - [ ] **6. Lexer**: the tokens of the language with their positions, the indentation turned into block starts and ends (four spaces, no tab), the texts and their escapes, the comments; every error as a code with its values and its position. Tests of every rule of [Lines and indentation](specs.md#lines-and-indentation) and [Names](specs.md#names).
