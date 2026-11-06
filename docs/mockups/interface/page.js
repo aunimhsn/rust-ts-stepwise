@@ -3,8 +3,8 @@
 // One group of tabs per open decision; `fallback` is the choice shown by default.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(INTERFACE_STYLES).map(([key, style]) => [key, style.title])), fallback: Object.keys(INTERFACE_STYLES)[0] },
-  // The two readings of "B on one bar" (block-place.js).
-  place: { label: "Place", options: { crumb: "B on one bar", stacked: "2 Two lines" }, fallback: "crumb" },
+  // The place of the level: on one bar (1 to 8), on two bars (9 to 13).
+  place: { label: "Place", options: { title: "1 Title", stacked: "2 Two lines", field: "3 Field", stone: "4 Stone", path: "5 Path", tag: "6 Tag", robot: "7 Robot", crumb: "8 Breadcrumb", "bar-plain": "9 Second bar", "bar-columns": "10 Over the columns", "bar-tabs": "11 Map tabs", "bar-goal": "12 With the goal", "bar-levels": "13 All the levels" }, fallback: "stacked" },
   // The texts of the bar around their center: tuned by eye on the owner's screen.
   menuOffset: { label: "Menus", options: { up: "-0.5 px", center: "0", down: "+0.5 px", more: "+1 px" }, fallback: "center" },
   barOffset: { label: "Place and maps", options: { up: "-0.5 px", center: "0", down: "+0.5 px", more: "+1 px" }, fallback: "center" },

@@ -1,17 +1,59 @@
-/* The breadcrumb after the menus, with a thin line before it. */
-.app-window .app-crumb { position: relative; display: flex; align-items: center; gap: 7px; flex: none; height: 28px; margin-left: 12px; padding: 0 8px; background: none; border: 0; border-radius: var(--radius-small); color: var(--band-text); line-height: 1; white-space: nowrap; }
+/* The place of the level in one bar: in the middle, centered on the height above the thin bar. */
+.app-window .app-place { position: absolute; left: 50%; top: 8px; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; height: 30px; box-sizing: border-box; padding: 0 12px; background: none; border: 0; border-radius: var(--radius-small); color: var(--band-text); line-height: 1; white-space: nowrap; }
+.app-window .app-place.is-open { background: var(--band-hover); }
+.app-place b { font: var(--title-weight) 14px/1 var(--font-title); }
+.app-place small { color: var(--band-weak); font-size: 13px; }
+.app-place em { display: flex; color: var(--band-weak); font-style: normal; }
+
+/* The maps on the right of the bar, or over the column of the map. */
+.is-one-bar .app-maps { margin-left: auto; }
+.is-place-crumb .app-maps { position: absolute; left: 50%; right: 0; top: 0; bottom: 3px; justify-content: center; margin-left: 0; }
+
+/* The breadcrumb. */
+.app-window .app-crumb { position: relative; display: flex; align-items: center; gap: 7px; flex: none; height: 28px; padding: 0 8px; background: none; border: 0; border-radius: var(--radius-small); color: var(--band-text); line-height: 1; white-space: nowrap; }
 .app-window .app-crumb.is-open { background: var(--band-hover); }
 .app-crumb span { color: var(--band-weak); }
 .app-crumb i { display: flex; color: var(--band-weak); }
 .app-crumb b { font: var(--title-weight) 14px/1 var(--font-title); }
+.is-place-crumb .app-crumb { margin-left: 12px; }
 
-/* The maps over the column of the map, centered, on the height above the thin bar of the progress. */
-:root[data-place="crumb"] .app-maps { position: absolute; left: 50%; right: 0; top: 0; bottom: 3px; justify-content: center; }
+/* 2. The chapter above the title. */
+.app-window .app-place.is-stacked { top: 4px; flex-direction: column; justify-content: center; gap: 0; height: 38px; }
+.is-stacked small { font-size: 10.5px; line-height: 13px; letter-spacing: .05em; text-transform: uppercase; }
+.app-place.is-stacked b { line-height: 18px; }
 
-/* The chapter above the title, in the middle of the bar. */
-.app-window .app-stacked { position: absolute; left: 50%; top: 4px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; justify-content: center; height: 38px; padding: 0 12px; background: none; border: 0; border-radius: var(--radius-small); color: var(--band-text); white-space: nowrap; }
-.app-window .app-stacked.is-open { background: var(--band-hover); }
-.app-stacked small { color: var(--band-weak); font-size: 10.5px; line-height: 13px; letter-spacing: .05em; text-transform: uppercase; }
-.app-stacked b { font: var(--title-weight) 14px/18px var(--font-title); }
-:root[data-place="stacked"] .app-maps { margin-left: auto; }
-:root[data-place="stacked"] .app-gear.is-right { margin-left: 10px; }
+/* 3. A field, as the command center of a code editor. */
+.app-window .app-place.is-field { width: 336px; background: var(--surface); border: 1px solid var(--idle); }
+.app-window .app-place.is-field.is-open { background: var(--surface); border-color: var(--band-text); }
+.is-field .place-number { margin-left: auto; color: var(--band-weak); font: 500 12.5px var(--font-code); }
+
+/* 4. The number in a stone, as on the path of the home screen. */
+.place-stone { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--chosen); color: var(--on-chosen); font: 600 13px var(--font-name); }
+.app-place.is-stone b, .app-place.is-path b, .app-place.is-tag b { font: 500 15px var(--font-name); }
+.is-stone small { margin-left: 2px; }
+
+/* 5. The stones of the chapter, the level to play filled and the next ones as ghosts. */
+.app-window .app-place.is-path { gap: 10px; }
+.place-stones { display: flex; align-items: center; }
+.place-stones b, .place-stones i { display: grid; place-items: center; border-radius: 50%; font: 600 11px var(--font-name); font-style: normal; }
+.app-place .place-stones b { width: 24px; height: 24px; background: var(--accent); color: var(--on-accent); font: 600 11px var(--font-name); }
+.place-stones i { box-sizing: border-box; width: 20px; height: 20px; border: 1.5px dashed var(--band-weak); color: var(--band-weak); }
+.place-stones u { width: 9px; border-top: 2px dashed var(--band-weak); }
+
+/* 6. A tag that hangs from the top of the window, over the blocks. */
+.app-window .app-place.is-tag { z-index: 1; top: 0; flex-direction: column; gap: 0; height: 60px; padding: 5px 20px 0; background: var(--accent); color: var(--on-accent); border-radius: 0 0 10px 10px; box-shadow: 0 3px 10px #2229353d; }
+.app-window .app-place.is-tag.is-open { background: var(--accent); }
+.is-tag small { color: inherit; font-size: 11px; line-height: 14px; opacity: .8; }
+.place-tag-line { display: flex; align-items: baseline; gap: 8px; }
+.place-big { font: 600 25px/32px var(--font-name); }
+
+/* 7. The robot says the level in a bubble. */
+.app-window .app-place.is-robot { top: 6px; gap: 9px; height: 34px; padding: 0 4px; }
+.place-bubble { position: relative; padding: 4px 13px; background: var(--surface); border: 1px solid var(--idle); border-radius: 12px; font: 500 14.5px/1.2 var(--font-name); }
+.place-bubble::before { content: ""; position: absolute; left: -5px; top: 50%; width: 8px; height: 8px; background: var(--surface); border-left: 1px solid var(--idle); border-bottom: 1px solid var(--idle); transform: translateY(-50%) rotate(45deg); }
+
+/* The strips of the section that compares the proposals. */
+.place-group { margin: 22px 0 12px; color: #e9ecef; font-size: 15px; font-weight: 700; }
+.place-strips { display: grid; gap: 28px; padding-bottom: 20px; }
+.app-window.is-strip { height: auto; overflow: visible; background: none; box-shadow: none; }
+.place-strip-title { display: block; margin-bottom: 5px; color: #e9ecef; font-size: 14px; font-weight: 700; }
