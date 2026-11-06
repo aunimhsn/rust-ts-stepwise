@@ -1,0 +1,17 @@
+/* The breadcrumb after the menus, with a thin line before it. */
+.app-window .app-crumb { position: relative; display: flex; align-items: center; gap: 7px; flex: none; height: 28px; margin-left: 12px; padding: 0 8px; background: none; border: 0; border-radius: var(--radius-small); color: var(--band-text); line-height: 1; white-space: nowrap; }
+.app-window .app-crumb.is-open { background: var(--band-hover); }
+.app-crumb span { color: var(--band-weak); }
+.app-crumb i { display: flex; color: var(--band-weak); }
+.app-crumb b { font: var(--title-weight) 14px/1 var(--font-title); }
+
+/* The maps over the column of the map, centered, on the height above the thin bar of the progress. */
+:root[data-place="crumb"] .app-maps { position: absolute; left: 50%; right: 0; top: 0; bottom: 3px; justify-content: center; }
+
+/* The chapter above the title, in the middle of the bar. */
+.app-window .app-stacked { position: absolute; left: 50%; top: 4px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; justify-content: center; height: 38px; padding: 0 12px; background: none; border: 0; border-radius: var(--radius-small); color: var(--band-text); white-space: nowrap; }
+.app-window .app-stacked.is-open { background: var(--band-hover); }
+.app-stacked small { color: var(--band-weak); font-size: 10.5px; line-height: 13px; letter-spacing: .05em; text-transform: uppercase; }
+.app-stacked b { font: var(--title-weight) 14px/18px var(--font-title); }
+:root[data-place="stacked"] .app-maps { margin-left: auto; }
+:root[data-place="stacked"] .app-gear.is-right { margin-left: 10px; }

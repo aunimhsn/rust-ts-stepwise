@@ -3,12 +3,12 @@
 // One group of tabs per open decision; `fallback` is the choice shown by default.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(INTERFACE_STYLES).map(([key, style]) => [key, style.title])), fallback: Object.keys(INTERFACE_STYLES)[0] },
-  // The texts of the two bars around their center: tuned by eye on the owner's screen.
+  // The two readings of "B on one bar" (block-place.js).
+  place: { label: "Place", options: { crumb: "B on one bar", stacked: "2 Two lines" }, fallback: "crumb" },
+  // The texts of the bar around their center: tuned by eye on the owner's screen.
   menuOffset: { label: "Menus", options: { up: "-0.5 px", center: "0", down: "+0.5 px", more: "+1 px" }, fallback: "center" },
-  barOffset: { label: "Second bar", options: { up: "-0.5 px", center: "0", down: "+0.5 px", more: "+1 px" }, fallback: "center" },
+  barOffset: { label: "Place and maps", options: { up: "-0.5 px", center: "0", down: "+0.5 px", more: "+1 px" }, fallback: "center" },
   mapLabel: { label: "Map label", options: { text: "Text font", name: "Font of the name", all: "With its numbers" }, fallback: "text" },
-  // How far the texts of the status bar sit below their place: tuned by eye on the owner's screen.
-  statusText: { label: "Status text", options: { none: "0", half: "+0.5 px", one: "+1 px", "one-half": "+1.5 px", two: "+2 px" }, fallback: "none" },
   settings: { label: "Settings", options: { gear: "Gear on the right", "gear-left": "Gear after the menus", name: "Menu on the name", view: "Menu View" }, fallback: "gear-left" },
 };
 

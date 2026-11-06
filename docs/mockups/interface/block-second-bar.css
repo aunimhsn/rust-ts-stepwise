@@ -1,9 +1,0 @@
-/* The second bar: the height of its content leaves out the thin bar of the progress at its bottom. */
-.app-second-bar { position: relative; flex: none; display: flex; height: 38px; box-sizing: border-box; padding-bottom: 3px; background: var(--band); color: var(--band-text); border-bottom: var(--band-line); }
-.app-bar-half { flex: 1 1 0; min-width: 0; display: flex; align-items: center; padding-left: 6px; }
-.app-bar-half.is-center { justify-content: center; padding-left: 0; }
-.app-window .app-crumb { display: flex; align-items: center; gap: 7px; height: 28px; padding: 0 8px; background: none; border: 0; border-radius: var(--radius-small); color: var(--band-text); line-height: 1; white-space: nowrap; }
-.app-window .app-crumb.is-open { background: var(--band-hover); }
-.app-crumb span { color: var(--band-weak); }
-.app-crumb i { display: flex; color: var(--band-weak); }
-.app-crumb b { font: var(--title-weight) 14px/1 var(--font-title); }
