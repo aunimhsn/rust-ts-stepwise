@@ -1,7 +1,6 @@
 // Section: the bubble of the goal, which takes the fonts chosen at the top of the page: alone, then in
-// the first visit of a level, over the starting code; then five bolder versions.
-const GOAL_HOT = [["hot-1", "A louder title"], ["hot-2", "The number as a big mark"], ["hot-3", "The robot says it"], ["hot-4", "A stroke of paint"], ["hot-5", "A mission card"]];
-const goalBoard = (title, options) => `<div><span class="goal-board-title">${title}</span><div class="app-window goal-board">${appGoal(options)}</div></div>`;
+// the first visit of a level, over the starting code.
+const goalBoard = title => `<div><span class="goal-board-title">${title}</span><div class="app-window goal-board">${appGoal()}</div></div>`;
 
 const firstVisitWindow = () => appWindow({
   header: { goalOpen: true },
@@ -13,7 +12,5 @@ const firstVisitWindow = () => appWindow({
 
 SECTIONS.push(["The bubble of the goal", () => `
   <p class="goal-group">Its fonts: the lists at the top of the page</p>
-  ${goalBoard("Alone", {})}
-  <div class="goal-real"><span class="goal-board-title">With the interface behind: the first visit of a level, 1280 × 720</span>${firstVisitWindow()}</div>
-  <p class="goal-group">Five bolder versions</p>
-  <div class="goal-boards">${GOAL_HOT.map(([kind, title], index) => goalBoard(`${index + 1} · ${title}`, { kind })).join("")}</div>`]);
+  ${goalBoard("Alone")}
+  <div class="goal-real"><span class="goal-board-title">With the interface behind: the first visit of a level, 1280 × 720</span>${firstVisitWindow()}</div>`]);

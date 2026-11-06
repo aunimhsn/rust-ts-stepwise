@@ -5,7 +5,6 @@ const CODE_FONTS = ["JetBrains Mono", "Fira Code", "Source Code Pro", "IBM Plex 
 // The parts that can take their own font: [label, CSS variable, group of the top of the page].
 const FONT_ROLES = {
   goalTitle: ["Title", "--font-goal-title", "Goal"],
-  goalChapter: ["Chapter", "--font-goal-chapter"],
   goalText: ["Goal text", "--font-goal-text"],
   goalLinks: ["Hint, manual", "--font-goal-links"],
   goalNew: ["New", "--font-goal-new"],

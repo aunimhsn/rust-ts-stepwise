@@ -6,7 +6,7 @@ const VARIANTS = {
   // The fonts to try: one for everything, then one per part, which follows it until it is changed.
   font: { label: "All text", select: true, options: Object.fromEntries(TEXT_FONTS.map(family => [family, family])), fallback: "Manrope" },
   code: { label: "Code", select: true, options: Object.fromEntries(CODE_FONTS.map(family => [family, family])), fallback: "JetBrains Mono" },
-  ...Object.fromEntries(Object.entries(FONT_ROLES).map(([key, [label, , section]]) => [key, { label, section, select: true, options: { same: "As all text", ...Object.fromEntries(TEXT_FONTS.map(family => [family, family])) }, fallback: "same" }])),
+  ...Object.fromEntries(Object.entries(FONT_ROLES).map(([key, [label, , section]]) => [key, { label, section, select: true, options: { same: "As all text", ...Object.fromEntries(TEXT_FONTS.map(family => [family, family])) }, fallback: key === "goalTitle" ? "Fredoka" : "same" }])),
 };
 
 const params = new URLSearchParams(location.search);
