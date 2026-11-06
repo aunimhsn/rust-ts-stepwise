@@ -10,33 +10,21 @@ function appWordmark(fontSize) {
   return `<div class="app-name" style="font-size:${fontSize}px"><img src="world-elements/daylight/logo.svg" height="${height.toFixed(1)}" alt="" style="margin-right:${(fontSize * 0.18).toFixed(1)}px;transform:translateY(${(height / 2 - middleOfText).toFixed(2)}px)"><span>stepwise</span></div>`;
 }
 
-// The bar of the header: the name, the menus, the way to the settings and, on one bar, the place of the
-// level and its maps; on two bars, they go to the second bar (block-second-bar.js). `menu` is the menu
-// open, `goalOpen` the bubble of the goal, and `place` the proposal shown.
-function appHeader({ shownMap = 1, passed = [], menu, goalOpen = false, place = chosen.place } = {}) {
-  const inSecondBar = place.startsWith("bar-");
-  const hasProgress = !inSecondBar || ["bar-tabs", "bar-mix-center", "bar-mix-left"].includes(place);
-  const isCombination = place.startsWith("mix-");
+// The header: the name, the menus, the way to the settings, the place of the level (block-place.js),
+// the thin bar of the progress. `menu` is the menu open and `goalOpen` the bubble of the goal.
+function appHeader({ menu, goalOpen = false } = {}) {
   const menus = ["Level", "Edit", "Run", ...(chosen.settings === "view" ? ["View"] : []), "Help"];
   const name = chosen.settings === "name"
     ? `<button type="button" class="app-name-menu ${menu === "Stepwise" ? "is-open" : ""}">${appWordmark(21)}<i>${ICONS.down(11)}</i></button>`
     : appWordmark(21);
   const gear = position => `<button type="button" class="app-gear ${position}" title="Settings">${ICONS.gear(18)}</button>`;
-  const inPlace = isCombination || place === "bar-mix-center" ? appPlace("stacked", goalOpen)
-    : inSecondBar || place === "bar-mix-center" ? ""
-    : place === "crumb" ? appCrumb(goalOpen) : appPlace(place, goalOpen);
-  const maps = inSecondBar || place === "mix-block" ? ""
-    : isCombination ? `<div class="app-header-tabs">${appMapTabs(shownMap, passed)}</div>`
-    : appMapButtons(shownMap, passed);
-  return `<header class="app-header ${inSecondBar ? "" : "is-one-bar"} is-place-${place} ${hasProgress ? "" : "is-alone"}">
+  return `<header class="app-header">
     ${name}
     <nav class="app-menus">${menus.map(item =>
       `<button type="button" class="app-menu ${item === menu ? "is-open" : ""}">${item}</button>`).join("")}</nav>
     ${chosen.settings === "gear-left" ? gear("is-left") : ""}
-    ${inPlace}
-    ${maps}
+    ${appPlace(goalOpen)}
     ${chosen.settings === "gear" ? gear("is-right") : ""}
-    ${hasProgress ? appProgress() : ""}
-  </header>
-  ${inSecondBar ? appSecondBar(place, { shownMap, passed, goalOpen }) : ""}`;
+    <div class="app-progress" title="17 of 20 levels done"><i style="width:85%"></i></div>
+  </header>`;
 }

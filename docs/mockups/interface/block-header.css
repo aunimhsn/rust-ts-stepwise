@@ -1,39 +1,17 @@
-/* The header: the name, the menus, the place of the level, the maps, the bar of the progress. */
+/* The header: the name, the menus, the place of the level, the bar of the progress. */
 .app-header { position: relative; flex: none; display: flex; align-items: center; height: 50px; box-sizing: border-box; padding: 0 12px 3px 14px; background: var(--band); color: var(--band-text); border-bottom: var(--band-line); }
 /* The baseline of the name sits 1 px under the one of the menus, the head of the robot on the center of the bar. */
 .app-name { position: relative; top: -2px; display: flex; align-items: baseline; font-family: var(--font-name); font-weight: 600; line-height: 1; white-space: nowrap; }
-/* Without the thin bar of the progress at its bottom, the bar is centered on its whole height. */
-.app-header.is-alone { height: 49px; padding-bottom: 0; }
 .app-menus { display: flex; align-items: center; gap: 2px; margin-left: 28px; }
 .app-window .app-menu { height: 30px; padding: 0 10px; line-height: 1; background: none; border: 0; border-radius: var(--radius-small); color: var(--band-text); font-weight: 500; }
 .app-window .app-menu.is-open { background: var(--band-hover); }
-.app-maps { display: flex; align-items: center; gap: 3px; color: var(--band-weak); line-height: 1; }
-.app-maps > span { margin-right: 7px; }
-.app-window .app-map-button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 44px; height: 30px; padding: 0; background: none; border: 0; border-radius: var(--radius-small); color: var(--band-text); font-weight: var(--strong-weight); line-height: 1; }
-.app-map-button::after { content: ""; width: 30px; height: 3px; border-radius: 2px; background: var(--idle); }
-.app-map-button.is-passed::after { background: var(--success); }
-.app-window .app-map-button.is-shown { background: var(--chosen); color: var(--on-chosen); }
 .app-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--progress-track); }
 .app-progress i { display: block; height: 100%; background: var(--progress); }
 
-/* The word Map in the font of the name, with or without its numbers. */
-:root[data-map-label="name"] .app-maps > span, :root[data-map-label="all"] .app-maps > span { font: 500 14px var(--font-name); }
-:root[data-map-label="all"] .app-window .app-map-button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 44px; height: 30px; padding: 0; background: none; border: 0; border-radius: var(--radius-small); color: var(--band-text); font-weight: var(--strong-weight); line-height: 1; }
 
 /* The ways to reach the settings: a gear at the end of the header, or a menu on the name. */
 .app-window .app-gear { display: grid; place-items: center; width: 30px; height: 30px; margin-left: auto; padding: 0; background: none; border: 0; border-radius: var(--radius-small); color: var(--band-weak); }
-.app-window .app-gear.is-left, .app-window .app-maps + .app-gear { margin-left: 10px; }
-.app-window .is-place-crumb .app-maps + .app-gear { margin-left: auto; }
+.app-window .app-gear.is-left { margin-left: 10px; }
 .app-window .app-name-menu { display: flex; align-items: center; gap: 5px; margin: 0 -6px; padding: 0 6px; background: none; border: 0; border-radius: var(--radius-small); color: var(--band-text); }
 .app-window .app-name-menu.is-open { background: var(--band-hover); }
 .app-name-menu i { display: flex; color: var(--band-weak); }
-
-/* Offsets of the texts of the two bars, tuned by eye on the owner's screen. */
-.app-menu, .app-gear, .app-name-menu i { position: relative; top: var(--menu-drop, 0); }
-.app-crumb, .app-maps > span, .app-map-button > span { position: relative; top: var(--bar-drop, 0); }
-:root[data-menu-offset="up"] { --menu-drop: -.5px; }
-:root[data-menu-offset="down"] { --menu-drop: .5px; }
-:root[data-menu-offset="more"] { --menu-drop: 1px; }
-:root[data-bar-offset="up"] { --bar-drop: -.5px; }
-:root[data-bar-offset="down"] { --bar-drop: .5px; }
-:root[data-bar-offset="more"] { --bar-drop: 1px; }
