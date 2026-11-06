@@ -1,10 +1,19 @@
-// Section: the boards of the bubble of the goal: the fifteen fonts on the same layout, then five
-// bolder versions in Manrope. The tab Font applies a font to the whole interface below.
+// Section: the bubble of the goal, which takes the fonts chosen at the top of the page: alone, then in
+// the first visit of a level, over the starting code; then five bolder versions.
 const GOAL_HOT = [["hot-1", "A louder title"], ["hot-2", "The number as a big mark"], ["hot-3", "The robot says it"], ["hot-4", "A stroke of paint"], ["hot-5", "A mission card"]];
 const goalBoard = (title, options) => `<div><span class="goal-board-title">${title}</span><div class="app-window goal-board">${appGoal(options)}</div></div>`;
 
+const firstVisitWindow = () => appWindow({
+  header: { goalOpen: true },
+  editor: { lines: ["# Paint a square of side 3", "function paint_side(length):", "    # Paint one side here"], state: "Ready", steps: 0, cursor: "Ln 3, Col 26" },
+  map: appWorld({ robot: "2,1", facing: "east" }),
+  panels: { tab: "Console", content: '<span class="app-weak">Run your program to see what it prints.</span>' },
+  overlay: appGoal(),
+});
+
 SECTIONS.push(["The bubble of the goal", () => `
-  <p class="goal-group">Fifteen fonts</p>
-  <div class="goal-boards">${Object.entries(FONTS).map(([font, { name }], index) => goalBoard(`${index + 1} · ${name}`, { font })).join("")}</div>
+  <p class="goal-group">Its fonts: the lists at the top of the page</p>
+  ${goalBoard("Alone", {})}
+  <div class="goal-real"><span class="goal-board-title">With the interface behind: the first visit of a level, 1280 × 720</span>${firstVisitWindow()}</div>
   <p class="goal-group">Five bolder versions</p>
-  <div class="goal-boards">${GOAL_HOT.map(([kind, title], index) => goalBoard(`${index + 16} · ${title}`, { kind, font: "manrope" })).join("")}</div>`]);
+  <div class="goal-boards">${GOAL_HOT.map(([kind, title], index) => goalBoard(`${index + 1} · ${title}`, { kind })).join("")}</div>`]);

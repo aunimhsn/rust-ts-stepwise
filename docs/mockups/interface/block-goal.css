@@ -1,22 +1,23 @@
 /* The bubble of the goal: two columns, then Let's go along the whole bottom, against its sides. */
 .app-goal { top: 57px; left: 390px; width: 500px; overflow: hidden; border: 0; }
 .goal-columns { display: flex; align-items: stretch; }
-.goal-main { flex: 1; min-width: 0; padding: 16px 18px 16px; font-family: var(--font-text); }
-.page-section .app-goal h3 { margin: 0; color: var(--text); font: 700 19px/1.25 var(--font-title); text-transform: none; letter-spacing: normal; }
-.goal-chapter { margin: 2px 0 12px; color: var(--weak); font-size: 12px; }
-.goal-text { margin: 0; line-height: 1.45; }
-.goal-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.goal-main { flex: 1; min-width: 0; padding: 16px 18px 16px; }
+.page-section .app-goal h3 { margin: 0; color: var(--text); font: 700 19px/1.25 var(--font-goal-title); text-transform: none; letter-spacing: normal; }
+.goal-chapter { margin: 2px 0 12px; color: var(--weak); font-family: var(--font-goal-chapter); font-size: 12px; }
+.goal-text { margin: 0; font-family: var(--font-goal-text); line-height: 1.45; }
+.goal-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; font-family: var(--font-goal-links); }
 .goal-links .app-chip { display: flex; align-items: center; gap: 5px; }
 
-.goal-new { flex: none; display: flex; flex-direction: column; gap: 6px; width: 132px; box-sizing: border-box; padding: 16px 14px; background: var(--goal-side); color: var(--on-goal-side); font-family: var(--font-text); }
-.goal-new h4 { margin: 0 0 4px; color: var(--goal-side-weak); font: 700 11.5px var(--font-text); letter-spacing: .04em; text-transform: uppercase; }
+.goal-new { flex: none; display: flex; flex-direction: column; gap: 6px; width: 132px; box-sizing: border-box; padding: 16px 14px; background: var(--goal-side); color: var(--on-goal-side); font-family: var(--font-goal-new); }
+.goal-new h4 { margin: 0 0 4px; color: var(--goal-side-weak); font: 700 11.5px var(--font-goal-new); letter-spacing: .04em; text-transform: uppercase; }
 
 .app-window .app-goal .app-close { top: 11px; right: 10px; }
 .app-window .app-close { position: absolute; display: flex; padding: 3px; background: none; border: 0; color: var(--weak); }
-.app-window button.goal-go { display: block; width: 100%; height: 42px; padding: 0; background: var(--accent); color: var(--on-accent); border: 0; font: 700 14px var(--font-text); }
+.app-window button.goal-go { display: block; width: 100%; height: 42px; padding: 0; background: var(--accent); color: var(--on-accent); border: 0; font: 700 14px var(--font-goal-go); }
 
 /* The boards: each bubble on its own, in the flow of the page. */
 .goal-boards { display: grid; grid-template-columns: repeat(2, 500px); gap: 26px 40px; }
+.goal-real { margin-top: 26px; }
 .goal-board-title { display: block; margin-bottom: 6px; color: #e9ecef; font-size: 14px; font-weight: 700; }
 .app-window.goal-board { width: 500px; height: auto; overflow: visible; background: none; box-shadow: none; }
 .goal-board .app-popup { position: relative; top: 0; left: 0; }

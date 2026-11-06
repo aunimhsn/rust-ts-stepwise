@@ -1,22 +1,22 @@
-// The fonts compared for the interface, each under the SIL Open Font License: for the titles and for
-// the text. Manrope, the owner's first idea, comes first.
-const FONTS = {
-  manrope: { name: "Manrope", title: "Manrope", text: "Manrope" },
-  inter: { name: "Inter", title: "Inter", text: "Inter" },
-  instrument: { name: "Instrument Sans", title: "Instrument Sans", text: "Instrument Sans" },
-  dm: { name: "DM Sans", title: "DM Sans", text: "DM Sans" },
-  figtree: { name: "Figtree", title: "Figtree", text: "Figtree" },
-  jakarta: { name: "Plus Jakarta Sans", title: "Plus Jakarta Sans", text: "Plus Jakarta Sans" },
-  outfit: { name: "Outfit", title: "Outfit", text: "Outfit" },
-  fredoka: { name: "Fredoka + Manrope", title: "Fredoka", text: "Manrope" },
-  grotesk: { name: "Space Grotesk + Manrope", title: "Space Grotesk", text: "Manrope" },
-  lexend: { name: "Lexend", title: "Lexend", text: "Lexend" },
-  nunito: { name: "Nunito Sans", title: "Nunito Sans", text: "Nunito Sans" },
-  atkinson: { name: "Atkinson Hyperlegible", title: "Atkinson Hyperlegible Next", text: "Atkinson Hyperlegible Next" },
-  plex: { name: "IBM Plex Sans", title: "IBM Plex Sans", text: "IBM Plex Sans" },
-  work: { name: "Work Sans", title: "Work Sans", text: "Work Sans" },
-  source: { name: "Source Sans 3", title: "Source Sans 3", text: "Source Sans 3" },
+// The fonts to try, each under the SIL Open Font License, for every part of the interface.
+const TEXT_FONTS = ["Manrope", "Inter", "Instrument Sans", "DM Sans", "Figtree", "Plus Jakarta Sans", "Outfit", "Fredoka", "Space Grotesk", "Lexend", "Nunito Sans", "Atkinson Hyperlegible Next", "IBM Plex Sans", "Work Sans", "Source Sans 3"];
+const CODE_FONTS = ["JetBrains Mono", "Fira Code", "Source Code Pro", "IBM Plex Mono", "Geist Mono", "DM Mono", "Red Hat Mono"];
+
+// The parts that can take their own font: [label, CSS variable, group of the top of the page].
+const FONT_ROLES = {
+  goalTitle: ["Title", "--font-goal-title", "Goal"],
+  goalChapter: ["Chapter", "--font-goal-chapter"],
+  goalText: ["Goal text", "--font-goal-text"],
+  goalLinks: ["Hint, manual", "--font-goal-links"],
+  goalNew: ["New", "--font-goal-new"],
+  goalGo: ["Let's go", "--font-goal-go"],
+  menus: ["Menus", "--font-menus", "Screen"],
+  placeChapter: ["Chapter", "--font-place-chapter"],
+  placeTitle: ["Level", "--font-place-title"],
+  tabs: ["Maps, Legend", "--font-tabs"],
+  panels: ["Console", "--font-panels"],
+  status: ["Status bar", "--font-status"],
 };
 
-// Single quotes: the value also goes into a style attribute.
-const fontStack = family => `'${family}', sans-serif`;
+// Single quotes: a value can also go into a style attribute.
+const fontStack = (family, fallback = "sans-serif") => `'${family}', ${fallback}`;

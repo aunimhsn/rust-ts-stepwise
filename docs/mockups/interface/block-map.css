@@ -4,7 +4,7 @@
 .app-world .app-map { box-shadow: var(--map-shadow); }
 
 /* The tabs and the button Legend take the whole height of the row, without gaps, against its two ends. */
-.app-map-row { flex: none; display: flex; align-items: stretch; height: 34px; background: var(--band); }
+.app-map-row { flex: none; display: flex; align-items: stretch; height: 34px; background: var(--band); font-family: var(--font-tabs); }
 .app-window .app-map-tab { padding: 0 16px; background: none; border: 0; color: var(--band-weak); font-weight: 500; }
 .app-window .app-map-row .app-chip { margin-left: auto; padding: 0 16px; background: var(--chip); color: var(--on-chip); border: 0; border-radius: 0; }
 .app-window .app-map-tab.is-shown { background: var(--map-block); color: var(--band-text); font-weight: var(--strong-weight); }

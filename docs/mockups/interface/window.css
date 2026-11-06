@@ -11,4 +11,10 @@
 .app-window button.app-primary { padding: 6px 16px; background: var(--accent); color: var(--on-accent); border: var(--control-border); border-radius: var(--control-radius); box-shadow: var(--control-shadow); font-weight: var(--strong-weight); }
 
 /* The tabs of the page take several rows: a section stops under them. */
-.page-section { scroll-margin-top: 150px; }
+.page-section { scroll-margin-top: 130px; }
+
+/* The lists of the fonts, at the top of the page. */
+.page-tabs select { max-width: 126px; padding: 3px 4px; border: 1px solid #3a3f45; border-radius: 4px; background: #24272b; color: #dee2e6; font: inherit; font-size: 13px; cursor: pointer; }
+.page-tabs .page-tabs-break { flex-basis: 100%; height: 0; }
+.page-tabs .page-tabs-section { align-self: center; color: #e9ecef; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+.page-tabs label.group { cursor: pointer; }
