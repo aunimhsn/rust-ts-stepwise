@@ -12,6 +12,7 @@
 .app-value { display: grid; grid-template-columns: 110px 1fr; font: 400 13px/20px var(--font-code); }
 .app-call { margin: 0 -6px; padding: 0 6px; border-radius: var(--radius-small); font: 400 13px/22px var(--font-code); }
 .app-call.is-current { background: var(--call-current); font-weight: 600; }
-.app-message { display: grid; grid-template-columns: max-content 1fr; gap: 16px; }
+/* The places take one column, so that the messages of a list line up. */
+.app-message { display: grid; grid-template-columns: 16ch 1fr; gap: 12px; }
 .app-place-link { color: var(--error); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
 .app-message b { font-weight: var(--strong-weight); }
