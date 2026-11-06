@@ -349,12 +349,14 @@ The interface is in English. Every text of the interface, the error messages and
 
 ### Look of the world
 
-The sheet of the world elements, [`docs/mockups/world-elements.html`](docs/mockups/world-elements.html), is the reference of every element: flat, seen from above, in the Daylight style. Each element is an SVG file of `docs/mockups/world-elements/daylight/`, reused as it is by the application, which stacks them in a cell; only the paint strokes are drawn by the map.
+The sheet of the world elements, [`docs/mockups/world-elements.html`](docs/mockups/world-elements.html), is the reference of every element: flat, seen from above, in the Daylight style. Each element is an SVG file of `docs/mockups/world-elements/daylight/`, reused as it is by the application, which stacks them in a cell; only the paint strokes, the lines every five cells and the shadows are drawn by the map.
 
 | Element | Look | Shades |
 |---|---|---|
 | Floor | A light gray cell with a thin line around it, so that the cells can be counted. | `#e1e5ea`, line `#cad1da` |
 | Wall | A plain slate cell; the walls meet as one mass. A wall below a floor cell has a light rim at its top, a wall above a floor cell a darker edge at its bottom: a flat hint of height. | `#5d687a`, rim `#7d899c`, edge `#3f4857` |
+| Line every five cells | A slightly thicker line, 4.5/64 of a cell wide, every five cells counted from the cell at the bottom left, to give the map a texture and to count the cells more easily. It lies under the paint. Drawn by the map. | the ink `#222935` at 10 % |
+| Shadow of a wall | The sun is at the top right: each wall casts a flat shadow, 10/64 of a cell long, toward the bottom left. The walls cast one shadow together. It lies over the paint and the goal marks, under the items and the robot. Drawn by the map. | the ink `#222935` at 10 % |
 | Paints | A stroke 28/64 of a cell wide through the centers of the cells, along the painted passages (see [Map](#map)), rounded at its ends. The red is darker and the yellow lighter so that they stay apart in a red-green color blindness. | `red` scarlet `#dc2f34`, `yellow` bright amber `#ffb300`, `blue` cobalt `#2459d6` |
 | Item | A teal hexagon with a dark center. | `#5fd0b0`, ink `#222935` |
 | Goal: paint | The stroke to paint, in its color at 35 % opacity; a cell painted with the right color hides it. | the paint |

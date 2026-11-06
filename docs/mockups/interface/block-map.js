@@ -6,34 +6,34 @@ const SAMPLE_SQUARE = ["2,1", "3,1", "4,1", "5,1", "5,2", "5,3", "5,4", "4,4", "
 const appMapRow = (shownMap, passed) => `<div class="app-map-row">${[1, 2, 3].map(number =>
   `<button type="button" class="app-map-tab ${number === shownMap ? "is-shown" : ""} ${passed.includes(number) ? "is-passed" : ""}">Map ${number}</button>`).join("")}<button type="button" class="app-chip">Legend</button></div>`;
 
-// The life of the map, cell by cell, from the sliders of the page. The lines: a thicker line every five
+// The life of the map, cell by cell, in units out of 64 for a cell. The lines: a thicker line every five
 // cells, counted from the cell at the bottom left, half of it on each side of the edge between two cells.
+const FIVE_LINE_WIDTH = 4.5;
+const FIVE_LINE_OPACITY = 0.1;
 function appFiveLines(x, y, height) {
-  const half = Number(chosen.lineWidth) / 2;
+  const half = FIVE_LINE_WIDTH / 2;
   const fromBottom = height - 1 - y;
   const rects = [];
   if (x > 0 && x % 5 === 0) rects.push(`<rect x="0" y="0" width="${half}" height="64"/>`);
   if (x % 5 === 4) rects.push(`<rect x="${64 - half}" y="0" width="${half}" height="64"/>`);
   if (fromBottom > 0 && fromBottom % 5 === 0) rects.push(`<rect x="0" y="${64 - half}" width="64" height="${half}"/>`);
   if (fromBottom % 5 === 4) rects.push(`<rect x="0" y="0" width="64" height="${half}"/>`);
-  return rects.length ? `<svg viewBox="0 0 64 64" aria-hidden="true"><g fill="#222935" opacity="${Number(chosen.lineStrength) / 100}">${rects.join("")}</g></svg>` : "";
+  return rects.length ? `<svg viewBox="0 0 64 64" aria-hidden="true"><g fill="#222935" opacity="${FIVE_LINE_OPACITY}">${rects.join("")}</g></svg>` : "";
 }
 
-// The shadows: every wall drawn again, moved away from the sun, and kept on this floor cell. Together, the
-// walls cast one flat shadow, without a darker overlap. The angle of the sun: 0° at the top, turning
-// clockwise, 315° at the top left.
+// The shadows: every wall drawn again, moved away from the sun, at the top right, and kept on this floor
+// cell. Together, the walls cast one flat shadow, without a darker overlap.
+const SHADOW_LENGTH = 10;
+const SHADOW_OPACITY = 0.1;
+const SHADOW_OFFSET = SHADOW_LENGTH * Math.SQRT1_2;
 function appWallShadow(x, y, rows) {
-  const length = Number(chosen.shadowLength);
-  if (length === 0) return "";
-  const angle = Number(chosen.sunAngle) * Math.PI / 180;
-  const [dx, dy] = [-Math.sin(angle) * length, Math.cos(angle) * length];
   const rects = [];
   for (const ny of [y - 1, y, y + 1]) for (const nx of [x - 1, x, x + 1]) {
     if (rows[ny]?.[nx] !== "#") continue;
-    const [left, top] = [(nx - x) * 64 + dx, (ny - y) * 64 + dy];
+    const [left, top] = [(nx - x) * 64 - SHADOW_OFFSET, (ny - y) * 64 + SHADOW_OFFSET];
     if (left < 64 && left > -64 && top < 64 && top > -64) rects.push(`<rect x="${left.toFixed(2)}" y="${top.toFixed(2)}" width="64" height="64"/>`);
   }
-  return rects.length ? `<svg viewBox="0 0 64 64" aria-hidden="true"><g fill="#222935" opacity="${Number(chosen.shadowStrength) / 100}">${rects.join("")}</g></svg>` : "";
+  return rects.length ? `<svg viewBox="0 0 64 64" aria-hidden="true"><g fill="#222935" opacity="${SHADOW_OPACITY}">${rects.join("")}</g></svg>` : "";
 }
 
 // The lines and the shadows of every floor cell of a map, to give to appMap.
