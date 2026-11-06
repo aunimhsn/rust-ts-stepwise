@@ -1,6 +1,6 @@
 /* The editor: the code with its margin, the three controls, the status bar. */
 .app-editor { display: flex; flex-direction: column; height: 100%; background: var(--editor); }
-.app-code { position: relative; flex: 1; min-height: 0; padding-top: 12px; background-color: var(--editor); background-image: var(--editor-rules); background-position: 0 12px; font: 400 var(--size-code)/var(--line-code) var(--font-code); color: var(--code-text); }
+.app-code { position: relative; flex: 1; min-height: 0; padding-top: 12px; background-color: var(--editor); background-image: var(--editor-rules); background-position: 0 12px; font: 400 var(--size-code)/var(--line-code) var(--font-code); font-variant-ligatures: none; color: var(--code-text); }
 /* The margin runs along the whole height, behind the lines. */
 .app-code::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 52px; background: var(--gutter); border-right: var(--gutter-line); }
 .app-line { position: relative; display: flex; height: var(--line-code); }

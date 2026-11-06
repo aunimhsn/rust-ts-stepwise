@@ -13,7 +13,6 @@ const FONT_ROLES = {
   placeChapter: ["Chapter", "--font-place-chapter"],
   placeTitle: ["Level", "--font-place-title"],
   tabs: ["Maps, Legend", "--font-tabs"],
-  panels: ["Console", "--font-panels"],
   status: ["Status bar", "--font-status"],
 };
 

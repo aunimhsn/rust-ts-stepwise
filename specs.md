@@ -12,7 +12,7 @@ Stepwise teaches the first steps of programming. The learner writes a small prog
 
 ## Design principles
 
-- **Look**: flat, clean and calm, seen from above, inspired by the clarity of Shapez 2 (no 3D, no perspective). Every element of the map reads at a glance; color is kept for what carries meaning (paints, errors, success, the current line).
+- **Look**: flat, clean and calm, seen from above, inspired by the clarity of Shapez 2 (no 3D, no perspective). Every element of the map reads at a glance; color is kept for what carries meaning (paints, errors, success, the current line); in the interface, the cyan of the eyes of the robot says what is new, the amber what to do, the teal what has passed.
 - **Identity**: our own robot, friendly and simple, whose smiling head is the logo of Stepwise. Its look comes from the sheet of the world elements (see [Look of the world](#look-of-the-world)).
 - **The robot shows what the program does**: every action is animated, the line being run is highlighted, and nothing happens without the learner seeing it.
 - **Tone of the messages**: short, friendly, in the second person, never blaming. An error says what happened, where (line and column), and how to fix it, with the words of the language: *"Expected ':' at the end of the `if` line."*
@@ -277,6 +277,8 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
 
 ### Console
 
+Everything in the console and the variables panel is in the font of the code, as the editor (Fira Code at this stage, its ligatures turned off so that the learner sees the characters typed).
+
 - The lines written by `print`, in order.
 - The errors, before running or while running, with their line and column: a click on an error puts the cursor on its position in the editor.
 - The messages of the level: the goals not met, the success.
@@ -342,7 +344,7 @@ The interface is in English. Every text of the interface, the error messages and
 - One kind of item in version 1 (its look comes from the sheet of the world elements).
 - The goal cells of a level are marked on the map (where to stand, which color where, where to put the items), so that the learner sees the target before writing code.
 - Outside the grid counts as a wall.
-- **Legend**: the button **Legend**, on the row above the map, or **Help › Legend of the map** opens the legend of the level in a bubble under the button (wireframe: [`docs/wireframes/overlays.excalidraw`](docs/wireframes/overlays.excalidraw)), which blocks nothing, like the goal: Escape, **×** or a click elsewhere closes it. The button carries a dot while the map has new elements not yet seen in the legend. The legend shows only the elements present on its map, each with its drawing and one sentence, the new ones marked as new, and a link to the section **The map** of the manual.
+- **Legend**: the button **Legend**, on the row above the map, or **Help › Legend of the map** opens the legend of the level in a bubble under the button (wireframe: [`docs/wireframes/overlays.excalidraw`](docs/wireframes/overlays.excalidraw)), which blocks nothing, like the goal: Escape, **×** or a click elsewhere closes it. The button carries a dot, in the cyan of the eyes of the robot, while the map has new elements not yet seen in the legend. The legend shows only the elements present on its map, each with its drawing and one sentence, the new ones marked as new, and a link to the section **The map** of the manual.
 
 ### Look of the world
 

@@ -3,12 +3,12 @@
 // One group of tabs per open decision; `fallback` is the choice shown by default.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(INTERFACE_STYLES).map(([key, style]) => [key, style.title])), fallback: Object.keys(INTERFACE_STYLES)[0] },
-  // How far the text of the links of the goal is raised: tuned by eye on the owner's screen.
-  linkLift: { label: "Text of the links", options: { none: "0", half: "-0.5 px", one: "-1 px" }, fallback: "half" },
+  // What the button Let's go does on hover.
+  goHover: { label: "Let's go on hover", options: { robot: "1 The robot crosses it", paint: "2 A stroke of paint fills it", light: "3 It lights up", grow: "4 The text grows", spread: "5 The letters spread" }, fallback: "robot" },
   // The fonts to try: one for everything, then one per part, which follows it until it is changed.
   font: { label: "All text", select: true, options: Object.fromEntries(TEXT_FONTS.map(family => [family, family])), fallback: "Manrope" },
-  code: { label: "Code", select: true, options: Object.fromEntries(CODE_FONTS.map(family => [family, family])), fallback: "JetBrains Mono" },
-  ...Object.fromEntries(Object.entries(FONT_ROLES).map(([key, [label, , section]]) => [key, { label, section, select: true, options: { same: "As all text", ...Object.fromEntries(TEXT_FONTS.map(family => [family, family])) }, fallback: key === "goalTitle" ? "Fredoka" : "same" }])),
+  code: { label: "Code", select: true, options: Object.fromEntries(CODE_FONTS.map(family => [family, family])), fallback: "Fira Code" },
+  ...Object.fromEntries(Object.entries(FONT_ROLES).map(([key, [label, , section]]) => [key, { label, section, select: true, options: { same: "As all text", ...Object.fromEntries(TEXT_FONTS.map(family => [family, family])) }, fallback: key === "goalTitle" || key === "goalGo" ? "Fredoka" : "same" }])),
 };
 
 const params = new URLSearchParams(location.search);
