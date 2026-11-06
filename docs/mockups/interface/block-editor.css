@@ -1,6 +1,6 @@
 /* The editor: the code with its margin, the three controls, the status bar. */
 .app-editor { display: flex; flex-direction: column; height: 100%; background: var(--editor); }
-.app-code { position: relative; flex: 1; min-height: 0; padding-top: 12px; background-color: var(--editor); background-image: var(--editor-rules); background-position: 0 12px; font: 400 var(--size-code)/var(--line-code) var(--font-code); font-variant-ligatures: none; color: var(--code-text); }
+.app-code { position: relative; flex: 1; min-height: 0; padding-top: 12px; background-color: var(--editor); background-image: var(--editor-rules); background-position: 0 12px; font: var(--code-weight) var(--size-code)/var(--line-code) var(--font-code); font-variant-ligatures: none; color: var(--code-text); }
 /* The margin runs along the whole height, behind the lines. */
 .app-code::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 52px; background: var(--gutter); border-right: var(--gutter-line); }
 .app-line { position: relative; display: flex; height: var(--line-code); }
@@ -9,10 +9,10 @@
 .app-mark { position: absolute; left: 6px; top: 50%; transform: translateY(-50%); display: flex; }
 .app-text { padding-left: 14px; white-space: pre; }
 .app-line.is-next { background: var(--current); }
-.app-line.is-next .app-number { color: var(--code-text); font-weight: 600; }
+.app-line.is-next .app-number { color: var(--code-text); font-weight: var(--code-strong-weight); }
 .app-line.is-next .app-mark { color: var(--current-mark); }
 .app-line.is-error { background: var(--error-soft); }
-.app-line.is-error .app-number, .app-line.is-error .app-mark { color: var(--error); font-weight: 600; }
+.app-line.is-error .app-number, .app-line.is-error .app-mark { color: var(--error); font-weight: var(--code-strong-weight); }
 .app-breakpoint { width: 11px; height: 11px; border-radius: 50%; background: var(--breakpoint); }
 
 .code-comment { color: var(--code-comment); font-style: var(--code-comment-style); }

@@ -15,7 +15,7 @@ Stepwise teaches the first steps of programming. The learner writes a small prog
 - **Look**: flat, clean and calm, seen from above, inspired by the clarity of Shapez 2 (no 3D, no perspective). Every element of the map reads at a glance; color is kept for what carries meaning (paints, errors, success, the current line); in the interface, the cyan of the eyes of the robot says what is new, the amber what to do, the teal what has passed.
 - **Identity**: our own robot, friendly and simple, whose smiling head is the logo of Stepwise. Its look comes from the sheet of the world elements (see [Look of the world](#look-of-the-world)).
 - **The robot shows what the program does**: every action is animated, the line being run is highlighted, and nothing happens without the learner seeing it.
-- **Three fonts, each with one role**: **Fredoka**, the personality, the familiarity with the robot, kept rare so that it keeps its effect: the name, what the robot says, **Let's go**, the great moments such as *"Level done!"*. **Manrope**, the interface: everything read or clicked. **Source Code Pro**, the code: the editor, the console, the variables panel, the examples of the manual.
+- **Three fonts, each with one role**: **Fredoka**, the personality, the familiarity with the robot, kept rare so that it keeps its effect: the name, what the robot says, **Let's go**, the great moments such as *"Level done!"*. **Manrope**, the interface: everything read or clicked. **Source Code Pro** in semi-bold, the code: the editor, the console, the variables panel, the examples of the manual.
 - **Tone of the messages**: short, friendly, in the second person, never blaming. An error says what happened, where (line and column), and how to fix it, with the words of the language: *"Expected ':' at the end of the `if` line."*
 - **Strict where it builds a habit**: indentation of exactly four spaces, `snake_case` names, a function defined before it is called, a variable declared before it is used. Each rule has its own clear message.
 
@@ -278,11 +278,11 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
 
 ### Console
 
-Everything in the console and the variables panel is in the font of the code, as the editor (Source Code Pro).
+Everything in the console and the variables panel is in the font of the code, as the editor (Source Code Pro in semi-bold, its titles in extra-bold).
 
 - The lines written by `print`, in order, in plain text; a long line goes on to the next one, without scrolling sideways. When the lines fill the block, it scrolls and keeps the last ones in sight.
-- The errors, before running or while running: their place in red, written as in the status bar (`Ln 9, Col 17`), then in bold what happened and under it how to fix it. The whole error lights up on hover; a click puts the cursor on its position in the editor.
-- The messages of the level: a goal not met in bold, with a red flag as on the map, in neutral words; a map passed in green with a check (*"Map 1 passed. Try map 2."*).
+- The errors, before running or while running: their place in red, written as in the status bar (`Ln 9, Col 17`), then in extra-bold what happened and under it how to fix it. The whole error lights up on hover; a click puts the cursor on its position in the editor.
+- The messages of the level: a goal not met in extra-bold, with a red flag as on the map, in neutral words; a map passed in green with a check (*"Map 1 passed. Try map 2."*).
 - Cleared at each **Run**.
 - **Run** shows the console tab.
 
