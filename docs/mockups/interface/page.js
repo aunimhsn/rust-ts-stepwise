@@ -3,10 +3,6 @@
 // One group of tabs per open decision; `fallback` is the choice shown by default.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(INTERFACE_STYLES).map(([key, style]) => [key, style.title])), fallback: Object.keys(INTERFACE_STYLES)[0] },
-  // The lines between the blocks, from all of them to none (window.css).
-  lines: { label: "Lines", options: { current: "1 All", header: "2 No line under the header", map: "3 Nor above the console", all: "4 No line at all", tone: "5 No line, console in the tone of the bars" }, fallback: "map" },
-  tabLines: { label: "Between the tabs", options: { none: "Nothing", lines: "A thin line" }, fallback: "none" },
-  legendStyle: { label: "Legend", options: { surface: "Light block", flat: "Same as the row" }, fallback: "surface" },
 };
 
 const params = new URLSearchParams(location.search);

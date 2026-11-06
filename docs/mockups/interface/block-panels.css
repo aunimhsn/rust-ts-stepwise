@@ -1,5 +1,5 @@
 /* The console and the variables, under the map, in two tabs. */
-.app-panels { display: flex; flex-direction: column; height: 100%; }
+.app-panels { display: flex; flex-direction: column; height: 100%; background: var(--band); }
 .app-tabs { flex: none; display: flex; gap: 4px; padding: 6px 8px; border-bottom: var(--tab-line); }
 .app-window .app-tab { position: relative; padding: 3px 12px; background: var(--tab); color: var(--on-tab); border: 0; border-radius: var(--radius-small); font-weight: 500; }
 .app-window .app-tab.is-chosen { background: var(--tab-chosen); color: var(--on-tab-chosen); }
@@ -10,7 +10,7 @@
 .app-values { margin-bottom: 10px; }
 .app-value { display: grid; grid-template-columns: 110px 1fr; font: 400 13px/20px var(--font-code); }
 .app-call { margin: 0 -6px; padding: 0 6px; border-radius: var(--radius-small); font: 400 13px/22px var(--font-code); }
-.app-call.is-current { background: var(--hover); font-weight: 600; }
+.app-call.is-current { background: var(--call-current); font-weight: 600; }
 .app-message { display: grid; grid-template-columns: max-content 1fr; gap: 16px; font-size: var(--size-text); }
 .app-place-link { color: var(--error); font: 600 12.5px/19px var(--font-code); text-decoration: underline; text-underline-offset: 2px; }
 .app-message b { font-weight: var(--strong-weight); }
