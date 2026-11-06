@@ -4,7 +4,7 @@
   --font-name: "Fredoka", sans-serif; /* The personality: the name, what the robot says, Let's go. */
   --font-text: "Manrope", sans-serif; /* The interface: everything that is read or clicked. */
   --font-title: "Manrope", sans-serif;
-  --font-code: "Fira Code", monospace; /* The code: the editor, the console, the variables. */
+  --font-code: "Source Code Pro", monospace; /* The code: the editor, the console, the variables. */
 }
 
 :root[data-theme="night-desk"] {

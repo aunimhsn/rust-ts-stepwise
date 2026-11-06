@@ -15,7 +15,7 @@ Stepwise teaches the first steps of programming. The learner writes a small prog
 - **Look**: flat, clean and calm, seen from above, inspired by the clarity of Shapez 2 (no 3D, no perspective). Every element of the map reads at a glance; color is kept for what carries meaning (paints, errors, success, the current line); in the interface, the cyan of the eyes of the robot says what is new, the amber what to do, the teal what has passed.
 - **Identity**: our own robot, friendly and simple, whose smiling head is the logo of Stepwise. Its look comes from the sheet of the world elements (see [Look of the world](#look-of-the-world)).
 - **The robot shows what the program does**: every action is animated, the line being run is highlighted, and nothing happens without the learner seeing it.
-- **Three fonts, each with one role**: **Fredoka**, the personality, the familiarity with the robot, kept rare so that it keeps its effect: the name, what the robot says, **Let's go**, the great moments such as *"Level done!"*. **Manrope**, the interface: everything read or clicked. **Fira Code**, the code: the editor, the console, the variables panel, the examples of the manual.
+- **Three fonts, each with one role**: **Fredoka**, the personality, the familiarity with the robot, kept rare so that it keeps its effect: the name, what the robot says, **Let's go**, the great moments such as *"Level done!"*. **Manrope**, the interface: everything read or clicked. **Source Code Pro**, the code: the editor, the console, the variables panel, the examples of the manual.
 - **Tone of the messages**: short, friendly, in the second person, never blaming. An error says what happened, where (line and column), and how to fix it, with the words of the language: *"Expected ':' at the end of the `if` line."*
 - **Strict where it builds a habit**: indentation of exactly four spaces, `snake_case` names, a function defined before it is called, a variable declared before it is used. Each rule has its own clear message.
 
@@ -278,7 +278,7 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
 
 ### Console
 
-Everything in the console and the variables panel is in the font of the code, as the editor (Fira Code, its ligatures turned off so that the learner sees the characters typed).
+Everything in the console and the variables panel is in the font of the code, as the editor (Source Code Pro).
 
 - The lines written by `print`, in order.
 - The errors, before running or while running, with their line and column: a click on an error puts the cursor on its position in the editor.
