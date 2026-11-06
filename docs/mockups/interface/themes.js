@@ -1,7 +1,5 @@
 // The styles of the interface compared in step 3a: their title and their description.
 const INTERFACE_STYLES = {
-  "clear-day": { title: "A · Clear Day", text: "The interface continues the map: cool light grays, white blocks, the teal of the item as the accent, the cyan of the eyes on the current line. Atkinson Hyperlegible Next and Mono, drawn for legibility. The calmest, and made for a projector." },
-  "night-desk": { title: "B · Night Desk", text: "The map is the only lit thing on a dark slate desk, and the blocks meet as bands. Amber, the paint of the logo, as the accent. Instrument Sans and JetBrains Mono. The closest to the editors of developers." },
-  "floor-plan": { title: "C · Floor Plan", text: "Clear Day pushed further: the interface is a level. The blocks are floors cut in one mass of slate wall, with its rim and its edge; the map sits directly in that wall. The controls take the hexagon of the item, the current line and the progress are strokes of paint, a color in the code carries its real paint, and the status bar changes color with the state. Lexend and DM Mono." },
-  "visor": { title: "D · Visor", text: "Night Desk pushed further: the interface is the visor of the robot. Near-black, large radii, round controls, the cyan of its eyes as the only accent; the current line is solid cyan, its mark is a small visor with two eyes, and the status bar changes color with the state. Bricolage Grotesque, Figtree and Geist Mono." },
+  "night-desk": { title: "A · Night Desk", text: "The map is the only lit thing on a dark slate desk, and the blocks meet as bands. Amber, the paint of the logo, as the accent. Instrument Sans and JetBrains Mono. The closest to the editors of developers." },
+  "day-desk": { title: "B · Day Desk", text: "Night Desk in a light version: the same bands without gaps, small radii, amber accent and fonts, on light grays; the map stands out on a darker gray block." },
 };
