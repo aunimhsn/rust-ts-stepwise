@@ -48,6 +48,7 @@ npm init -y && npm install playwright && npx playwright install chromium
 2. **Give each open decision its own control** in `VARIANTS`, so that the owner compares on screen instead of imagining; once decided, remove it and keep the choice in the tokens. About a hundred small decisions went this way on the first project, each in a minute. The control depends on the decision:
    - **A few distinct variants** (two button shapes, three header variants, five offsets…): a group of tabs, with the variants also side by side when the difference is fine.
    - **Values that combine** (a font per role, colors, sizes): one list per role (`select: true`, with the CSS `variable` it sets), which changes the page at once. The owner then tries every combination instead of waiting for a new board; a list "for everything" that the others follow until they are changed saves many clicks.
+   - **Values tuned by eye** (a width, an angle, a darkness): a slider (`range`, with the CSS `variable` it sets), whose value shows beside it. The owner tunes it on their own screen, then sends back the address, which holds the values.
    - **The address keeps every choice**, so that the owner can reload the page or send the exact combination.
    - **An important element is shown alone and in real conditions**, with the interface behind it, both following the controls.
    - **Number the proposals once**, from 1 upward across every series: letters, or a numbering that starts again in each series, get mixed up ("the B" of which series?).
