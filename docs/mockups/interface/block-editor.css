@@ -23,7 +23,7 @@
 .code-value { color: var(--code-value); }
 
 .app-controls { position: absolute; right: 12px; bottom: 12px; display: flex; gap: 8px; }
-.app-window .app-control { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; background: var(--control); color: var(--on-control); border: var(--control-border); border-radius: var(--control-radius); box-shadow: var(--control-shadow); clip-path: var(--control-clip, none); }
+.app-window .app-control { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; background: var(--control); color: var(--on-control); border: var(--control-border); border-radius: var(--control-radius); box-shadow: var(--control-shadow); }
 .app-window .app-control.is-main { background: var(--accent); color: var(--on-accent); }
 
 .app-status { flex: none; display: flex; align-items: center; gap: 22px; height: 30px; box-sizing: border-box; padding: 0 12px; background: var(--status); color: var(--on-status); border-top: var(--status-line); font-size: 12.5px; white-space: nowrap; }

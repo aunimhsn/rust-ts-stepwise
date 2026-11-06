@@ -2,7 +2,7 @@
 const LOGO_GROUNDS = [["Day Desk", "#eceff3", "#1b2028"], ["Night Desk", "#171b21", "#e8ecf1"]];
 
 SECTIONS.push(["Logo", () => `
-  <p>The logo without its arrow: each variant keeps the height of the head of the robot, so that the name stays on the line of the menus. The tab <b>Logo</b> also changes it in the windows below.</p>
+  <p>Each variant keeps the height of the head of the robot, so that the name stays on the line of the menus. The tab <b>Logo</b> also changes it in the windows below.</p>
   <div class="page-row">${LOGO_GROUNDS.map(([title, ground, ink]) => `
     <div class="page-slot"><span>${title}</span>
       <div class="logo-sheet" style="background:${ground};color:${ink}">${Object.entries(LOGOS).map(([key, logo]) => `

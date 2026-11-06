@@ -1,5 +1,0 @@
-/* The open decisions compared in tabs: each changes tokens of the chosen theme. Removed once decided. */
-
-/* The shape of the controls. A hexagon cuts their shadow: it takes the slate of the walls to stay visible. */
-:root[data-controls="round"] { --control-radius: 50%; }
-:root[data-controls="hexagon"] { --control-clip: polygon(50% 0, 96% 25%, 96% 75%, 50% 100%, 4% 75%, 4% 25%); --control: #5d687a; --on-control: #ffffff; --control-shadow: none; --control-radius: 0; }

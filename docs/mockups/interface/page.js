@@ -4,7 +4,6 @@
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(INTERFACE_STYLES).map(([key, style]) => [key, style.title])), fallback: Object.keys(INTERFACE_STYLES)[0] },
   logo: { label: "Logo", options: Object.fromEntries(Object.entries(LOGOS).map(([key, logo]) => [key, logo.title])), fallback: Object.keys(LOGOS)[0] },
-  controls: { label: "Controls", options: { square: "Square", round: "Round", hexagon: "Hexagon" }, fallback: "square" },
 };
 
 const params = new URLSearchParams(location.search);

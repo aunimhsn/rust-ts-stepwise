@@ -19,5 +19,5 @@
 
 /* The logos compared, side by side. */
 .logo-sheet { padding: 16px 20px; display: grid; gap: 14px; }
-.logo-row { display: grid; grid-template-columns: 92px 170px 320px 40px; align-items: center; }
+.logo-row { display: grid; grid-template-columns: 104px 190px 370px 50px; align-items: center; }
 .logo-row small { font: 12px system-ui, sans-serif; opacity: .7; }

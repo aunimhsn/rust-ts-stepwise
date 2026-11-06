@@ -2,6 +2,8 @@
 // height, so that only what surrounds it changes. Without the arrow of the first logo, the image is
 // no taller than the name.
 const LOGOS = {
+  "arrow-through": { title: "Arrow through" },
+  "arrow-out": { title: "Arrow out" },
   head: { title: "Head" },
   lit: { title: "Lit eyes" },
   amber: { title: "Amber head" },
