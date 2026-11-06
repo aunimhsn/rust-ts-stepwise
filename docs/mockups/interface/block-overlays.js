@@ -7,7 +7,7 @@ const appGoal = () => `<div class="app-popup app-goal">
   <h3>Functions · 18. Paint a square</h3>
   <button type="button" class="app-close" title="Close">${ICONS.close(15)}</button>
   <p>Paint a red square of side 3, starting where the robot stands. Write one side as a function, then call it for each side.</p>
-  <p class="app-weak">New here: <code>function</code>, parameters.</p>
+  <p class="app-weak">New here: function, parameters.</p>
   <div class="app-goal-links"><button type="button" class="app-chip">Show hint</button><button type="button" class="app-chip">Manual: Functions ${ICONS.external(11)}</button></div>
   <div class="app-goal-end"><button type="button" class="app-primary">Let's go</button></div>
 </div>`;

@@ -14,4 +14,3 @@
 .app-goal-links { display: flex; gap: 8px; margin-top: 12px; }
 .app-goal-links .app-chip { display: flex; align-items: center; gap: 5px; }
 .app-goal-end { display: flex; justify-content: flex-end; margin-top: 12px; }
-.page-slot .app-goal code { color: inherit; font-family: var(--font-code); font-size: .95em; }
