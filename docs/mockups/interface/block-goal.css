@@ -13,8 +13,12 @@
 
 /* The links: a slate background, as the walls, lighter on hover, without a border. */
 .goal-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; font-family: var(--font-goal-links); }
-.app-window .goal-link { display: flex; align-items: center; gap: 5px; padding: 5px 11px; background: var(--goal-link); color: var(--on-goal-link); border: 0; border-radius: var(--radius-small); font-weight: 500; white-space: nowrap; }
+.app-window .goal-link { padding: calc(5px - var(--goal-link-lift, .5px)) 11px calc(5px + var(--goal-link-lift, .5px)); background: var(--goal-link); color: var(--on-goal-link); border: 0; border-radius: var(--radius-small); font-weight: 500; white-space: nowrap; }
 .app-window .goal-link:hover { background: var(--goal-link-hover); }
+/* How far the text of the links is raised: tuned by eye on the owner's screen. */
+:root[data-link-lift="none"] { --goal-link-lift: 0px; }
+:root[data-link-lift="half"] { --goal-link-lift: .5px; }
+:root[data-link-lift="one"] { --goal-link-lift: 1px; }
 
 /* What is new: a dark column, its title in the cyan of the eyes of the robot. */
 .goal-new { flex: none; display: flex; flex-direction: column; gap: 6px; width: 132px; box-sizing: border-box; padding: 16px 14px; background: var(--goal-side); color: var(--on-goal-side); font-family: var(--font-goal-new); }

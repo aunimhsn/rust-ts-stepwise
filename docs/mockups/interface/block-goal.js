@@ -6,7 +6,7 @@ function appGoal() {
       <div class="goal-main">
         <div class="goal-says"><img class="goal-robot" src="world-elements/daylight/logo.svg" alt=""><h3>Paint a square</h3></div>
         <p class="goal-text">Paint a red square of side 3, starting where the robot stands. Write one side as a function, then call it for each side.</p>
-        <div class="goal-links"><button type="button" class="goal-link">Show hint</button><button type="button" class="goal-link">Manual: Functions ${ICONS.external(11)}</button></div>
+        <div class="goal-links"><button type="button" class="goal-link">Show hint</button><button type="button" class="goal-link" title="Opens the manual at the section of this level">Read the manual</button></div>
       </div>
       <aside class="goal-new">
         <h4>New</h4>

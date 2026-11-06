@@ -3,6 +3,8 @@
 // One group of tabs per open decision; `fallback` is the choice shown by default.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(INTERFACE_STYLES).map(([key, style]) => [key, style.title])), fallback: Object.keys(INTERFACE_STYLES)[0] },
+  // How far the text of the links of the goal is raised: tuned by eye on the owner's screen.
+  linkLift: { label: "Text of the links", options: { none: "0", half: "-0.5 px", one: "-1 px" }, fallback: "half" },
   // The fonts to try: one for everything, then one per part, which follows it until it is changed.
   font: { label: "All text", select: true, options: Object.fromEntries(TEXT_FONTS.map(family => [family, family])), fallback: "Manrope" },
   code: { label: "Code", select: true, options: Object.fromEntries(CODE_FONTS.map(family => [family, family])), fallback: "JetBrains Mono" },

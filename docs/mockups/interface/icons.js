@@ -12,5 +12,4 @@ const ICONS = {
   chevron: size => appIcon(size, '<path d="m6 3.5 4.5 4.5L6 12.5"/>'),
   close: size => appIcon(size, '<path d="m4 4 8 8M12 4l-8 8"/>'),
   next: size => appIcon(size, '<path d="M4.5 3.5 11 8l-6.5 4.5Z"/>', "currentColor"),
-  external: size => appIcon(size, '<path d="M5.5 3.5h7v7M12.5 3.5l-9 9"/>'),
 };
