@@ -12,9 +12,10 @@ Stepwise teaches the first steps of programming. The learner writes a small prog
 
 ## Design principles
 
-- **Look**: flat, clean and calm, seen from above, inspired by the clarity of Shapez 2 (no 3D, no perspective). Every element of the map reads at a glance; color is kept for what carries meaning (paints, errors, success, the current line).
+- **Look**: flat, clean and calm, seen from above, inspired by the clarity of Shapez 2 (no 3D, no perspective). Every element of the map reads at a glance; color is kept for what carries meaning (paints, errors, success, the current line); in the interface, the cyan of the eyes of the robot says what is new, the amber what to do, the teal what has passed.
 - **Identity**: our own robot, friendly and simple, whose smiling head is the logo of Stepwise. Its look comes from the sheet of the world elements (see [Look of the world](#look-of-the-world)).
 - **The robot shows what the program does**: every action is animated, the line being run is highlighted, and nothing happens without the learner seeing it.
+- **Three fonts, each with one role**: **Fredoka**, the personality, the familiarity with the robot, kept rare so that it keeps its effect: the name, what the robot says, **Let's go**, the great moments such as *"Level done!"*. **Manrope**, the interface: everything read or clicked. **Source Code Pro** in semi-bold, the code: the editor, the console, the variables panel, the examples of the manual.
 - **Tone of the messages**: short, friendly, in the second person, never blaming. An error says what happened, where (line and column), and how to fix it, with the words of the language: *"Expected ':' at the end of the `if` line."*
 - **Strict where it builds a habit**: indentation of exactly four spaces, `snake_case` names, a function defined before it is called, a variable declared before it is used. Each rule has its own clear message.
 
@@ -175,25 +176,26 @@ Wireframe: [`docs/wireframes/home-screen.excalidraw`](docs/wireframes/home-scree
 
 Wireframe: [`docs/wireframes/level-screen.excalidraw`](docs/wireframes/level-screen.excalidraw). The code on the left, the world on the right, under a header of one line:
 
-- **Header**: the logo and the name; the menus **Level**, **Edit**, **Run**, **Help**; in the middle, the place of the level (`◎ Functions › 18. Paint a square`), a button that opens its goal; on the right, the maps of the level (see [Variants](#levels-and-progression)). A thin bar along the bottom of the header fills with the levels done; on hover, a discreet *"17 of 20 levels done"*.
+- **Header**: the logo and the name; the menus **Level**, **Edit**, **Run**, **Help**; on the right, a gear that opens the settings; in the middle, the place of the level, its chapter in small semi-bold capitals above its title (`FUNCTIONS`, `Paint a square`), a button that opens its goal. The number of the level stands in an amber circle in Fredoka, on the crossing of the header and the two columns, 3 pixels lower so that it clears the title, which stays centered; it also opens the goal, and stays over the bubble of the goal. A thin bar along the bottom of the header fills with the levels done; on hover, a discreet *"17 of 20 levels done"*. The content of the header is centered on the height above that thin bar.
 - **Editor**, on the left, on the whole height: the code with its line numbers and breakpoints; three square buttons fixed in its bottom right corner, which don't scroll with the code: **Run** / **Pause** / **Resume** (one button, ▶ or ⏸), **Step** (an arrow down onto a dot, as the *step into* of the developer tools) and **Reset** (↻). They have no text: each one names itself, with its shortcut, on hover. They grow pale while the learner types and come back as soon as the mouse moves; the code can scroll past its last line so that no line stays under them.
-- **Status bar**, under the code, as in VS Code: the state of the program (`Ready`, `Running`, `Paused at line 5 · Reset to edit`, `Error at line 3`, and once it ends without error `Ended · goal not met`, `Ended · map 1 passed`, `Ended · level done`, or `Ended` in the sandbox, so that the learner knows that the map shows the end of the run and not its start; the code can be changed, and **Run** puts the map back), the number of errors when there are some (a click shows the first one in the console), the steps run (`47 steps`), the speed (five small squares to click), the position of the cursor (`Ln 7, Col 12`).
-- **Map**, on the right, on top: the whole map, always; its cells grow or shrink to fill the block, up to a maximum size (about 64 pixels, tuned with the mock-up), the map centered in its block. No zoom, no scrolling. The button **Legend** sits in its top right corner (see [Map](#map)).
+- **Status bar**, under the code, as in VS Code: the state of the program (`Ready`, `Running`, `Paused at line 5 · Reset to edit`, `Error at line 3`, and once it ends without error `Ended · goal not met`, `Ended · map 1 passed`, `Ended · level done`, or `Ended` in the sandbox, so that the learner knows that the map shows the end of the run and not its start; the code can be changed, and **Run** puts the map back), the number of errors when there are some (a click shows the first one in the console), the steps run (`47 steps`), the speed (five small squares to click), the position of the cursor (`Ln 7, Col 12`). The bar takes the color of the state: the accent when paused, the error color on an error.
+- **Map**, on the right, on top: a row with one tab per map of the level (`Map 1`, `Map 2`, `Map 3`; see [Variants](#levels-and-progression)), against its left end and without gaps, and the button **Legend** against its right end (see [Map](#map)), all on the whole height of the row; the code keeps the whole height of the window. Under this row, the whole map, always; its cells grow or shrink to fill the block, up to a maximum size (about 64 pixels, tuned with the mock-up), the map centered in its block. No zoom, no scrolling.
 - **Console** and **Variables**, under the map, about 250 pixels high: two tabs; from about 1600 pixels wide, side by side without tabs.
+- **No lines**: the blocks meet without any line, each zone in its own tone: the code on the light tone of work, the map on its gray, the bars and the console in one tone around them.
 - **Widths**: the editor takes half the window, and stops growing at about 80 characters (about two fifths of a 1920-pixel screen); the map and the panels take the rest. The text keeps its size on a large screen, where more lines show; the zoom of the browser enlarges everything for a projector.
 
 The menus give every command of the screen, with its shortcut, so that the learner meets the shortcuts of a code editor:
 
 | Menu | Commands |
 |---|---|
-| **Level** | Goal, Previous level, Next level (greyed until the level is done), All levels (the home screen), Sandbox, Restore starting code…, Settings. |
+| **Level** | Goal, Previous level, Next level (greyed until the level is done), All levels (the home screen), Sandbox, Restore starting code…. |
 | **Edit** | Undo, Redo, Commands (the command menu), Toggle breakpoint, Remove all breakpoints. |
 | **Run** | Run / Pause / Resume, Step, Reset, Speed. |
 | **Help** | Manual, Look up in the manual (F1, the word at the cursor), Legend of the map, Keyboard shortcuts. |
 
 The previous and the next level are only in the menu, so that a click by mistake never changes the level.
 
-**Goal**: a bubble under the place of the level, which doesn't block the screen: the learner can keep it open while typing, and Escape or a click elsewhere closes it. It shows the title, the goal, the elements new on the map, **Show hint**, the links to the manual, and **Let's go**, which closes it. It opens by itself the first time the learner opens the level.
+**Goal**: a bubble under the place of the level, which doesn't block the screen: the learner can keep it open while typing, and Escape or a click elsewhere closes it. The head of the robot says the title of the level in a speech bubble, in Fredoka; the number and the chapter stay in the header. Under it, the goal, **Show hint** and **Read the manual**, which opens the manual at the section of the level, both on a slate background that grows lighter on hover. On the right, a dark column, **New**, its title in the cyan of the eyes of the robot, lists what the level brings. **Let's go** closes the bubble: an amber bar along its whole bottom, against its sides, in Fredoka; on hover, the robot crosses it at its own size, over the text, and leaves by the right, its paint covering the whole button behind it. For a learner who asked for less motion, the button only lights up. It opens by itself the first time the learner opens the level.
 
 The window needs at least 1280 × 720 pixels: below, a message replaces the screen (see [Error handling](#error-handling)) and goes away once the window is large enough again, without losing anything.
 
@@ -213,7 +215,7 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
   | Functions | `function`, parameters, `return` | 3 |
 
 - A level has a title, a goal written in a few sentences, its map, the code it starts with, and an optional hint, hidden until the learner asks for it. Each level links to the sections of the manual it needs.
-- **Variants**: a level may have up to three maps, the same task on different ground (a wall further away, another number of items), so that a program written for one map only doesn't pass. The learner switches between them with the buttons **1**, **2**, **3** on the right of the header, above the map, hidden when the level has one map; the shown map has a full background. **Run** runs the shown variant. A bar under each number turns green once its variant has passed, and stays grey until then; the level is done once every variant has passed with the same code. Changing the code turns the bars grey again.
+- **Variants**: a level may have up to three maps, the same task on different ground (a wall further away, another number of items), so that a program written for one map only doesn't pass. The learner switches between them with the tabs on top of the block of the map, hidden when the level has one map; the tab of the shown map opens on the block. **Run** runs the shown variant. A tab takes a pale teal background once its variant has passed, a full teal when it is also the shown map; the level is done once every variant has passed with the same code. Changing the code takes these backgrounds away.
 - The levels are numbered from the first to the last, across the chapters (`18. Paint a square`). The number is computed from their order, never saved: the progress is saved under a stable name of each level, so that a level added later doesn't mix it up.
 - The levels open in order: a level done opens the next one. A done level stays playable. Each level must be earned: there is no setting that unlocks every level; a learner who is stuck has the hint, then the teacher.
 - **Level codes**, as the passwords of the old console games: each level has a code of two English words (`GREEN-OWL`), easy to write and to dictate, unrelated to its title so that it can't be guessed, and tied to the stable name of the level, not to its number, so that a level added later changes no code. Entering the code of a level opens it and every level before it, without marking them done. The success panel gives the code of the next level, so that the learner can go on from another computer (the progress lives in one browser); the home screen shows the code of every level open or done. The teacher gives a code to open a level for the whole class, or the code of the last level for a demonstration; the list of the codes is in a guide for the teachers in `docs/`, readable in the repository: the codes add friction, not security.
@@ -224,7 +226,7 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
   - the robot carries an item, or carries none.
 - **New elements**: each element of the map (see [Map](#map)) is introduced by the first level that uses it: the goal of this level names it, links to the section **The map** of the manual, and the legend of the level marks it as new. There is no tutorial level showing every element at once: a chapter brings one idea, and an element waits for the chapter that needs it.
 - When the program ends and every goal is met, the variant passes; once every variant has, a success panel offers the next level. When a goal isn't met, the console says which one, and the cells concerned are marked on the map.
-- **Success panel** (wireframe: [`docs/wireframes/success-panel.excalidraw`](docs/wireframes/success-panel.excalidraw)): in the middle of the screen, over a veil, once the robot has hopped (about one second). The robot, *"Level done!"*, *"18. Paint a square · its 3 maps passed"*; what the learner used (*"function, parameters, while"*), the number of lines and of steps, never a score; the code of the next level (*"Code of the next level: GREEN-OWL · Write it down to go on from another computer."*); **Next level: 19. Two squares** (Enter), **Stay on this level** (Escape: back to the code, which can be changed) and **All levels**. When a map passes and others remain, there is no panel: the console says *"Map 1 passed. Try map 2."* and the bar of that map turns green.
+- **Success panel** (wireframe: [`docs/wireframes/success-panel.excalidraw`](docs/wireframes/success-panel.excalidraw)): in the middle of the screen, over a veil, once the robot has hopped (about one second). The robot, *"Level done!"*, *"18. Paint a square · its 3 maps passed"*; what the learner used (*"function, parameters, while"*), the number of lines and of steps, never a score; the code of the next level (*"Code of the next level: GREEN-OWL · Write it down to go on from another computer."*); **Next level: 19. Two squares** (Enter), **Stay on this level** (Escape: back to the code, which can be changed) and **All levels**. When a map passes and others remain, there is no panel: the console says *"Map 1 passed. Try map 2."* and the tab of that map turns teal.
 
 ### Code editor
 
@@ -270,15 +272,17 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
 
 - **Running**: the first control is **Pause** (⏸), **Step** is greyed, the next line is highlighted, the step counter rises; the console is shown. When the learner types, the code doesn't change and the status bar lights up briefly with *"Reset the program to edit your code."*
 - **Paused on a breakpoint**: the breakpoint and the highlighted line together; the first control is **Resume** (▶); the variables panel opens by itself.
-- **Errors before running**: the words underlined, their message on hover; *"2 errors"* in the status bar; **Run** lists them in the console, each with its place (*"Line 5, col 9"*), which puts the cursor on it; the map stays at its start.
+- **Errors before running**: the words underlined, their message on hover; *"2 errors"* in the status bar; **Run** lists them in the console, each with its place in red, written as in the status bar (*"Ln 5, Col 9"*), which puts the cursor on it; the map stays at its start.
 - **Error while running**: the line of the error marked in the margin, the map as it was at the error (the robot against the wall), the error in the console, a dot on the tab **Variables**; the status bar says `Error at line 5`.
-- **Goal not met**: a flag on each cell of a goal not met, the eyes of the robot dimmed; the console says which goal (*"The goal isn't met: 7 cells of the square aren't red."*); the bar of the map stays grey; the status bar says `Ended · goal not met`.
+- **Goal not met**: a flag on each cell of a goal not met, the eyes of the robot dimmed; the console says which goal (*"The goal isn't met: 7 cells of the square aren't red."*); the tab of the map doesn't turn teal; the status bar says `Ended · goal not met`.
 
 ### Console
 
-- The lines written by `print`, in order.
-- The errors, before running or while running, with their line and column: a click on an error puts the cursor on its position in the editor.
-- The messages of the level: the goals not met, the success.
+Everything in the console and the variables panel is in the font of the code, as the editor (Source Code Pro in semi-bold, its titles in extra-bold).
+
+- The lines written by `print`, in order, in plain text; a long line goes on to the next one, without scrolling sideways. When the lines fill the block, it scrolls and keeps the last ones in sight.
+- The errors, before running or while running: their place in red, written as in the status bar (`Ln 9, Col 17`), then in extra-bold what happened and under it how to fix it. The whole error lights up on hover; a click puts the cursor on its position in the editor.
+- The messages of the level: a goal not met in extra-bold, with a red flag as on the map, in neutral words; a map passed in green with a check (*"Map 1 passed. Try map 2."*).
 - Cleared at each **Run**.
 - **Run** shows the console tab.
 
@@ -287,7 +291,7 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
 Its tab opens by itself when the program pauses (by **Pause**, **Step** or a breakpoint). When the program stops on an error, the console stays shown, with the error, and a dot on the tab **Variables** says that it holds the state at that moment. Otherwise, the tab says *"Pause the program to see its variables."* It shows:
 
 - the variables of the function being run (or of the main program), with their values; the ones changed by the last step stand out;
-- the calls in progress, from the main program to the current function, each with its line; a click on one shows its variables.
+- the calls in progress, from the main program to the current function, each with its line (`paint_side · Ln 5`); a click on one shows its variables.
 
 ### Manual
 
@@ -319,12 +323,13 @@ Wireframe: [`docs/wireframes/manual.excalidraw`](docs/wireframes/manual.excalidr
 
 ### Sandbox
 
-An open map with a few walls, paints and items, without goal. The code is saved like a level's; **Run**, the console and the variables panel work the same way. Wireframe: the frame *Sandbox* of [`docs/wireframes/level-screen.excalidraw`](docs/wireframes/level-screen.excalidraw). It is the level screen without what belongs to a goal: in the middle of the header, *"◇ Sandbox"*, which isn't a button; no maps on the right of the header, no progress bar; no goal marks on the map; the menu **Level** keeps **All levels**, **Sandbox** (the current screen), **Restore starting code…** and **Settings**. Editing the map of the sandbox, and a level editor, come later (see the [backlog](docs/backlog.md)).
+An open map with a few walls, paints and items, without goal. The code is saved like a level's; **Run**, the console and the variables panel work the same way. Wireframe: the frame *Sandbox* of [`docs/wireframes/level-screen.excalidraw`](docs/wireframes/level-screen.excalidraw). It is the level screen without what belongs to a goal: in the middle of the header, *"◇ Sandbox"*, which isn't a button; no tabs of maps, no progress bar; no goal marks on the map; the menu **Level** keeps **All levels**, **Sandbox** (the current screen) and **Restore starting code…**. Editing the map of the sandbox, and a level editor, come later (see the [backlog](docs/backlog.md)).
 
 ### Settings
 
-A panel in the middle of the screen, over a veil, opened from the header of the home screen or **Level › Settings** (wireframe: [`docs/wireframes/overlays.excalidraw`](docs/wireframes/overlays.excalidraw)). A change applies at once and is saved, without a **Save** button; Escape, **×** or a click on the veil closes it.
+A panel in the middle of the screen, over a veil, opened from the header of the home screen or the gear of the level screen, since they belong to the whole application and not to a level (wireframe: [`docs/wireframes/overlays.excalidraw`](docs/wireframes/overlays.excalidraw)). A change applies at once and is saved, without a **Save** button; Escape, **×** or a click on the veil closes it.
 
+- **Theme**: **Day Desk** (light, by default, so that a whole class sees the same screen) or **Night Desk** (dark). Only the interface changes: the map keeps the same look in both.
 - **Sounds**: on or off (off by default, so that a classroom stays quiet).
 - **Clear all progress…**: puts every level back in its first state (as **Restore starting code**, its breakpoints with its code) and clears the levels done and the levels opened by a code, after a confirmation; the settings stay. The messages only say *"the levels done and the code of every level"*: the breakpoints go with the code, without being named.
 
@@ -340,16 +345,18 @@ The interface is in English. Every text of the interface, the error messages and
 - One kind of item in version 1 (its look comes from the sheet of the world elements).
 - The goal cells of a level are marked on the map (where to stand, which color where, where to put the items), so that the learner sees the target before writing code.
 - Outside the grid counts as a wall.
-- **Legend**: the button **Legend**, in the top right corner of the map, or **Help › Legend of the map** opens the legend of the level in a bubble under the button (wireframe: [`docs/wireframes/overlays.excalidraw`](docs/wireframes/overlays.excalidraw)), which blocks nothing, like the goal: Escape, **×** or a click elsewhere closes it. The button carries a dot while the map has new elements not yet seen in the legend. The legend shows only the elements present on its map, each with its drawing and one sentence, the new ones marked as new, and a link to the section **The map** of the manual.
+- **Legend**: the button **Legend**, on the row above the map, or **Help › Legend of the map** opens the legend of the level in a bubble under the button (wireframe: [`docs/wireframes/overlays.excalidraw`](docs/wireframes/overlays.excalidraw)), which blocks nothing, like the goal: Escape, **×** or a click elsewhere closes it. The button carries a dot, in the cyan of the eyes of the robot, while the map has new elements not yet seen in the legend. The legend shows only the elements present on its map, each with its drawing and one sentence, the new ones marked as new, and a link to the section **The map** of the manual.
 
 ### Look of the world
 
-The sheet of the world elements, [`docs/mockups/world-elements.html`](docs/mockups/world-elements.html), is the reference of every element: flat, seen from above, in the Daylight style. Each element is an SVG file of `docs/mockups/world-elements/daylight/`, reused as it is by the application, which stacks them in a cell; only the paint strokes are drawn by the map.
+The sheet of the world elements, [`docs/mockups/world-elements.html`](docs/mockups/world-elements.html), is the reference of every element: flat, seen from above, in the Daylight style. Each element is an SVG file of `docs/mockups/world-elements/daylight/`, reused as it is by the application, which stacks them in a cell; only the paint strokes, the lines every five cells and the shadows are drawn by the map.
 
 | Element | Look | Shades |
 |---|---|---|
 | Floor | A light gray cell with a thin line around it, so that the cells can be counted. | `#e1e5ea`, line `#cad1da` |
 | Wall | A plain slate cell; the walls meet as one mass. A wall below a floor cell has a light rim at its top, a wall above a floor cell a darker edge at its bottom: a flat hint of height. | `#5d687a`, rim `#7d899c`, edge `#3f4857` |
+| Line every five cells | A slightly thicker line, 4.5/64 of a cell wide, every five cells counted from the cell at the bottom left, to give the map a texture and to count the cells more easily. It lies under the paint. Drawn by the map. | the ink `#222935` at 10 % |
+| Shadow of a wall | The sun is at the top right: each wall casts a flat shadow, 10/64 of a cell long, toward the bottom left. The walls cast one shadow together. It lies over the paint and the goal marks, under the items and the robot. Drawn by the map. | the ink `#222935` at 10 % |
 | Paints | A stroke 28/64 of a cell wide through the centers of the cells, along the painted passages (see [Map](#map)), rounded at its ends. The red is darker and the yellow lighter so that they stay apart in a red-green color blindness. | `red` scarlet `#dc2f34`, `yellow` bright amber `#ffb300`, `blue` cobalt `#2459d6` |
 | Item | A teal hexagon with a dark center. | `#5fd0b0`, ink `#222935` |
 | Goal: paint | The stroke to paint, in its color at 35 % opacity; a cell painted with the right color hides it. | the paint |
@@ -357,8 +364,8 @@ The sheet of the world elements, [`docs/mockups/world-elements.html`](docs/mocku
 | Goal: where to stand | A large square slot, in which the robot fits. | as the item slot |
 | Goal not met | A small red flag planted in the corner of the cell, once a run ends without meeting it. | `#c2255c` (may follow the error color of the design system) |
 | Robot | White, with two tracks, a dark visor with two cyan eyes at its front (its direction), and a bay at its back that holds the item it carries. Its pincer comes out of its front only while it picks up or drops an item. At the end of a run, its eyes light up in yellow when every goal is met, and dim when not. | body `#ffffff`, ink `#222935`, eyes `#3fc3ff`, bay `#d5dbe3`, lit `#ffd23f`, dim `#7d8798` |
-| Logo | The head of the robot with happy eyes and a smile, carried up by a stroke of yellow paint that rises above it as a chevron. | the robot, the yellow paint |
-| Name | `stepwise` in lowercase, in Fredoka 600 (SIL Open Font License), beside the logo: the middle of the head of the robot meets the middle of the lowercase letters, raised by 0.011 em; the name starts 0.18 em after the head, whose height is 1.25 times the capitals. | the ink of the page |
+| Logo | The head of the robot with happy eyes and a smile, alone, so that the name stays on the line of the text beside it. It is also the icon of a browser tab. | the robot |
+| Name | `stepwise` in lowercase, in Fredoka 600 (SIL Open Font License), beside the logo: the middle of the head of the robot meets the middle of the lowercase letters, raised by 0.011 em; the name starts 0.18 em after the head, which is 1.25 times the height of the capitals. In a header, its baseline sits 1 px under the one of the menus. | the ink of the page |
 
 ## Local files
 

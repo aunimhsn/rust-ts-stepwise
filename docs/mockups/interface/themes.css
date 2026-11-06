@@ -1,0 +1,47 @@
+/* The styles of the interface: tokens only. The components of the blocks use nothing else. */
+
+:root {
+  --font-name: "Fredoka", sans-serif; /* The personality: the name, what the robot says, Let's go. */
+  --font-text: "Manrope", sans-serif; /* The interface: everything that is read or clicked. */
+  --font-title: "Manrope", sans-serif;
+  --font-code: "Source Code Pro", monospace; /* The code: the editor, the console, the variables. */
+  --code-weight: 600; --code-strong-weight: 800;
+}
+
+:root[data-theme="night-desk"] {
+  --title-weight: 600; --strong-weight: 600; --size-text: 13.5px; --size-code: 14px; --line-code: 21px;
+  --gap: 0; --radius: 0; --radius-small: 3px; --border: none; --block-shadow: none; --pop-shadow: 0 14px 40px #0009; --pop-border: 1px solid #434d5c;
+  --app-bg: #39424f; --band: #171b21; --band-text: #e8ecf1; --band-weak: #98a3b2; --band-hover: #2a313b; --band-line: none;
+  --surface: #1e232b; --pop: #272e38; --text: #e8ecf1; --weak: #98a3b2; --hover: #333b47;
+  --accent: #ffb300; --on-accent: #171b21; --accent-soft: #4a3c17; --error: #ff7b7b; --error-soft: #47262c; --success: #46c98f; --idle: #4b5564;
+  --progress: #46c98f; --progress-track: #2a313b;
+  --chosen: #e8ecf1; --on-chosen: #171b21;
+  --passed: #5fd0b0; --on-passed: #222935; --passed-soft: color-mix(in srgb, #5fd0b0 28%, var(--band));
+  --control: #2f3641; --on-control: #e8ecf1; --control-border: none; --control-shadow: 0 2px 8px #0006; --control-radius: 3px;
+  --chip: #2f3641; --on-chip: #e8ecf1; --chip-border: none;
+  --editor: #1e232b; --gutter: #1e232b; --gutter-text: #677282; --gutter-line: none; --editor-rules: none;
+  --current: #413a23; --current-mark: #ffb300; --breakpoint: #ff7b7b;
+  --code-text: #e8ecf1; --code-comment: #8490a0; --code-comment-style: normal; --code-keyword: #8fb8ff; --code-keyword-weight: var(--code-weight); --code-function: #68d8bb; --code-string: #ffd27a; --code-number: #ffa98a; --code-value: #ffa98a;
+  --status: #171b21; --on-status: #a7b1bf; --status-line: none; --status-strong: #ffb300; --status-paused: #ffb300; --on-status-paused: #171b21; --status-failed: #ff7b7b; --on-status-failed: #171b21;
+  --map-block: #262c35; --map-shadow: 0 10px 34px #0008;
+  --tab: transparent; --on-tab: #98a3b2; --tab-chosen: #2f3641; --on-tab-chosen: #e8ecf1; --call-current: #2f3641; --goal-side: #12161c; --on-goal-side: #ffffff; --goal-new-title: #3fc3ff; --goal-bubble: #1d222a; --goal-link: #5d687a; --on-goal-link: #ffffff; --goal-link-hover: #6b778a; --tab-line: none;
+}
+
+:root[data-theme="day-desk"] {
+  --title-weight: 600; --strong-weight: 600; --size-text: 13.5px; --size-code: 14px; --line-code: 21px;
+  --gap: 0; --radius: 0; --radius-small: 3px; --border: none; --block-shadow: none; --pop-shadow: 0 14px 40px #22293540; --pop-border: 1px solid #c3cad3;
+  --app-bg: #c9d0d9; --band: #eceff3; --band-text: #1b2028; --band-weak: #5c6675; --band-hover: #dde2e8; --band-line: none;
+  --surface: #fafbfc; --pop: #ffffff; --text: #1b2028; --weak: #5c6675; --hover: #e4e8ed;
+  --accent: #ffb300; --on-accent: #1b2028; --accent-soft: #fff0c7; --error: #bf2f3a; --error-soft: #fbe5e6; --success: #14906a; --idle: #c3cad3;
+  --progress: #14906a; --progress-track: #dde2e8;
+  --chosen: #1b2028; --on-chosen: #f6f7f9;
+  --passed: #5fd0b0; --on-passed: #222935; --passed-soft: color-mix(in srgb, #5fd0b0 28%, var(--band));
+  --control: #ffffff; --on-control: #1b2028; --control-border: none; --control-shadow: 0 1px 5px #22293538; --control-radius: 3px;
+  --chip: #ffffff; --on-chip: #1b2028; --chip-border: 1px solid #c3cad3;
+  --editor: #fafbfc; --gutter: #fafbfc; --gutter-text: #939daa; --gutter-line: none; --editor-rules: none;
+  --current: #ffe9ad; --current-mark: #8a5a00; --breakpoint: #cf3a44;
+  --code-text: #1b2028; --code-comment: #6e7a8a; --code-comment-style: normal; --code-keyword: #2d5cc2; --code-keyword-weight: var(--code-weight); --code-function: #09795f; --code-string: #8f5f06; --code-number: #b34c1c; --code-value: #b34c1c;
+  --status: #eceff3; --on-status: #4f5968; --status-line: none; --status-strong: #8a5a00; --status-paused: #ffb300; --on-status-paused: #1b2028; --status-failed: #bf2f3a; --on-status-failed: #ffffff;
+  --map-block: #d3d8df; --map-shadow: 0 8px 26px #22293540;
+  --tab: transparent; --on-tab: #5c6675; --tab-chosen: #d3d9e1; --on-tab-chosen: #1b2028; --call-current: #d3d9e1; --goal-side: #222935; --on-goal-side: #ffffff; --goal-new-title: #3fc3ff; --goal-bubble: #eceff3; --goal-link: #5d687a; --on-goal-link: #ffffff; --goal-link-hover: #6b778a; --tab-line: none;
+}

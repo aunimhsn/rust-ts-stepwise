@@ -1,0 +1,14 @@
+/* The block of the map: the row of its tabs and of the button Legend, then the whole map centered. */
+.app-block.is-map { display: flex; flex-direction: column; }
+.app-world { flex: 1; min-height: 0; display: grid; place-items: center; background: var(--map-block); }
+.app-world .app-map { box-shadow: var(--map-shadow); }
+
+/* The tabs and the button Legend take the whole height of the row, without gaps, against its two ends. */
+.app-map-row { flex: none; display: flex; align-items: stretch; height: 34px; background: var(--band); }
+.app-window .app-map-tab { padding: 0 16px; background: none; border: 0; color: var(--band-weak); font-weight: 500; }
+.app-window .app-map-row .app-chip { margin-left: auto; padding: 0 16px; background: var(--chip); color: var(--on-chip); border: 0; border-radius: 0; }
+.app-window .app-map-tab.is-shown { background: var(--map-block); color: var(--band-text); font-weight: var(--strong-weight); }
+
+/* A map that has passed: a pale teal background, full on the map shown. */
+.app-window .app-map-tab.is-passed { background: var(--passed-soft); color: var(--band-text); }
+.app-window .app-map-tab.is-passed.is-shown { background: var(--passed); color: var(--on-passed); }

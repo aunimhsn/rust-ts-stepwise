@@ -1,0 +1,41 @@
+/* The editor: the code with its margin, the three controls, the status bar. */
+.app-editor { display: flex; flex-direction: column; height: 100%; background: var(--editor); }
+.app-code { position: relative; flex: 1; min-height: 0; padding-top: 12px; background-color: var(--editor); background-image: var(--editor-rules); background-position: 0 12px; font: var(--code-weight) var(--size-code)/var(--line-code) var(--font-code); font-variant-ligatures: none; color: var(--code-text); }
+/* The margin runs along the whole height, behind the lines. */
+.app-code::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 52px; background: var(--gutter); border-right: var(--gutter-line); }
+.app-line { position: relative; display: flex; height: var(--line-code); }
+.app-margin { flex: none; position: relative; width: 52px; color: var(--gutter-text); }
+.app-number { position: absolute; right: 9px; font-size: .88em; }
+.app-mark { position: absolute; left: 6px; top: 50%; transform: translateY(-50%); display: flex; }
+.app-text { padding-left: 14px; white-space: pre; }
+.app-line.is-next { background: var(--current); }
+.app-line.is-next .app-number { color: var(--code-text); font-weight: var(--code-strong-weight); }
+.app-line.is-next .app-mark { color: var(--current-mark); }
+.app-line.is-error { background: var(--error-soft); }
+.app-line.is-error .app-number, .app-line.is-error .app-mark { color: var(--error); font-weight: var(--code-strong-weight); }
+.app-breakpoint { width: 11px; height: 11px; border-radius: 50%; background: var(--breakpoint); }
+
+.code-comment { color: var(--code-comment); font-style: var(--code-comment-style); }
+.code-keyword { color: var(--code-keyword); font-weight: var(--code-keyword-weight); }
+.code-function { color: var(--code-function); }
+.code-string { color: var(--code-string); }
+.code-number { color: var(--code-number); }
+.code-value { color: var(--code-value); }
+
+.app-controls { position: absolute; right: 12px; bottom: 12px; display: flex; gap: 8px; }
+.app-window .app-control { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; background: var(--control); color: var(--on-control); border: var(--control-border); border-radius: var(--control-radius); box-shadow: var(--control-shadow); }
+.app-window .app-control.is-main { background: var(--accent); color: var(--on-accent); }
+
+.app-status { flex: none; display: flex; align-items: center; gap: 22px; height: 30px; box-sizing: border-box; padding: 0 12px; background: var(--status); color: var(--on-status); border-top: var(--status-line); font-size: 12.5px; white-space: nowrap; }
+.app-status b { color: var(--status-strong); font-weight: var(--strong-weight); }
+/* The bar takes the color of the state of the program, as in a code editor. */
+.app-status.is-paused { background: var(--status-paused); color: var(--on-status-paused); }
+.app-status.is-failed { background: var(--status-failed); color: var(--on-status-failed); }
+.app-status.is-paused b, .app-status.is-failed b { color: inherit; }
+.app-speed { display: flex; align-items: center; gap: 3px; }
+.app-speed span { margin-right: 5px; }
+.app-speed i { width: 9px; height: 13px; box-sizing: border-box; border: 1px solid currentColor; border-radius: 1px; }
+.app-speed i.is-on { background: currentColor; }
+.app-cursor { margin-left: auto; }
+/* The texts of the bar sit half a pixel low, tuned by eye; the squares of the speed stay in place. */
+.app-status > b, .app-status > span, .app-speed span { position: relative; top: .5px; }

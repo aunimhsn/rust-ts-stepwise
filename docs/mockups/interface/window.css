@@ -1,0 +1,14 @@
+/* A window of the application, at its real size, and its two columns. The blocks meet without any line:
+   each zone has its own tone. */
+.app-window { position: relative; display: flex; flex-direction: column; width: 1280px; height: 720px; overflow: hidden; background: var(--app-bg); color: var(--text); font: 400 var(--size-text)/1.4 var(--font-text); box-shadow: 0 8px 30px #0006; }
+.app-window button { font: inherit; color: inherit; cursor: pointer; }
+.app-body { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 216px; gap: var(--gap); padding: var(--gap); }
+.app-block { min-width: 0; min-height: 0; overflow: hidden; background: var(--surface); border: var(--border); border-radius: var(--radius); box-shadow: var(--block-shadow); }
+.app-block.is-editor { grid-row: 1 / 3; }
+
+/* A small button with a text, and the main button of a bubble. */
+.app-chip { padding: 3px 10px; background: var(--chip); color: var(--on-chip); border: var(--chip-border); border-radius: var(--radius-small); font-weight: 500; white-space: nowrap; }
+.app-window button.app-primary { padding: 6px 16px; background: var(--accent); color: var(--on-accent); border: var(--control-border); border-radius: var(--control-radius); box-shadow: var(--control-shadow); font-weight: var(--strong-weight); }
+
+/* The tabs of the page take several rows: a section stops under them. */
+.page-section { scroll-margin-top: 130px; }
