@@ -3,6 +3,10 @@
 // One group of tabs per open decision; `fallback` is the choice shown by default.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(INTERFACE_STYLES).map(([key, style]) => [key, style.title])), fallback: Object.keys(INTERFACE_STYLES)[0] },
+  // The life of the map: the line every five cells, the direction of the sun, the length of the shadows.
+  gridLine: { label: "Line every 5 cells", options: { thin: "Thin", medium: "Medium", strong: "Strong" }, fallback: "thin" },
+  sun: { label: "Sun", options: { "top-left": "Top left", top: "Top", "top-right": "Top right" }, fallback: "top-left" },
+  shadow: { label: "Shadow", options: { short: "Short", medium: "Medium", long: "Long" }, fallback: "medium" },
 };
 
 const params = new URLSearchParams(location.search);

@@ -12,3 +12,7 @@
 /* A map that has passed: a pale teal background, full on the map shown. */
 .app-window .app-map-tab.is-passed { background: var(--passed-soft); color: var(--band-text); }
 .app-window .app-map-tab.is-passed.is-shown { background: var(--passed); color: var(--on-passed); }
+
+/* The maps of the section on the life of the map. */
+.life-maps { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
+.life-map > span { display: block; margin-bottom: 6px; color: #e9ecef; font-size: 13px; font-weight: 700; }

@@ -38,16 +38,20 @@ function appGoalPaint(color, around = []) {
 // `missed` marks a goal not met once the program has ended.
 // `wallEdge` adds the darker edge at the bottom of a wall above a floor cell, and `wallRim` the light
 // rim at the top of a wall below a floor cell: a flat hint of height.
-function appCell({ wall = false, wallEdge = true, wallRim = true, paint, around = [], goalPaint, goalAround = [], goalItem = false, item = false, goalStand = false, robot, carrying = false, pincer = false, lit, missed = false } = {}, size = 48) {
+// `lines` is drawn on the floor, under the paint, and `shade` over the paint and the goal marks, under
+// the item and the robot.
+function appCell({ wall = false, wallEdge = true, wallRim = true, lines = "", shade = "", paint, around = [], goalPaint, goalAround = [], goalItem = false, item = false, goalStand = false, robot, carrying = false, pincer = false, lit, missed = false } = {}, size = 48) {
   const images = [`<img src="${element(wall ? "wall" : "floor")}" alt="">`];
   if (wall && wallRim) images.push(`<img src="${element("wall-rim")}" alt="">`);
   if (wall && wallEdge) images.push(`<img src="${element("wall-edge")}" alt="">`);
+  if (lines) images.push(lines);
   if (paint) images.push(appPaint(paint, around));
   // A goal met hides its mark: the paint alone shows that the cell is done.
   if (goalPaint && goalPaint !== paint) images.push(appGoalPaint(goalPaint, goalAround));
-  for (const [shown, name] of [[goalItem, "goal-item"], [item, "item"], [goalStand, "goal-stand"]]) {
-    if (shown) images.push(`<img src="${element(name)}" alt="">`);
-  }
+  if (goalItem) images.push(`<img src="${element("goal-item")}" alt="">`);
+  if (goalStand) images.push(`<img src="${element("goal-stand")}" alt="">`);
+  if (shade) images.push(shade);
+  if (item) images.push(`<img src="${element("item")}" alt="">`);
   // The robot covers the paint of its cell: the learner follows it through the code.
   // The item it carries lies in its bay, the light panel at its back, and turns with it.
   const carried = carrying ? `<img class="is-carried" src="${element("item")}" alt="">` : "";
