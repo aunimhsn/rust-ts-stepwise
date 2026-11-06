@@ -4,9 +4,14 @@
 .app-place small { color: var(--band-weak); font-size: 10.5px; font-weight: 600; line-height: 13px; letter-spacing: .05em; text-transform: uppercase; }
 .app-place b { font: var(--title-weight) 14px/18px var(--font-title); }
 
-/* The number of the level, in an amber circle centered where the header meets the two columns, over the
-   bubble of the goal. */
-.app-window .app-level-mark { position: absolute; z-index: 3; left: 640px; top: 49px; display: grid; place-items: center; width: var(--level-mark, 28px); height: var(--level-mark, 28px); padding: 0; transform: translate(-50%, -50%); background: var(--accent); color: var(--on-accent); border: 0; border-radius: 50%; font: 600 calc(var(--level-mark, 28px) * .47) var(--font-name); }
-:root[data-level-mark="small"] { --level-mark: 24px; }
-:root[data-level-mark="medium"] { --level-mark: 28px; }
-:root[data-level-mark="large"] { --level-mark: 34px; }
+/* The number of the level, in an amber circle where the header meets the two columns, over the bubble of
+   the goal. Two tests for it to clear the title: the circle lower, or the title higher. */
+.app-window .app-level-mark { position: absolute; z-index: 3; left: 640px; top: 49px; display: grid; place-items: center; width: 28px; height: 28px; padding: 0; transform: translate(-50%, -50%); background: var(--accent); color: var(--on-accent); border: 0; border-radius: 50%; font: 600 13px var(--font-name); }
+.app-window.is-mark-lower .app-level-mark { top: 52px; }
+.app-window.is-mark-raised .app-place { top: 2px; }
+
+/* The two tests side by side: the middle of the window, at its real size. */
+.mark-tests { display: grid; grid-template-columns: repeat(2, 640px); gap: 16px 12px; }
+.mark-test > span { display: block; margin-bottom: 6px; color: #e9ecef; font-size: 14px; font-weight: 700; }
+.mark-crop { width: 640px; height: 150px; overflow: hidden; }
+.mark-crop .app-window { margin-left: -320px; box-shadow: none; }

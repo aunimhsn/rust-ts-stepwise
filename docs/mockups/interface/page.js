@@ -3,7 +3,8 @@
 // One group of tabs per open decision; `fallback` is the choice shown by default.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(INTERFACE_STYLES).map(([key, style]) => [key, style.title])), fallback: Object.keys(INTERFACE_STYLES)[0] },
-  levelMark: { label: "Circle of the level", options: { small: "Small", medium: "Medium", large: "Large" }, fallback: "medium" },
+  // How the circle of the level clears the title: two tests.
+  markFit: { label: "Circle and title", options: { lower: "1 The circle lower", raised: "2 The title higher" }, fallback: "lower" },
 };
 
 const params = new URLSearchParams(location.search);

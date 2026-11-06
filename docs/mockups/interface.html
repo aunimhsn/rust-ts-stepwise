@@ -10,7 +10,7 @@
   interface/themes.css.
 
   Serve the repository root, then open http://127.0.0.1:<port>/docs/mockups/interface.html:
-    python3 -m http.server 8765 --bind 127.0.0.1
+    python3 docs/mockups/serve.py 8765
 -->
 <!-- The three fonts of the interface, under the SIL Open Font License, which the application can embed. -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Manrope:wght@400;500;600;700&family=Source+Code+Pro:wght@600;800&display=block">
@@ -46,6 +46,7 @@
 <script src="interface/block-console.js"></script>
 <script src="interface/window.js"></script>
 <!-- One script per section, the newest first: it is shown at the top of the page. -->
+<script src="interface/section-level-mark.js"></script>
 <script src="interface/section-console.js"></script>
 <script src="interface/section-goal-boards.js"></script>
 <script src="interface/section-paused.js"></script>
