@@ -3,8 +3,6 @@
 // One group of tabs per open decision; `fallback` is the choice shown by default.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(INTERFACE_STYLES).map(([key, style]) => [key, style.title])), fallback: Object.keys(INTERFACE_STYLES)[0] },
-  // What the button Let's go does on hover.
-  goHover: { label: "Let's go on hover", options: { robot: "1 The robot crosses it", paint: "2 A stroke of paint fills it", light: "3 It lights up", grow: "4 The text grows", spread: "5 The letters spread" }, fallback: "robot" },
 };
 
 const params = new URLSearchParams(location.search);

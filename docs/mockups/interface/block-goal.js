@@ -1,8 +1,7 @@
 // The bubble of the goal: the robot says the title of the level, the goal and its links under it, what
 // is new in a dark column on the right, and Let's go along the whole bottom.
-// `hover` is what the button Let's go does on hover.
-function appGoal(hover = chosen.goHover) {
-  return `<div class="app-popup app-goal is-hover-${hover}">
+function appGoal() {
+  return `<div class="app-popup app-goal">
     <div class="goal-columns">
       <div class="goal-main">
         <div class="goal-says"><img class="goal-robot" src="world-elements/daylight/logo.svg" alt=""><h3>Paint a square</h3></div>
