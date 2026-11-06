@@ -19,7 +19,7 @@ Design first (phases 3 to 5 of [process.md](process.md), with a sheet of the wor
 - [x] **1. Sheet of the world elements** (#4, #5)
 - [x] **2. Wireframes** (#6, #7, #8, #9)
 - [ ] **3. Mock-up**: the HTML mock-up of every screen and state, with real sample code and errors, in `docs/mockups/interface.html`. The world keeps the elements of step 1. Done when every scenario looks right at 1280 × 720 and on a large screen.
-  - [ ] **3a. Style of the interface**: the level screen (paused, an error while running, a menu, the goal) in 3 or 4 styles around the world of step 1; Day Desk and Night Desk kept as the two themes; the logo reworked so that the name lines up with the menus.
+  - [x] **3a. Style of the interface**: the level screen (paused, an error while running, a menu, the goal) in 3 or 4 styles around the world of step 1; Day Desk and Night Desk kept as the two themes; the logo reworked so that the name lines up with the menus.
   - [ ] **3b. Whole level screen**: every state of a run, the menus and the keyboard shortcuts of the controls decided, the goal, the legend, the command menu, the success panel, the confirmations, the sandbox, the large screen.
   - [ ] **3c. Other screens**: the home screen and its path, the manual, the settings with the theme, the messages (the storage refused, the window too small, the browser too old, offline).
   - [ ] **3d. Animations and sounds**: the animations of the map as mini-scenes to replay and tune, at every speed (each action of the robot, `pick_up()` with its pincer, the end of a run that succeeds or fails), with their sounds, synthesized and CC0 compared by ear.
