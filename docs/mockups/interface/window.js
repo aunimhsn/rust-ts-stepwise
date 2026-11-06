@@ -8,6 +8,7 @@ const appWindow = ({ header, maps = {}, editor, map, panels, overlay = "" }) => 
       <div class="app-block is-map">${appMapRow(maps.shown ?? 1, maps.passed ?? [])}${map}</div>
       <div class="app-block">${appPanels(panels)}</div>
     </div>
+    ${appLevelMark()}
     ${overlay}
   </div>`;
 
