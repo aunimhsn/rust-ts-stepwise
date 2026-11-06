@@ -3,6 +3,8 @@
 // One group of tabs per open decision; `fallback` is the choice shown by default.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(INTERFACE_STYLES).map(([key, style]) => [key, style.title])), fallback: Object.keys(INTERFACE_STYLES)[0] },
+  tabLines: { label: "Between the tabs", options: { none: "Nothing", lines: "A thin line" }, fallback: "none" },
+  legendStyle: { label: "Legend", options: { surface: "Light block", flat: "Same as the row" }, fallback: "surface" },
   settings: { label: "Settings", options: { gear: "Gear on the right", "gear-left": "Gear after the menus", name: "Menu on the name", view: "Menu View" }, fallback: "gear-left" },
 };
 
