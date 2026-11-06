@@ -21,11 +21,14 @@
 .is-bar-under .app-map-tab::before { left: 16px; right: 16px; bottom: 4px; }
 .is-bar-edge .app-map-tab::before { left: 0; right: 0; bottom: 0; border-radius: 0; }
 
-/* The maps as pills: they float on their row, a ring shows the map on the screen, whatever its state. */
+/* The maps as pills, in the style of the button Legend and at its height: a contour shows the map on the
+   screen, whatever its state. */
 .app-map-row.is-shape-pills { align-items: center; gap: 4px; padding-left: 8px; }
-.app-window .app-map-row.is-shape-pills .app-map-tab { height: 26px; padding: 0 14px; overflow: hidden; border-radius: 999px; }
-.app-window .app-map-row.is-shape-pills .app-map-tab.is-shown { background: none; box-shadow: inset 0 0 0 1.5px var(--band-text); }
-.app-window .app-map-row.is-shape-pills[class*="is-bar-teal"] .app-map-tab.is-passed.is-shown { background: #5fd0b0; box-shadow: inset 0 0 0 1.5px #222935; }
+.app-map-row .app-chip { box-sizing: border-box; height: 26px; }
+.app-window .app-map-row.is-shape-pills .app-map-tab { box-sizing: border-box; height: 26px; padding: 0 10px; overflow: hidden; background: var(--chip); color: var(--on-chip); border: var(--chip-border); border-radius: var(--radius-small); }
+.app-window .app-map-row.is-shape-pills .app-map-tab.is-shown { border: 1.5px solid var(--band-text); }
+.app-window .app-map-row.is-shape-pills[class*="is-bar-teal"] .app-map-tab.is-passed { border-color: transparent; }
+.app-window .app-map-row.is-shape-pills[class*="is-bar-teal"] .app-map-tab.is-passed.is-shown { background: #5fd0b0; color: #222935; border-color: var(--band-text); }
 .is-shape-pills.is-bar-top .app-map-tab::before { left: 12px; right: 12px; top: 3px; }
 .app-window .app-map-row.is-shape-pills.is-bar-under .app-map-tab { padding-bottom: 4px; }
 .is-shape-pills.is-bar-under .app-map-tab::before { left: 14px; right: 14px; bottom: 3px; }
