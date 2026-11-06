@@ -7,6 +7,7 @@ const pausedWindow = overrides => appWindow({
   map: appWorld({ painted: ["2,1", "3,1", "4,1", "5,1", "5,2"], robot: "5,2", facing: "south" }),
   panels: { tab: "Variables", content: appVariables("paint_side", [["length", "3"]], [["main program", 10], ["paint_side", 5]]) },
   overlay: overrides?.overlay,
+  lines: overrides?.lines,
 });
 
 SECTIONS.push(["Paused", () => `<div class="page-row"><div class="page-slot"><span>1280 × 720, paused on line 5, map 1 and map 2 passed, map 2 shown</span>${pausedWindow()}</div></div>`]);

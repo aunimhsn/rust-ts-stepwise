@@ -1,7 +1,8 @@
 // A window of the level screen: the header, the editor on the left, the map above the panels.
-// `maps` gives the tabs of the map: the map shown and the maps that have passed.
-const appWindow = ({ header, maps = {}, editor, map, panels, overlay = "" }) => `
-  <div class="app-window">
+// `maps` gives the tabs of the map: the map shown and the maps that have passed; `lines` the lines kept
+// between the blocks.
+const appWindow = ({ header, maps = {}, editor, map, panels, overlay = "", lines = chosen.lines }) => `
+  <div class="app-window is-lines-${lines}">
     ${appHeader(header)}
     <div class="app-body">
       <div class="app-block is-editor">${appEditor(editor)}</div>

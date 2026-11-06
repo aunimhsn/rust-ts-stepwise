@@ -9,9 +9,5 @@
 .app-progress i { display: block; height: 100%; background: var(--progress); }
 
 
-/* The ways to reach the settings: a gear at the end of the header, or a menu on the name. */
+/* The gear of the settings, at the right end of the header. */
 .app-window .app-gear { display: grid; place-items: center; width: 30px; height: 30px; margin-left: auto; padding: 0; background: none; border: 0; border-radius: var(--radius-small); color: var(--band-weak); }
-.app-window .app-gear.is-left { margin-left: 10px; }
-.app-window .app-name-menu { display: flex; align-items: center; gap: 5px; margin: 0 -6px; padding: 0 6px; background: none; border: 0; border-radius: var(--radius-small); color: var(--band-text); }
-.app-window .app-name-menu.is-open { background: var(--band-hover); }
-.app-name-menu i { display: flex; color: var(--band-weak); }

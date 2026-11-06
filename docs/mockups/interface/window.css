@@ -11,3 +11,15 @@
 
 /* The tabs of the page take several rows: a section stops under them. */
 .page-section { scroll-margin-top: 150px; }
+
+/* The lines between the blocks, from all of them to none. The blocks meet directly where a line goes. */
+.app-window:not(.is-lines-current) .app-header { height: 49px; border-bottom: 0; }
+.app-window:not(.is-lines-current) .app-body { padding: 0; }
+.app-window:not(.is-lines-current) .app-map-row .app-chip { border-left: 0; }
+.is-lines-map .app-body, .is-lines-all .app-body, .is-lines-tone .app-body { row-gap: 0; }
+.is-lines-all .app-body, .is-lines-tone .app-body { column-gap: 0; }
+.is-lines-tone .app-block:last-child { --surface: var(--band); }
+
+/* The right of a window with the edge of the code, to compare the lines side by side. */
+.lines-crop { width: 650px; height: 720px; overflow: hidden; }
+.lines-crop .app-window { margin-left: -630px; box-shadow: none; }

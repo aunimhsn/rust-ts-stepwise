@@ -10,21 +10,15 @@ function appWordmark(fontSize) {
   return `<div class="app-name" style="font-size:${fontSize}px"><img src="world-elements/daylight/logo.svg" height="${height.toFixed(1)}" alt="" style="margin-right:${(fontSize * 0.18).toFixed(1)}px;transform:translateY(${(height / 2 - middleOfText).toFixed(2)}px)"><span>stepwise</span></div>`;
 }
 
-// The header: the name, the menus, the way to the settings, the place of the level (block-place.js),
-// the thin bar of the progress. `menu` is the menu open and `goalOpen` the bubble of the goal.
+// The header: the name, the menus, the place of the level (block-place.js), the gear of the settings at
+// its right end, the thin bar of the progress. `menu` is the menu open and `goalOpen` the bubble of the goal.
 function appHeader({ menu, goalOpen = false } = {}) {
-  const menus = ["Level", "Edit", "Run", ...(chosen.settings === "view" ? ["View"] : []), "Help"];
-  const name = chosen.settings === "name"
-    ? `<button type="button" class="app-name-menu ${menu === "Stepwise" ? "is-open" : ""}">${appWordmark(21)}<i>${ICONS.down(11)}</i></button>`
-    : appWordmark(21);
-  const gear = position => `<button type="button" class="app-gear ${position}" title="Settings">${ICONS.gear(18)}</button>`;
   return `<header class="app-header">
-    ${name}
-    <nav class="app-menus">${menus.map(item =>
+    ${appWordmark(21)}
+    <nav class="app-menus">${["Level", "Edit", "Run", "Help"].map(item =>
       `<button type="button" class="app-menu ${item === menu ? "is-open" : ""}">${item}</button>`).join("")}</nav>
-    ${chosen.settings === "gear-left" ? gear("is-left") : ""}
     ${appPlace(goalOpen)}
-    ${chosen.settings === "gear" ? gear("is-right") : ""}
+    <button type="button" class="app-gear" title="Settings">${ICONS.gear(18)}</button>
     <div class="app-progress" title="17 of 20 levels done"><i style="width:85%"></i></div>
   </header>`;
 }

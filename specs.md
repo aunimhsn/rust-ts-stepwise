@@ -175,7 +175,7 @@ Wireframe: [`docs/wireframes/home-screen.excalidraw`](docs/wireframes/home-scree
 
 Wireframe: [`docs/wireframes/level-screen.excalidraw`](docs/wireframes/level-screen.excalidraw). The code on the left, the world on the right, under a header of one line:
 
-- **Header**: the logo and the name; the menus **Level**, **Edit**, **Run**, **Help**; in the middle, the place of the level, its chapter in small capitals above its number and title (`FUNCTIONS`, `18. Paint a square`), a button that opens its goal. A thin bar along the bottom of the header fills with the levels done; on hover, a discreet *"17 of 20 levels done"*. The content of the header is centered on the height above that thin bar.
+- **Header**: the logo and the name; the menus **Level**, **Edit**, **Run**, **Help**; on the right, a gear that opens the settings; in the middle, the place of the level, its chapter in small capitals above its number and title (`FUNCTIONS`, `18. Paint a square`), a button that opens its goal. A thin bar along the bottom of the header fills with the levels done; on hover, a discreet *"17 of 20 levels done"*. The content of the header is centered on the height above that thin bar.
 - **Editor**, on the left, on the whole height: the code with its line numbers and breakpoints; three square buttons fixed in its bottom right corner, which don't scroll with the code: **Run** / **Pause** / **Resume** (one button, ▶ or ⏸), **Step** (an arrow down onto a dot, as the *step into* of the developer tools) and **Reset** (↻). They have no text: each one names itself, with its shortcut, on hover. They grow pale while the learner types and come back as soon as the mouse moves; the code can scroll past its last line so that no line stays under them.
 - **Status bar**, under the code, as in VS Code: the state of the program (`Ready`, `Running`, `Paused at line 5 · Reset to edit`, `Error at line 3`, and once it ends without error `Ended · goal not met`, `Ended · map 1 passed`, `Ended · level done`, or `Ended` in the sandbox, so that the learner knows that the map shows the end of the run and not its start; the code can be changed, and **Run** puts the map back), the number of errors when there are some (a click shows the first one in the console), the steps run (`47 steps`), the speed (five small squares to click), the position of the cursor (`Ln 7, Col 12`). The bar takes the color of the state: the accent when paused, the error color on an error.
 - **Map**, on the right, on top: a row with one tab per map of the level (`Map 1`, `Map 2`, `Map 3`; see [Variants](#levels-and-progression)) and the button **Legend** on its right (see [Map](#map)); the code keeps the whole height. Under this row, the whole map, always; its cells grow or shrink to fill the block, up to a maximum size (about 64 pixels, tuned with the mock-up), the map centered in its block. No zoom, no scrolling.
@@ -186,7 +186,7 @@ The menus give every command of the screen, with its shortcut, so that the learn
 
 | Menu | Commands |
 |---|---|
-| **Level** | Goal, Previous level, Next level (greyed until the level is done), All levels (the home screen), Sandbox, Restore starting code…, Settings. |
+| **Level** | Goal, Previous level, Next level (greyed until the level is done), All levels (the home screen), Sandbox, Restore starting code…. |
 | **Edit** | Undo, Redo, Commands (the command menu), Toggle breakpoint, Remove all breakpoints. |
 | **Run** | Run / Pause / Resume, Step, Reset, Speed. |
 | **Help** | Manual, Look up in the manual (F1, the word at the cursor), Legend of the map, Keyboard shortcuts. |
@@ -319,11 +319,11 @@ Wireframe: [`docs/wireframes/manual.excalidraw`](docs/wireframes/manual.excalidr
 
 ### Sandbox
 
-An open map with a few walls, paints and items, without goal. The code is saved like a level's; **Run**, the console and the variables panel work the same way. Wireframe: the frame *Sandbox* of [`docs/wireframes/level-screen.excalidraw`](docs/wireframes/level-screen.excalidraw). It is the level screen without what belongs to a goal: in the middle of the header, *"◇ Sandbox"*, which isn't a button; no tabs of maps, no progress bar; no goal marks on the map; the menu **Level** keeps **All levels**, **Sandbox** (the current screen), **Restore starting code…** and **Settings**. Editing the map of the sandbox, and a level editor, come later (see the [backlog](docs/backlog.md)).
+An open map with a few walls, paints and items, without goal. The code is saved like a level's; **Run**, the console and the variables panel work the same way. Wireframe: the frame *Sandbox* of [`docs/wireframes/level-screen.excalidraw`](docs/wireframes/level-screen.excalidraw). It is the level screen without what belongs to a goal: in the middle of the header, *"◇ Sandbox"*, which isn't a button; no tabs of maps, no progress bar; no goal marks on the map; the menu **Level** keeps **All levels**, **Sandbox** (the current screen) and **Restore starting code…**. Editing the map of the sandbox, and a level editor, come later (see the [backlog](docs/backlog.md)).
 
 ### Settings
 
-A panel in the middle of the screen, over a veil, opened from the header of the home screen or **Level › Settings** (wireframe: [`docs/wireframes/overlays.excalidraw`](docs/wireframes/overlays.excalidraw)). A change applies at once and is saved, without a **Save** button; Escape, **×** or a click on the veil closes it.
+A panel in the middle of the screen, over a veil, opened from the header of the home screen or the gear of the level screen, since they belong to the whole application and not to a level (wireframe: [`docs/wireframes/overlays.excalidraw`](docs/wireframes/overlays.excalidraw)). A change applies at once and is saved, without a **Save** button; Escape, **×** or a click on the veil closes it.
 
 - **Theme**: **Day Desk** (light, by default, so that a whole class sees the same screen) or **Night Desk** (dark). Only the interface changes: the map keeps the same look in both.
 - **Sounds**: on or off (off by default, so that a classroom stays quiet).
