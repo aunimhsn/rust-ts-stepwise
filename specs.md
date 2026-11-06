@@ -358,8 +358,8 @@ The sheet of the world elements, [`docs/mockups/world-elements.html`](docs/mocku
 | Goal: where to stand | A large square slot, in which the robot fits. | as the item slot |
 | Goal not met | A small red flag planted in the corner of the cell, once a run ends without meeting it. | `#c2255c` (may follow the error color of the design system) |
 | Robot | White, with two tracks, a dark visor with two cyan eyes at its front (its direction), and a bay at its back that holds the item it carries. Its pincer comes out of its front only while it picks up or drops an item. At the end of a run, its eyes light up in yellow when every goal is met, and dim when not. | body `#ffffff`, ink `#222935`, eyes `#3fc3ff`, bay `#d5dbe3`, lit `#ffd23f`, dim `#7d8798` |
-| Logo | The head of the robot with happy eyes and a smile, crossed from left to right by an arrow of yellow paint that passes behind it. It is no taller than the head, so that the name stays on the line of the text beside it. | the robot, the yellow paint |
-| Name | `stepwise` in lowercase, in Fredoka 600 (SIL Open Font License), beside the logo: the middle of the head of the robot meets the middle of the lowercase letters, raised by 0.011 em; the name starts 0.18 em after the tip of the arrow, and the head is 1.25 times the height of the capitals. In a header, its baseline sits 1 px under the one of the menus. | the ink of the page |
+| Logo | The head of the robot with happy eyes and a smile, alone, so that the name stays on the line of the text beside it. It is also the icon of a browser tab. | the robot |
+| Name | `stepwise` in lowercase, in Fredoka 600 (SIL Open Font License), beside the logo: the middle of the head of the robot meets the middle of the lowercase letters, raised by 0.011 em; the name starts 0.18 em after the head, which is 1.25 times the height of the capitals. In a header, its baseline sits 1 px under the one of the menus. | the ink of the page |
 
 ## Local files
 
