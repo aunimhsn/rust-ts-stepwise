@@ -11,15 +11,29 @@ function appWordmark(fontSize) {
 }
 
 // `shownMap` is the map on the screen (from 1), `passed` the maps that have passed, `menu` the menu
-// open and `goalOpen` the bubble of the goal.
-function appHeader({ shownMap = 1, passed = [], menu, goalOpen = false } = {}) {
+// open, `goalOpen` the bubble of the goal, and `place` the presentation of the place of the level.
+function appHeader({ shownMap = 1, passed = [], menu, goalOpen = false, place = chosen.place } = {}) {
+  const inSecondBar = place.startsWith("bar-");
+  const menus = ["Level", "Edit", "Run", ...(chosen.settings === "view" ? ["View"] : []), "Help"];
+  const name = chosen.settings === "name"
+    ? `<button type="button" class="app-name-menu ${menu === "Stepwise" ? "is-open" : ""}">${appWordmark(21)}<i>${ICONS.down(11)}</i></button>`
+    : appWordmark(21);
+  const gear = position => `<button type="button" class="app-gear ${position}" title="Settings">${ICONS.gear(18)}</button>`;
   return `<header class="app-header">
-    ${appWordmark(21)}
-    <nav class="app-menus">${["Level", "Edit", "Run", "Help"].map(item =>
+    ${name}
+    <nav class="app-menus">${menus.map(item =>
       `<button type="button" class="app-menu ${item === menu ? "is-open" : ""}">${item}</button>`).join("")}</nav>
-    <button type="button" class="app-place ${goalOpen ? "is-open" : ""}"><i>${ICONS.target(15)}</i><span>Functions</span><i>${ICONS.chevron(11)}</i><b>18. Paint a square</b></button>
-    <div class="app-maps"><span>Map</span>${[1, 2, 3].map(number =>
-      `<button type="button" class="app-map-button ${number === shownMap ? "is-shown" : ""} ${passed.includes(number) ? "is-passed" : ""}">${number}</button>`).join("")}</div>
-    <div class="app-progress" title="17 of 20 levels done"><i style="width:85%"></i></div>
-  </header>`;
+    ${chosen.settings === "gear-left" ? gear("is-left") : ""}
+    ${inSecondBar ? "" : appPlace(place, goalOpen)}
+    ${inSecondBar ? "" : `<div class="app-maps">${appMapButtons(shownMap, passed)}</div>`}
+    ${chosen.settings === "gear" ? gear("is-right") : ""}
+    ${!inSecondBar || place === "bar-tabs" ? appProgress() : ""}
+  </header>
+  ${inSecondBar ? appSecondBar(place, { shownMap, passed, goalOpen }) : ""}`;
 }
+
+// The word Map and the buttons of the maps, each with its bar, green once the map has passed.
+const appMapButtons = (shownMap, passed) => `<span>Map</span>${[1, 2, 3].map(number =>
+  `<button type="button" class="app-map-button ${number === shownMap ? "is-shown" : ""} ${passed.includes(number) ? "is-passed" : ""}">${number}</button>`).join("")}`;
+
+const appProgress = () => '<div class="app-progress" title="17 of 20 levels done"><i style="width:85%"></i></div>';

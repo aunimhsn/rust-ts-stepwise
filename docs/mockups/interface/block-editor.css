@@ -37,3 +37,9 @@
 .app-speed i { width: 9px; height: 13px; box-sizing: border-box; border: 1px solid currentColor; border-radius: 1px; }
 .app-speed i.is-on { background: currentColor; }
 .app-cursor { margin-left: auto; }
+/* The texts of the bar, lowered by the tab Status text; the squares of the speed stay in place. */
+.app-status > b, .app-status > span, .app-speed span { position: relative; top: var(--status-drop, 0); }
+:root[data-status-text="half"] { --status-drop: .5px; }
+:root[data-status-text="one"] { --status-drop: 1px; }
+:root[data-status-text="one-half"] { --status-drop: 1.5px; }
+:root[data-status-text="two"] { --status-drop: 2px; }

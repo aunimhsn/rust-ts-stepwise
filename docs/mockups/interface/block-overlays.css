@@ -7,6 +7,8 @@
 .app-menu-row i { display: flex; color: var(--weak); }
 .app-menu-line { margin: 5px 0; border-top: 1px solid var(--hover); }
 
+:root[data-place="tag"] .app-goal { top: 66px; }
+:root[data-place^="bar-"] .app-goal { top: 86px; left: 190px; }
 .app-goal { top: 52px; left: 420px; width: 440px; padding: 14px 16px; }
 .page-section .app-goal h3 { margin: 0 0 8px; padding-right: 24px; font: var(--title-weight) 16px/1.3 var(--font-title); color: var(--text); text-transform: none; letter-spacing: normal; }
 .app-goal p { margin: 0 0 6px; }

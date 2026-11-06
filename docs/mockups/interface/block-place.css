@@ -1,0 +1,47 @@
+/* The place of the level, in the middle of the header, and its variants. */
+.app-window .app-place { position: absolute; left: 50%; top: 9px; transform: translateX(-50%); display: flex; align-items: baseline; gap: 8px; height: 30px; box-sizing: border-box; padding: 5px 12px 0; background: none; border: 0; border-radius: var(--radius-small); color: var(--band-text); white-space: nowrap; }
+.app-window .app-place.is-open { background: var(--band-hover); }
+.app-place b { font: var(--title-weight) 14px var(--font-title); }
+.app-place small { color: var(--band-weak); font-size: 13px; }
+.app-place em { display: flex; align-self: center; margin-top: -5px; color: var(--band-weak); font-style: normal; }
+
+/* 2. The chapter above the title. */
+.app-window .app-place.is-stacked { top: 4px; flex-direction: column; align-items: center; gap: 0; height: 38px; padding: 2px 12px 0; }
+.is-stacked small { font-size: 10.5px; line-height: 13px; letter-spacing: .05em; text-transform: uppercase; }
+.is-stacked b { line-height: 18px; }
+
+/* 3. A field, as the command center of a code editor. */
+.app-window .app-place.is-field { width: 336px; background: var(--surface); border: 1px solid var(--idle); padding-top: 4px; }
+.app-window .app-place.is-field.is-open { background: var(--surface); border-color: var(--band-text); }
+.is-field .place-number { margin-left: auto; color: var(--band-weak); font: 500 12.5px var(--font-code); }
+
+/* 4. The number in a stone, as on the path of the home screen. */
+.app-window .app-place.is-stone { align-items: center; padding-top: 0; }
+.place-stone { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--chosen); color: var(--on-chosen); font: 600 13px var(--font-name); }
+.is-stone b, .is-path b, .is-tag b, .is-robot b { font: 500 15px var(--font-name); }
+.is-stone small { margin-left: 2px; }
+
+/* 5. The stones of the chapter, the level to play filled and the next ones as ghosts. */
+.app-window .app-place.is-path { align-items: center; gap: 10px; padding-top: 0; }
+.place-stones { display: flex; align-items: center; }
+.place-stones b, .place-stones i { display: grid; place-items: center; border-radius: 50%; font: 600 11px var(--font-name); font-style: normal; }
+.place-stones b { width: 24px; height: 24px; background: var(--accent); color: var(--on-accent); }
+.place-stones i { box-sizing: border-box; width: 20px; height: 20px; border: 1.5px dashed var(--band-weak); color: var(--band-weak); }
+.place-stones u { width: 9px; border-top: 2px dashed var(--band-weak); }
+
+/* 6. A tag that hangs from the top of the window, over the blocks. */
+.app-window .app-place.is-tag { z-index: 1; top: 0; flex-direction: column; align-items: center; gap: 0; height: 60px; padding: 5px 20px 0; background: var(--accent); color: var(--on-accent); border-radius: 0 0 10px 10px; box-shadow: 0 3px 10px #2229353d; }
+.app-window .app-place.is-tag.is-open { background: var(--accent); }
+.is-tag small { color: inherit; font-size: 11px; line-height: 14px; opacity: .8; }
+.place-tag-line { display: flex; align-items: baseline; gap: 8px; }
+.place-big { font: 600 25px/32px var(--font-name); }
+
+/* 7. The robot says the level in a bubble. */
+.app-window .app-place.is-robot { top: 7px; align-items: center; gap: 9px; height: 34px; padding: 0 4px; }
+.place-bubble { position: relative; padding: 3px 13px 4px; background: var(--surface); border: 1px solid var(--idle); border-radius: 12px; font: 500 14.5px var(--font-name); }
+.place-bubble::before { content: ""; position: absolute; left: -5px; top: 50%; width: 8px; height: 8px; background: var(--surface); border-left: 1px solid var(--idle); border-bottom: 1px solid var(--idle); transform: translateY(-50%) rotate(45deg); }
+
+/* The strips of the section that compares the variants. */
+.place-strips { display: grid; gap: 28px; padding-bottom: 20px; }
+.app-window.is-strip { height: auto; overflow: visible; background: none; box-shadow: none; }
+.place-strip-title { display: block; margin-bottom: 5px; color: #adb5bd; font-size: 12px; }

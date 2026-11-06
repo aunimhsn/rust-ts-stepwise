@@ -1,13 +1,9 @@
 /* The header: the name, the menus, the place of the level, the maps, the bar of the progress. */
 .app-header { position: relative; flex: none; display: flex; align-items: baseline; height: 48px; box-sizing: border-box; padding: 7px 12px 0 14px; background: var(--band); color: var(--band-text); border-bottom: var(--band-line); }
-.app-name { display: flex; align-items: baseline; font-family: Fredoka, sans-serif; font-weight: 600; line-height: 28px; white-space: nowrap; transform: translateY(1px); }
+.app-name { display: flex; align-items: baseline; font-family: var(--font-name); font-weight: 600; line-height: 28px; white-space: nowrap; transform: translateY(1px); }
 .app-menus { display: flex; align-items: baseline; gap: 2px; margin-left: 28px; }
 .app-window .app-menu { padding: 5px 10px; background: none; border: 0; border-radius: var(--radius-small); color: var(--band-text); font-weight: 500; }
 .app-window .app-menu.is-open { background: var(--band-hover); }
-.app-window .app-place { position: absolute; left: 50%; top: 9px; transform: translateX(-50%); display: flex; align-items: baseline; gap: 7px; height: 30px; box-sizing: border-box; padding: 5px 14px 0; background: none; border: 0; border-radius: var(--radius-small); color: var(--band-text); white-space: nowrap; }
-.app-window .app-place.is-open { background: var(--band-hover); }
-.app-place b { font: var(--title-weight) 14px var(--font-title); }
-.app-place i { display: flex; align-self: center; margin-top: -5px; color: var(--band-weak); font-style: normal; }
 .app-maps { margin-left: auto; display: flex; align-items: baseline; gap: 3px; color: var(--band-weak); }
 .app-maps > span { margin-right: 7px; }
 .app-window .app-map-button { position: relative; width: 44px; height: 30px; background: none; border: 0; border-radius: var(--radius-small); color: var(--band-text); font-weight: var(--strong-weight); padding: 0 0 3px; }
@@ -16,3 +12,14 @@
 .app-window .app-map-button.is-shown { background: var(--chosen); color: var(--on-chosen); }
 .app-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--progress-track); }
 .app-progress i { display: block; height: 100%; background: var(--progress); }
+
+/* The word Map in the font of the name, with or without its numbers. */
+:root[data-map-label="name"] .app-maps > span, :root[data-map-label="all"] .app-maps > span { font: 500 14px var(--font-name); }
+:root[data-map-label="all"] .app-window .app-map-button { font: 500 14px var(--font-name); }
+
+/* The ways to reach the settings: a gear at the end of the header, or a menu on the name. */
+.app-window .app-gear { align-self: flex-start; display: grid; place-items: center; width: 30px; height: 30px; margin: 2px 0 0 auto; padding: 0; background: none; border: 0; border-radius: var(--radius-small); color: var(--band-weak); }
+.app-window .app-gear.is-left, .app-window .app-maps + .app-gear { margin-left: 10px; }
+.app-window .app-name-menu { display: flex; align-items: baseline; gap: 5px; margin: 0 -6px; padding: 0 6px; background: none; border: 0; border-radius: var(--radius-small); color: var(--band-text); }
+.app-window .app-name-menu.is-open { background: var(--band-hover); }
+.app-name-menu i { display: flex; align-self: center; color: var(--band-weak); }

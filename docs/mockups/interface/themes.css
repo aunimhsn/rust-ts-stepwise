@@ -1,5 +1,7 @@
 /* The styles of the interface: tokens only. The components of the blocks use nothing else. */
 
+:root { --font-name: Fredoka, sans-serif; }
+
 :root[data-theme="night-desk"] {
   --font-text: "Instrument Sans", sans-serif; --font-title: "Instrument Sans", sans-serif; --font-code: "JetBrains Mono", monospace;
   --title-weight: 600; --strong-weight: 600; --size-text: 13.5px; --size-code: 14px; --line-code: 21px;
