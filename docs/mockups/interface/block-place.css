@@ -1,5 +1,5 @@
 /* The place of the level: in the middle of the header, centered on the height above the thin bar. */
 .app-window .app-place { position: absolute; left: 50%; top: 4px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; justify-content: center; height: 38px; box-sizing: border-box; padding: 0 12px; background: none; border: 0; border-radius: var(--radius-small); color: var(--band-text); white-space: nowrap; }
 .app-window .app-place.is-open { background: var(--band-hover); }
-.app-place small { color: var(--band-weak); font-family: var(--font-place-chapter); font-size: 10.5px; line-height: 13px; letter-spacing: .05em; text-transform: uppercase; }
-.app-place b { font: var(--title-weight) 14px/18px var(--font-place-title); }
+.app-place small { color: var(--band-weak); font-size: 10.5px; line-height: 13px; letter-spacing: .05em; text-transform: uppercase; }
+.app-place b { font: var(--title-weight) 14px/18px var(--font-title); }

@@ -1,9 +1,13 @@
 /* The styles of the interface: tokens only. The components of the blocks use nothing else. */
 
-:root { --font-name: Fredoka, sans-serif; }
+:root {
+  --font-name: "Fredoka", sans-serif; /* The personality: the name, what the robot says, Let's go. */
+  --font-text: "Manrope", sans-serif; /* The interface: everything that is read or clicked. */
+  --font-title: "Manrope", sans-serif;
+  --font-code: "Fira Code", monospace; /* The code: the editor, the console, the variables. */
+}
 
 :root[data-theme="night-desk"] {
-  --font-text: "Instrument Sans", sans-serif; --font-title: "Instrument Sans", sans-serif; --font-code: "JetBrains Mono", monospace;
   --title-weight: 600; --strong-weight: 600; --size-text: 13.5px; --size-code: 14px; --line-code: 21px;
   --gap: 0; --radius: 0; --radius-small: 3px; --border: none; --block-shadow: none; --pop-shadow: 0 14px 40px #0009; --pop-border: 1px solid #434d5c;
   --app-bg: #39424f; --band: #171b21; --band-text: #e8ecf1; --band-weak: #98a3b2; --band-hover: #2a313b; --band-line: none;
@@ -23,7 +27,6 @@
 }
 
 :root[data-theme="day-desk"] {
-  --font-text: "Instrument Sans", sans-serif; --font-title: "Instrument Sans", sans-serif; --font-code: "JetBrains Mono", monospace;
   --title-weight: 600; --strong-weight: 600; --size-text: 13.5px; --size-code: 14px; --line-code: 21px;
   --gap: 0; --radius: 0; --radius-small: 3px; --border: none; --block-shadow: none; --pop-shadow: 0 14px 40px #22293540; --pop-border: 1px solid #c3cad3;
   --app-bg: #c9d0d9; --band: #eceff3; --band-text: #1b2028; --band-weak: #5c6675; --band-hover: #dde2e8; --band-line: none;

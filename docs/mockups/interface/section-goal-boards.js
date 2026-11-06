@@ -1,5 +1,4 @@
-// Section: the bubble of the goal, which takes the fonts chosen at the top of the page: alone, then in
-// the first visit of a level, over the starting code.
+// Section: the bubble of the goal, alone, then in the first visit of a level, over the starting code.
 const goalBoard = (title, hover) => `<div><span class="goal-board-title">${title}</span><div class="app-window goal-board">${appGoal(hover)}</div></div>`;
 
 const firstVisitWindow = () => appWindow({
@@ -13,6 +12,5 @@ const firstVisitWindow = () => appWindow({
 SECTIONS.push(["The button Let's go on hover: move the mouse over each", () => `<div class="goal-boards">${Object.entries(VARIANTS.goHover.options).map(([hover, title]) => goalBoard(title, hover)).join("")}</div>`]);
 
 SECTIONS.push(["The bubble of the goal", () => `
-  <p class="goal-group">Its fonts: the lists at the top of the page</p>
   ${goalBoard("Alone")}
   <div class="goal-real"><span class="goal-board-title">With the interface behind: the first visit of a level, 1280 × 720</span>${firstVisitWindow()}</div>`]);

@@ -2,7 +2,7 @@
 .app-header { position: relative; flex: none; display: flex; align-items: center; height: 49px; box-sizing: border-box; padding: 0 12px 3px 14px; background: var(--band); color: var(--band-text); border-bottom: var(--band-line); }
 /* The baseline of the name sits 1 px under the one of the menus, the head of the robot on the center of the bar. */
 .app-name { position: relative; top: -2px; display: flex; align-items: baseline; font-family: var(--font-name); font-weight: 600; line-height: 1; white-space: nowrap; }
-.app-menus { display: flex; align-items: center; gap: 2px; margin-left: 28px; font-family: var(--font-menus); }
+.app-menus { display: flex; align-items: center; gap: 2px; margin-left: 28px; }
 .app-window .app-menu { height: 30px; padding: 0 10px; line-height: 1; background: none; border: 0; border-radius: var(--radius-small); color: var(--band-text); font-weight: 500; }
 .app-window .app-menu.is-open { background: var(--band-hover); }
 .app-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--progress-track); }
