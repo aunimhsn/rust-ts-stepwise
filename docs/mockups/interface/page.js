@@ -3,7 +3,6 @@
 // One group of tabs per open decision; `fallback` is the choice shown by default.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(INTERFACE_STYLES).map(([key, style]) => [key, style.title])), fallback: Object.keys(INTERFACE_STYLES)[0] },
-  mapWord: { label: "Word Map", options: { each: "Map 1, Map 2, Map 3", once: "Map, then 1 2 3", none: "1 2 3" }, fallback: "each" },
   mapShape: { label: "Maps as", options: { pills: "Pills", tabs: "Tabs" }, fallback: "pills" },
   // How a tab shows that its map has passed: a bar in three places, or a teal background (block-map.css).
   tabBar: { label: "Map passed", options: { teal: "Teal", "teal-soft": "Pale teal", "teal-check": "Teal with a check", "teal-soft-check": "Pale teal with a check", top: "Bar on top", under: "Bar under the text", edge: "Bar on the edge" }, fallback: "teal-soft" },

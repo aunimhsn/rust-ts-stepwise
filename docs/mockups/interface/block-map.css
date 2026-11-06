@@ -33,10 +33,6 @@
 .app-window .app-map-row.is-shape-pills.is-bar-under .app-map-tab { padding-bottom: 4px; }
 .is-shape-pills.is-bar-under .app-map-tab::before { left: 14px; right: 14px; bottom: 3px; }
 
-/* The word Map once before the numbers, or not at all: the numbers take a small square or round shape. */
-.app-map-word { align-self: center; margin-right: 6px; color: var(--band-weak); }
-.app-window .app-map-row.is-word-once .app-map-tab, .app-window .app-map-row.is-word-none .app-map-tab { min-width: 34px; padding: 0 8px; }
-
 /* The rows that compare the ways to show it. */
 .tab-bar-rows { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; width: 1280px; padding-bottom: 8px; }
 .app-window.is-strip { width: 100%; height: auto; overflow: visible; background: none; box-shadow: none; }
