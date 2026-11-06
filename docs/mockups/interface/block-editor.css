@@ -8,11 +8,24 @@
 .app-number { position: absolute; right: 9px; font-size: .88em; }
 .app-mark { position: absolute; left: 6px; top: 50%; transform: translateY(-50%); display: flex; }
 .app-text { padding-left: 14px; white-space: pre; }
-.app-line.is-next { background: var(--current); }
-.app-line.is-next .app-number { color: var(--code-text); font-weight: 600; }
+/* The current line, drawn behind its text: a band, or a stroke with a radius. */
+.app-line.is-next::before { content: ""; position: absolute; inset: var(--current-inset, 0); background: var(--current); border-radius: var(--current-radius, 0); }
+.app-line > * { position: relative; }
+.app-line.is-next .app-text { color: var(--current-code, inherit); }
+.app-line.is-next .code-comment { color: var(--current-code, var(--code-comment)); }
+.app-line.is-next .code-keyword { color: var(--current-code, var(--code-keyword)); }
+.app-line.is-next .code-function { color: var(--current-code, var(--code-function)); }
+.app-line.is-next .code-string { color: var(--current-code, var(--code-string)); }
+.app-line.is-next .code-number { color: var(--current-code, var(--code-number)); }
+.app-line.is-next .code-value { color: var(--current-code, var(--code-value)); }
+.app-line.is-next .app-number { color: var(--current-code, var(--code-text)); font-weight: 600; }
 .app-line.is-next .app-mark { color: var(--current-mark); }
 .app-line.is-error { background: var(--error-soft); }
 .app-line.is-error .app-number, .app-line.is-error .app-mark { color: var(--error); font-weight: 600; }
+/* The mark of the next line: an arrow, or a small visor with the two eyes of the robot. */
+.app-mark-arrow { display: var(--mark-arrow, flex); }
+.app-mark-eyes { display: var(--mark-eyes, none); align-items: center; justify-content: space-evenly; width: 22px; height: 13px; border-radius: 7px; background: #222935; }
+.app-mark-eyes i { width: 5px; height: 5px; border-radius: 50%; background: #3fc3ff; }
 .app-breakpoint { width: 11px; height: 11px; border-radius: 50%; background: var(--breakpoint); }
 
 .code-comment { color: var(--code-comment); font-style: var(--code-comment-style); }
@@ -21,14 +34,20 @@
 .code-string { color: var(--code-string); }
 .code-number { color: var(--code-number); }
 .code-value { color: var(--code-value); }
+/* A color in the code can carry its real paint. */
+.code-paint { text-decoration-line: var(--paint-line, none); text-decoration-thickness: 3px; text-underline-offset: 3px; }
 
 .app-controls { position: absolute; right: 12px; bottom: 12px; display: flex; gap: 8px; }
-.app-window .app-control { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; background: var(--control); color: var(--on-control); border: var(--control-border); border-radius: var(--control-radius); box-shadow: var(--control-shadow); }
+.app-window .app-control { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; background: var(--control); color: var(--on-control); border: var(--control-border); border-radius: var(--control-radius); box-shadow: var(--control-shadow); clip-path: var(--control-clip, none); }
 .app-window .app-control.is-main { background: var(--accent); color: var(--on-accent); }
 
 .app-status { flex: none; display: flex; align-items: center; gap: 22px; height: 30px; box-sizing: border-box; padding: 0 12px; background: var(--status); color: var(--on-status); border-top: var(--status-line); font-size: 12.5px; white-space: nowrap; }
 .app-status b { color: var(--status-strong); font-weight: var(--strong-weight); }
 .app-status b.is-error { color: var(--status-error); }
+/* The bar can change color with the state of the program, as in a code editor. */
+.app-status.is-paused { background: var(--status-paused, var(--status)); color: var(--on-status-paused, var(--on-status)); }
+.app-status.is-paused b { color: var(--on-status-paused, var(--status-strong)); }
+.app-status.is-failed { background: var(--status-failed, var(--status)); color: var(--on-status-failed, var(--on-status)); }
 .app-speed { display: flex; align-items: center; gap: 3px; }
 .app-speed span { margin-right: 5px; }
 .app-speed i { width: 9px; height: 13px; box-sizing: border-box; border: 1px solid currentColor; border-radius: 1px; }

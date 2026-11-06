@@ -3,6 +3,8 @@
 // One group of tabs per open decision; `fallback` is the choice shown by default.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(INTERFACE_STYLES).map(([key, style]) => [key, style.title])), fallback: Object.keys(INTERFACE_STYLES)[0] },
+  // How far the name sits below the line of the menus: tuned by eye on the owner's screen.
+  name: { label: "Name", options: { 0: "Same baseline", 1: "1 px lower", 2: "2 px lower" }, fallback: "0" },
 };
 
 const params = new URLSearchParams(location.search);

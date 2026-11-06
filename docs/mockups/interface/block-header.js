@@ -1,13 +1,14 @@
-// The name beside the logo, as decided on the sheet of the world elements: the head of the robot
-// is a quarter taller than the capitals, and its middle meets the middle of the lowercase letters.
+// The name beside the head of the robot, on the same line as the menus. The arrow of the logo is
+// left out until the logo is reworked: it made the image taller than the text. As decided on the
+// sheet of the world elements, the head is a quarter taller than the capitals, and its middle
+// meets the middle of the lowercase letters.
 function appWordmark(fontSize) {
   const context = document.createElement("canvas").getContext("2d");
   context.font = "600 100px Fredoka, sans-serif";
   const letterHeight = letter => context.measureText(letter).actualBoundingBoxAscent / 100;
-  const [headTop, headBottom, rightMargin] = [23.4 / 64, 56.8 / 64, 12.7 / 64];
-  const size = letterHeight("S") * fontSize / (headBottom - headTop) * 1.25;
-  const lift = letterHeight("x") * fontSize / 2 - (1 - (headTop + headBottom) / 2) * size + 0.5 / 44 * fontSize;
-  return `<div style="font:600 ${fontSize}px/1.4 Fredoka, sans-serif;white-space:nowrap"><img src="world-elements/daylight/logo.svg" width="${size.toFixed(1)}" height="${size.toFixed(1)}" alt="" style="vertical-align:${lift.toFixed(2)}px;margin-right:${(fontSize * 0.18 - rightMargin * size).toFixed(1)}px">stepwise</div>`;
+  const height = letterHeight("S") * fontSize * 1.25;
+  const middleOfText = letterHeight("x") * fontSize / 2 + 0.5 / 44 * fontSize;
+  return `<div class="app-name" style="font-size:${fontSize}px"><img src="world-elements/daylight/logo-head.svg" height="${height.toFixed(1)}" alt="" style="margin-right:${(fontSize * 0.18).toFixed(1)}px;transform:translateY(${(height / 2 - middleOfText).toFixed(2)}px)"><span>stepwise</span></div>`;
 }
 
 // `shownMap` is the map on the screen (from 1), `passed` the maps that have passed, `menu` the menu

@@ -5,7 +5,7 @@
 .app-menu-row.is-hovered { background: var(--hover); }
 .app-menu-row kbd { color: var(--weak); font: 400 12px var(--font-text); }
 .app-menu-row i { display: flex; color: var(--weak); }
-.app-menu-line { margin: 5px 0; border-top: var(--border); }
+.app-menu-line { margin: 5px 0; border-top: 1px solid var(--hover); }
 
 .app-goal { top: 52px; left: 420px; width: 440px; padding: 14px 16px; }
 .page-section .app-goal h3 { margin: 0 0 8px; padding-right: 24px; font: var(--title-weight) 16px/1.3 var(--font-title); color: var(--text); text-transform: none; letter-spacing: normal; }
