@@ -12,6 +12,10 @@
     use nothing else, so that a style is cheap to add or tweak.
   - VARIANTS holds one group of tabs per open decision; the address keeps the choices
     (e.g. ?theme=slate&button=pill), to share them. Remove a group once decided.
+  - A value that combines with others (a font per role, a color, a size) is a list instead:
+    `select: true` and the CSS `variable` it sets. It applies at once, without redrawing the page.
+  - A value tuned by eye (a width, an angle, a darkness) is a slider: `range` and the CSS `variable` it
+    sets, with its `unit` if it has one.
   - SECTIONS lists every scenario and state, each drawn as a window; a new section goes at the
     top, so that the owner finds it at once. Past ten sections, a table of contents under the
     header links to each.
@@ -33,6 +37,9 @@
   .page-tabs .group > span { margin-right: 4px; color: #adb5bd; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
   .page-tabs button { padding: 4px 10px; border: 1px solid #3a3f45; border-radius: 4px; background: #24272b; color: #dee2e6; font: inherit; cursor: pointer; }
   .page-tabs button[aria-pressed="true"] { background: #e9ecef; color: #1b1d20; border-color: #e9ecef; }
+  .page-tabs input[type="range"] { width: 140px; accent-color: #e9ecef; }
+  .page-tabs output { min-width: 3ch; color: #dee2e6; font-variant-numeric: tabular-nums; }
+  .page-tabs select { padding: 3px 4px; border: 1px solid #3a3f45; border-radius: 4px; background: #24272b; color: #dee2e6; font: inherit; cursor: pointer; }
   .page-header { padding: 18px 16px 0; }
   .page-header h1 { margin: 0 0 4px; font-size: 20px; }
   .page-header p { margin: 0; max-width: 760px; color: #adb5bd; }
@@ -62,7 +69,7 @@
   /* Components: prefix the classes of the application (here `app-`) and of the states
      (`is-`), so that they never collide with the classes of the page or of each other. */
   .app-window { width: 420px; overflow: hidden; background: var(--band-b); color: var(--text); font-family: var(--font-text); box-shadow: 0 8px 30px #0006; }
-  .app-header { display: flex; align-items: center; height: 48px; padding-left: var(--padding); background: var(--band-a); font-weight: 800; }
+  .app-header { display: flex; align-items: center; height: var(--header-height, 48px); padding-left: var(--padding); background: var(--band-a); font-family: var(--font-title, var(--font-text)); font-weight: 800; }
   .app-header .app-spacer { flex: 1; }
   .app-block { display: grid; place-items: center; width: 48px; height: 48px; background: var(--control); color: var(--weak); }
   .app-content { padding: var(--padding); }
@@ -89,11 +96,18 @@
   const VARIANTS = {
     theme: { label: "Style", options: Object.fromEntries(Object.entries(THEMES).map(([key, theme]) => [key, theme.title])), fallback: "slate" },
     button: { label: "Button", options: { square: "Square", pill: "Pill" }, fallback: "square" },
+    // A list, for a value that combines with others: each option is a value of the CSS variable.
+    titleFont: { label: "Title font", select: true, variable: "--font-title", options: { "system-ui, sans-serif": "System", "Georgia, serif": "Georgia", "ui-monospace, monospace": "Monospace" }, fallback: "system-ui, sans-serif" },
+    // A slider, for a value tuned by eye: `unit` follows the value in the CSS variable.
+    headerSize: { label: "Header height", range: { min: 36, max: 64, step: 1 }, variable: "--header-height", unit: "px", fallback: "48" },
   };
 
   const params = new URLSearchParams(location.search);
+  const accepts = (variant, value) => variant.range
+    ? value !== null && Number(value) >= variant.range.min && Number(value) <= variant.range.max
+    : value in variant.options;
   const chosen = Object.fromEntries(Object.entries(VARIANTS).map(([key, variant]) =>
-    [key, params.get(key) in variant.options ? params.get(key) : variant.fallback]));
+    [key, accepts(variant, params.get(key)) ? params.get(key) : variant.fallback]));
 
   // Components: functions that return HTML, with sample data close to real ones.
   // Avoid global names that the browser already uses (`top`, `name`, `status`…).
@@ -119,10 +133,23 @@
     ]],
   ];
 
+  // A list or a slider only changes a variable: the page stays as it is, and a slider keeps the pointer.
+  function applyVariables() {
+    for (const [key, variant] of Object.entries(VARIANTS)) {
+      if (variant.variable) document.documentElement.style.setProperty(variant.variable, chosen[key] + (variant.unit ?? ""));
+    }
+  }
+  const keepInAddress = () => history.replaceState(null, "", "?" + new URLSearchParams(chosen));
+
   function render() {
     for (const key of Object.keys(VARIANTS)) document.documentElement.dataset[key] = chosen[key];
-    document.getElementById("tabs").innerHTML = Object.entries(VARIANTS).map(([key, variant]) =>
-      `<div class="group"><span>${variant.label}</span>${Object.entries(variant.options).map(([value, label]) =>
+    applyVariables();
+    document.getElementById("tabs").innerHTML = Object.entries(VARIANTS).map(([key, variant]) => variant.range
+      ? `<label class="group"><span>${variant.label}</span><input type="range" data-variant="${key}" min="${variant.range.min}" max="${variant.range.max}" step="${variant.range.step}" value="${chosen[key]}"><output>${chosen[key]}${variant.unit ?? ""}</output></label>`
+      : variant.select
+      ? `<label class="group"><span>${variant.label}</span><select data-variant="${key}">${Object.entries(variant.options).map(([value, label]) =>
+        `<option value="${value}" ${chosen[key] === value ? "selected" : ""}>${label}</option>`).join("")}</select></label>`
+      : `<div class="group"><span>${variant.label}</span>${Object.entries(variant.options).map(([value, label]) =>
         `<button type="button" data-variant="${key}" data-value="${value}" aria-pressed="${chosen[key] === value}">${label}</button>`).join("")}</div>`).join("");
     const theme = THEMES[chosen.theme];
     // Past ten sections, a table of contents under the header: the title of each section up to its colon.
@@ -138,10 +165,19 @@
 
   document.getElementById("tabs").addEventListener("click", event => {
     const { variant, value } = event.target.dataset;
-    if (!variant) return;
+    if (!variant || value === undefined) return;
     chosen[variant] = value;
-    history.replaceState(null, "", "?" + new URLSearchParams(chosen));
+    keepInAddress();
     render();
+  });
+  // A list fires "input" too; so does a slider, at every step of its move.
+  document.getElementById("tabs").addEventListener("input", event => {
+    const { variant } = event.target.dataset;
+    if (!variant) return;
+    chosen[variant] = event.target.value;
+    if (VARIANTS[variant].range) event.target.nextElementSibling.value = chosen[variant] + (VARIANTS[variant].unit ?? "");
+    keepInAddress();
+    applyVariables();
   });
   document.getElementById("file-warning").hidden = location.protocol !== "file:";
   render();
