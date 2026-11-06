@@ -1,0 +1,30 @@
+/* The ideas compared in tabs: each changes tokens of the chosen style. Removed once decided. */
+
+/* The status bar takes the color of the state, as in a code editor. */
+:root[data-status-bar="state"] { --status-paused: var(--accent); --on-status-paused: var(--on-accent); }
+:root[data-status-bar="state"][data-theme="night-desk"] { --status-failed: #ff7b7b; --on-status-failed: #171b21; --status-error: #171b21; }
+:root[data-status-bar="state"][data-theme="day-desk"] { --status-failed: #bf2f3a; --on-status-failed: #ffffff; --status-error: #ffffff; }
+
+/* A color in the code carries its real paint. */
+:root[data-paint="on"] { --paint-line: underline; }
+
+/* The progress is a stroke of the paint of the logo. */
+:root[data-progress="stroke"] { --progress: #ffb300; --progress-height: 4px; --progress-round: 0 2px 2px 0; }
+
+/* The current line is rounded as a stroke of paint. */
+:root[data-current-line="stroke"] { --current-radius: 11px; --current-inset: 0 8px 0 4px; }
+
+/* The mark of the current line is a small visor with the eyes of the robot. */
+:root[data-mark="visor"] { --mark-arrow: none; --mark-eyes: flex; }
+
+/* The shape of the controls. A hexagon cuts their shadow: it takes the slate of the walls to stay visible. */
+:root[data-controls="round"] { --control-radius: 50%; }
+:root[data-controls="hexagon"] { --control-clip: polygon(50% 0, 96% 25%, 96% 75%, 50% 100%, 4% 75%, 4% 25%); --control: #5d687a; --on-control: #ffffff; --control-shadow: none; --control-radius: 0; }
+
+/* The map sits directly in a mass of slate wall: outside the grid counts as a wall. */
+:root[data-map="wall"] { --map-block: #5d687a; --map-shadow: 0 -3px 0 #3f4857, 0 2px 0 #7d899c; }
+
+/* The cyan of the eyes of the robot as the only accent, the current line solid. */
+:root[data-accent="cyan"][data-theme] { --accent: #3fc3ff; --on-accent: #0d1015; --current: #3fc3ff; --current-code: #0d1015; --current-mark: #0d1015; --chosen: #3fc3ff; --on-chosen: #0d1015; --tab-chosen: #3fc3ff; --on-tab-chosen: #0d1015; }
+:root[data-accent="cyan"][data-theme="night-desk"] { --status-strong: #3fc3ff; }
+:root[data-accent="cyan"][data-theme="day-desk"] { --status-strong: #0a6f9c; }

@@ -1,8 +1,6 @@
 /* The header: the name, the menus, the place of the level, the maps, the bar of the progress. */
 .app-header { position: relative; flex: none; display: flex; align-items: baseline; height: 48px; box-sizing: border-box; padding: 7px 12px 0 14px; background: var(--band); color: var(--band-text); border-bottom: var(--band-line); }
-.app-name { display: flex; align-items: baseline; font-family: Fredoka, sans-serif; font-weight: 600; line-height: 28px; white-space: nowrap; }
-:root[data-name="1"] .app-name { transform: translateY(1px); }
-:root[data-name="2"] .app-name { transform: translateY(2px); }
+.app-name { display: flex; align-items: baseline; font-family: Fredoka, sans-serif; font-weight: 600; line-height: 28px; white-space: nowrap; transform: translateY(1px); }
 .app-menus { display: flex; align-items: baseline; gap: 2px; margin-left: 28px; }
 .app-window .app-menu { padding: 5px 10px; background: none; border: 0; border-radius: var(--radius-small); color: var(--band-text); font-weight: 500; }
 .app-window .app-menu.is-open { background: var(--band-hover); }

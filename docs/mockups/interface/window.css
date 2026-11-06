@@ -9,3 +9,6 @@
 /* A small button with a text, and the main button of a bubble. */
 .app-chip { padding: 3px 10px; background: var(--chip); color: var(--on-chip); border: var(--chip-border); border-radius: var(--radius-small); font-weight: 500; white-space: nowrap; }
 .app-window button.app-primary { padding: 6px 16px; background: var(--accent); color: var(--on-accent); border: var(--control-border); border-radius: var(--control-radius); box-shadow: var(--control-shadow); font-weight: var(--strong-weight); }
+
+/* The tabs of the page take several rows: a section stops under them. */
+.page-section { scroll-margin-top: 150px; }
