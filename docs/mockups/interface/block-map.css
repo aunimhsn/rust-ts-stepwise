@@ -4,37 +4,10 @@
 .app-world .app-map { box-shadow: var(--map-shadow); }
 
 .app-map-row { flex: none; display: flex; align-items: flex-end; gap: 2px; height: 34px; box-sizing: border-box; padding-left: 12px; background: var(--band); }
-.app-map-row .app-chip { align-self: center; margin-left: auto; margin-right: 8px; }
-.app-window .app-map-row .app-map-tab { position: relative; height: 31px; padding: 0 16px; background: none; border: 0; border-radius: var(--radius-small) var(--radius-small) 0 0; color: var(--band-weak); font-weight: 500; }
-.app-window .app-map-row .app-map-tab.is-shown { background: var(--map-block); color: var(--band-text); font-weight: var(--strong-weight); }
+.app-map-row .app-chip { box-sizing: border-box; align-self: center; height: 26px; margin-left: auto; margin-right: 8px; }
+.app-window .app-map-tab { height: 31px; padding: 0 16px; background: none; border: 0; border-radius: var(--radius-small) var(--radius-small) 0 0; color: var(--band-weak); font-weight: 500; }
+.app-window .app-map-tab.is-shown { background: var(--map-block); color: var(--band-text); font-weight: var(--strong-weight); }
 
-/* A map that has passed: a teal background, the teal of the item, which reads on the two themes. */
-.app-window .app-map-row[class*="is-bar-teal"] .app-map-tab.is-passed { background: #5fd0b0; color: #222935; }
-.app-window .app-map-row[class*="is-bar-teal-soft"] .app-map-tab.is-passed:not(.is-shown) { background: color-mix(in srgb, #5fd0b0 28%, var(--band)); color: var(--band-text); }
-.app-window .app-map-row[class*="-check"] .app-map-tab { display: flex; align-items: center; gap: 5px; }
-
-/* Or a bar, grey until the map has passed, in three places. */
-.is-bar-top .app-map-tab::before, .is-bar-under .app-map-tab::before, .is-bar-edge .app-map-tab::before { content: ""; position: absolute; height: 3px; border-radius: 2px; background: var(--idle); }
-.is-bar-top .app-map-tab.is-passed::before, .is-bar-under .app-map-tab.is-passed::before, .is-bar-edge .app-map-tab.is-passed::before { background: var(--success); }
-.is-bar-top .app-map-tab::before { left: 7px; right: 7px; top: 3px; }
-.app-window .app-map-row.is-bar-under .app-map-tab { padding-bottom: 5px; }
-.is-bar-under .app-map-tab::before { left: 16px; right: 16px; bottom: 4px; }
-.is-bar-edge .app-map-tab::before { left: 0; right: 0; bottom: 0; border-radius: 0; }
-
-/* The maps as pills, in the style of the button Legend and at its height: a contour shows the map on the
-   screen, whatever its state. */
-.app-map-row.is-shape-pills { align-items: center; gap: 4px; padding-left: 8px; }
-.app-map-row .app-chip { box-sizing: border-box; height: 26px; }
-.app-window .app-map-row.is-shape-pills .app-map-tab { box-sizing: border-box; height: 26px; padding: 0 10px; overflow: hidden; background: var(--chip); color: var(--on-chip); border: var(--chip-border); border-radius: var(--radius-small); }
-.app-window .app-map-row.is-shape-pills .app-map-tab.is-shown { border: 1.5px solid var(--band-text); }
-.app-window .app-map-row.is-shape-pills[class*="is-bar-teal"] .app-map-tab.is-passed { border-color: transparent; }
-.app-window .app-map-row.is-shape-pills[class*="is-bar-teal"] .app-map-tab.is-passed.is-shown { background: #5fd0b0; color: #222935; border-color: var(--band-text); }
-.is-shape-pills.is-bar-top .app-map-tab::before { left: 12px; right: 12px; top: 3px; }
-.app-window .app-map-row.is-shape-pills.is-bar-under .app-map-tab { padding-bottom: 4px; }
-.is-shape-pills.is-bar-under .app-map-tab::before { left: 14px; right: 14px; bottom: 3px; }
-
-/* The rows that compare the ways to show it. */
-.tab-bar-rows { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; width: 1280px; padding-bottom: 8px; }
-.app-window.is-strip { width: 100%; height: auto; overflow: visible; background: none; box-shadow: none; }
-.tab-bar-title { display: block; margin-bottom: 5px; color: #e9ecef; font-size: 14px; font-weight: 700; }
-.app-window.is-strip .app-world { height: 22px; flex: none; }
+/* A map that has passed: a pale teal background, full on the map shown. */
+.app-window .app-map-tab.is-passed { background: var(--passed-soft); color: var(--band-text); }
+.app-window .app-map-tab.is-passed.is-shown { background: var(--passed); color: var(--on-passed); }

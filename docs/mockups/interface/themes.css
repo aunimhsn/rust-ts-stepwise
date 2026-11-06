@@ -11,6 +11,7 @@
   --accent: #ffb300; --on-accent: #171b21; --accent-soft: #4a3c17; --error: #ff7b7b; --error-soft: #47262c; --success: #46c98f; --idle: #4b5564;
   --progress: #46c98f; --progress-track: #2a313b;
   --chosen: #e8ecf1; --on-chosen: #171b21;
+  --passed: #5fd0b0; --on-passed: #222935; --passed-soft: color-mix(in srgb, #5fd0b0 28%, var(--band));
   --control: #2f3641; --on-control: #e8ecf1; --control-border: none; --control-shadow: 0 2px 8px #0006; --control-radius: 3px;
   --chip: #2f3641; --on-chip: #e8ecf1; --chip-border: none;
   --editor: #1e232b; --gutter: #1e232b; --gutter-text: #677282; --gutter-line: none; --editor-rules: none;
@@ -30,6 +31,7 @@
   --accent: #ffb300; --on-accent: #1b2028; --accent-soft: #fff0c7; --error: #bf2f3a; --error-soft: #fbe5e6; --success: #14906a; --idle: #c3cad3;
   --progress: #14906a; --progress-track: #dde2e8;
   --chosen: #1b2028; --on-chosen: #f6f7f9;
+  --passed: #5fd0b0; --on-passed: #222935; --passed-soft: color-mix(in srgb, #5fd0b0 28%, var(--band));
   --control: #ffffff; --on-control: #1b2028; --control-border: none; --control-shadow: 0 1px 5px #22293538; --control-radius: 3px;
   --chip: #ffffff; --on-chip: #1b2028; --chip-border: 1px solid #c3cad3;
   --editor: #fafbfc; --gutter: #fafbfc; --gutter-text: #939daa; --gutter-line: none; --editor-rules: none;
