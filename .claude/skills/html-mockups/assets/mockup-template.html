@@ -12,6 +12,8 @@
     use nothing else, so that a style is cheap to add or tweak.
   - VARIANTS holds one group of tabs per open decision; the address keeps the choices
     (e.g. ?theme=slate&button=pill), to share them. Remove a group once decided.
+  - A value that combines with others (a font per role, a color, a size) is a list instead:
+    `select: true` and the CSS `variable` it sets. It applies at once, without redrawing the page.
   - SECTIONS lists every scenario and state, each drawn as a window; a new section goes at the
     top, so that the owner finds it at once. Past ten sections, a table of contents under the
     header links to each.
@@ -33,6 +35,7 @@
   .page-tabs .group > span { margin-right: 4px; color: #adb5bd; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
   .page-tabs button { padding: 4px 10px; border: 1px solid #3a3f45; border-radius: 4px; background: #24272b; color: #dee2e6; font: inherit; cursor: pointer; }
   .page-tabs button[aria-pressed="true"] { background: #e9ecef; color: #1b1d20; border-color: #e9ecef; }
+  .page-tabs select { padding: 3px 4px; border: 1px solid #3a3f45; border-radius: 4px; background: #24272b; color: #dee2e6; font: inherit; cursor: pointer; }
   .page-header { padding: 18px 16px 0; }
   .page-header h1 { margin: 0 0 4px; font-size: 20px; }
   .page-header p { margin: 0; max-width: 760px; color: #adb5bd; }
@@ -62,7 +65,7 @@
   /* Components: prefix the classes of the application (here `app-`) and of the states
      (`is-`), so that they never collide with the classes of the page or of each other. */
   .app-window { width: 420px; overflow: hidden; background: var(--band-b); color: var(--text); font-family: var(--font-text); box-shadow: 0 8px 30px #0006; }
-  .app-header { display: flex; align-items: center; height: 48px; padding-left: var(--padding); background: var(--band-a); font-weight: 800; }
+  .app-header { display: flex; align-items: center; height: 48px; padding-left: var(--padding); background: var(--band-a); font-family: var(--font-title, var(--font-text)); font-weight: 800; }
   .app-header .app-spacer { flex: 1; }
   .app-block { display: grid; place-items: center; width: 48px; height: 48px; background: var(--control); color: var(--weak); }
   .app-content { padding: var(--padding); }
@@ -89,6 +92,8 @@
   const VARIANTS = {
     theme: { label: "Style", options: Object.fromEntries(Object.entries(THEMES).map(([key, theme]) => [key, theme.title])), fallback: "slate" },
     button: { label: "Button", options: { square: "Square", pill: "Pill" }, fallback: "square" },
+    // A list, for a value that combines with others: each option is a value of the CSS variable.
+    titleFont: { label: "Title font", select: true, variable: "--font-title", options: { "system-ui, sans-serif": "System", "Georgia, serif": "Georgia", "ui-monospace, monospace": "Monospace" }, fallback: "system-ui, sans-serif" },
   };
 
   const params = new URLSearchParams(location.search);
@@ -119,10 +124,21 @@
     ]],
   ];
 
+  // A list only changes a variable: the page stays as it is.
+  function applyVariables() {
+    for (const [key, variant] of Object.entries(VARIANTS)) {
+      if (variant.variable) document.documentElement.style.setProperty(variant.variable, chosen[key]);
+    }
+  }
+  const keepInAddress = () => history.replaceState(null, "", "?" + new URLSearchParams(chosen));
+
   function render() {
     for (const key of Object.keys(VARIANTS)) document.documentElement.dataset[key] = chosen[key];
-    document.getElementById("tabs").innerHTML = Object.entries(VARIANTS).map(([key, variant]) =>
-      `<div class="group"><span>${variant.label}</span>${Object.entries(variant.options).map(([value, label]) =>
+    applyVariables();
+    document.getElementById("tabs").innerHTML = Object.entries(VARIANTS).map(([key, variant]) => variant.select
+      ? `<label class="group"><span>${variant.label}</span><select data-variant="${key}">${Object.entries(variant.options).map(([value, label]) =>
+        `<option value="${value}" ${chosen[key] === value ? "selected" : ""}>${label}</option>`).join("")}</select></label>`
+      : `<div class="group"><span>${variant.label}</span>${Object.entries(variant.options).map(([value, label]) =>
         `<button type="button" data-variant="${key}" data-value="${value}" aria-pressed="${chosen[key] === value}">${label}</button>`).join("")}</div>`).join("");
     const theme = THEMES[chosen.theme];
     // Past ten sections, a table of contents under the header: the title of each section up to its colon.
@@ -138,10 +154,17 @@
 
   document.getElementById("tabs").addEventListener("click", event => {
     const { variant, value } = event.target.dataset;
-    if (!variant) return;
+    if (!variant || value === undefined) return;
     chosen[variant] = value;
-    history.replaceState(null, "", "?" + new URLSearchParams(chosen));
+    keepInAddress();
     render();
+  });
+  document.getElementById("tabs").addEventListener("change", event => {
+    const { variant } = event.target.dataset;
+    if (!variant) return;
+    chosen[variant] = event.target.value;
+    keepInAddress();
+    applyVariables();
   });
   document.getElementById("file-warning").hidden = location.protocol !== "file:";
   render();

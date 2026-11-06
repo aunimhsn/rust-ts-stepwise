@@ -45,7 +45,12 @@ npm init -y && npm install playwright && npx playwright install chromium
 ## 3. Iterate with the owner
 
 1. The owner picks a style, or mixes two. Iterate on it alone, **one change at a time** (the main color, then the logo, then a font…).
-2. **Give each open decision its own group of tabs** in `VARIANTS` (two button shapes, three header variants, five offsets…), so that the owner compares on screen instead of imagining; once decided, remove the group and keep the choice in the tokens. About a hundred small decisions went this way on the first project, each in a minute.
+2. **Give each open decision its own control** in `VARIANTS`, so that the owner compares on screen instead of imagining; once decided, remove it and keep the choice in the tokens. About a hundred small decisions went this way on the first project, each in a minute. The control depends on the decision:
+   - **A few distinct variants** (two button shapes, three header variants, five offsets…): a group of tabs, with the variants also side by side when the difference is fine.
+   - **Values that combine** (a font per role, colors, sizes): one list per role (`select: true`, with the CSS `variable` it sets), which changes the page at once. The owner then tries every combination instead of waiting for a new board; a list "for everything" that the others follow until they are changed saves many clicks.
+   - **The address keeps every choice**, so that the owner can reload the page or send the exact combination.
+   - **An important element is shown alone and in real conditions**, with the interface behind it, both following the controls.
+   - **Number the proposals once**, from 1 upward across every series: letters, or a numbering that starts again in each series, get mixed up ("the B" of which series?).
 3. **Pixel alignments are tuned by eye on the owner's real screen**, with a tab of offsets (0, 0.5, 1, 1.5 px): the display scale of headless screenshots differs, so they only give the direction. Align icons on the lowercase letters next to them, not on the box of the text.
 4. When the owner points at something, change only that, and say what changed.
 5. From then on, **the mock-up is the reference** of the interface: say so in `specs.md`; the wireframe only fixed the first layout.
