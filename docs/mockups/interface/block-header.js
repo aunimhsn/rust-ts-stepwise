@@ -15,20 +15,26 @@ function appWordmark(fontSize) {
 // open, `goalOpen` the bubble of the goal, and `place` the proposal shown.
 function appHeader({ shownMap = 1, passed = [], menu, goalOpen = false, place = chosen.place } = {}) {
   const inSecondBar = place.startsWith("bar-");
-  const hasProgress = !inSecondBar || place === "bar-tabs";
+  const hasProgress = !inSecondBar || ["bar-tabs", "bar-mix-center", "bar-mix-left"].includes(place);
+  const isCombination = place.startsWith("mix-");
   const menus = ["Level", "Edit", "Run", ...(chosen.settings === "view" ? ["View"] : []), "Help"];
   const name = chosen.settings === "name"
     ? `<button type="button" class="app-name-menu ${menu === "Stepwise" ? "is-open" : ""}">${appWordmark(21)}<i>${ICONS.down(11)}</i></button>`
     : appWordmark(21);
   const gear = position => `<button type="button" class="app-gear ${position}" title="Settings">${ICONS.gear(18)}</button>`;
-  const inPlace = inSecondBar ? "" : place === "crumb" ? appCrumb(goalOpen) : appPlace(place, goalOpen);
+  const inPlace = isCombination || place === "bar-mix-center" ? appPlace("stacked", goalOpen)
+    : inSecondBar || place === "bar-mix-center" ? ""
+    : place === "crumb" ? appCrumb(goalOpen) : appPlace(place, goalOpen);
+  const maps = inSecondBar || place === "mix-block" ? ""
+    : isCombination ? `<div class="app-header-tabs">${appMapTabs(shownMap, passed)}</div>`
+    : appMapButtons(shownMap, passed);
   return `<header class="app-header ${inSecondBar ? "" : "is-one-bar"} is-place-${place} ${hasProgress ? "" : "is-alone"}">
     ${name}
     <nav class="app-menus">${menus.map(item =>
       `<button type="button" class="app-menu ${item === menu ? "is-open" : ""}">${item}</button>`).join("")}</nav>
     ${chosen.settings === "gear-left" ? gear("is-left") : ""}
     ${inPlace}
-    ${inSecondBar ? "" : appMapButtons(shownMap, passed)}
+    ${maps}
     ${chosen.settings === "gear" ? gear("is-right") : ""}
     ${hasProgress ? appProgress() : ""}
   </header>

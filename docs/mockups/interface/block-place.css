@@ -52,6 +52,27 @@
 .place-bubble { position: relative; padding: 4px 13px; background: var(--surface); border: 1px solid var(--idle); border-radius: 12px; font: 500 14.5px/1.2 var(--font-name); }
 .place-bubble::before { content: ""; position: absolute; left: -5px; top: 50%; width: 8px; height: 8px; background: var(--surface); border-left: 1px solid var(--idle); border-bottom: 1px solid var(--idle); transform: translateY(-50%) rotate(45deg); }
 
+/* 14 to 16. The two lines and the map tabs on one bar: the tabs stand on the bottom of the bar, over
+   the thin bar of the progress, and open on the block of the map. */
+.app-header-tabs { position: absolute; bottom: -1px; z-index: 1; display: flex; gap: 2px; }
+.app-window .app-header-tabs .app-map-tab { height: 33px; }
+.is-place-mix-right .app-header-tabs { right: 12px; }
+:root[data-settings="gear"] .is-place-mix-right .app-header-tabs { right: 52px; }
+.is-place-mix-split .app-header-tabs { left: calc(50% + 12px); }
+.app-window .is-place-mix-split .app-place.is-stacked { left: auto; right: calc(50% + 4px); transform: none; align-items: flex-end; }
+.is-place-mix-left .app-header-tabs { left: 50%; right: 0; justify-content: center; }
+:root[data-settings="gear"] .is-place-mix-left .app-header-tabs { right: 52px; }
+.app-window .is-place-mix-left .app-place.is-stacked { position: static; transform: none; align-items: flex-start; margin-left: 6px; }
+
+/* 17. The map tabs on top of the block of the map, the button Legend on their row. */
+.app-block.has-map-tabs { display: flex; flex-direction: column; }
+.has-map-tabs .app-world { flex: 1; min-height: 0; height: auto; }
+.app-block-tabs { flex: none; display: flex; align-items: flex-end; gap: 2px; height: 34px; padding-left: 12px; background: var(--band); }
+.has-map-tabs .app-world .app-chip { top: -29px; }
+
+/* The windows cut to their top, to compare the combinations. */
+.mix-crop { width: 1280px; height: 190px; overflow: hidden; }
+
 /* The strips of the section that compares the proposals. */
 .place-group { margin: 22px 0 12px; color: #e9ecef; font-size: 15px; font-weight: 700; }
 .place-strips { display: grid; gap: 28px; padding-bottom: 20px; }

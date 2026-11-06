@@ -20,9 +20,11 @@ const SECOND_BARS = {
   tabs: ({ crumb, tabs }) => `<div class="app-bar-half">${crumb}</div><div class="app-bar-half is-tabs">${tabs}</div>`,
   goal: ({ crumb, maps }) => `${crumb}<p class="app-bar-goal">Paint a red square of side 3, starting where the robot stands.</p>${maps}${appProgress()}`,
   levels: ({ crumb, maps }) => `${crumb}${appAllLevels()}${maps}`,
+  "mix-center": ({ tabs }) => `<div class="app-bar-half"></div><div class="app-bar-half is-tabs">${tabs}</div>`,
+  "mix-left": ({ tabs, goalOpen }) => `<div class="app-bar-half">${appPlace("stacked", goalOpen)}</div><div class="app-bar-half is-tabs">${tabs}</div>`,
 };
 
 const appSecondBar = (place, { shownMap, passed, goalOpen }) => {
   const kind = place.replace("bar-", "");
-  return `<div class="app-second-bar is-${kind}">${SECOND_BARS[kind]({ crumb: appCrumb(goalOpen), maps: appMapButtons(shownMap, passed), tabs: appMapTabs(shownMap, passed) })}</div>`;
+  return `<div class="app-second-bar is-${kind}">${SECOND_BARS[kind]({ crumb: appCrumb(goalOpen), maps: appMapButtons(shownMap, passed), tabs: appMapTabs(shownMap, passed), goalOpen })}</div>`;
 };

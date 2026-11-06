@@ -3,8 +3,9 @@
 // One group of tabs per open decision; `fallback` is the choice shown by default.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(INTERFACE_STYLES).map(([key, style]) => [key, style.title])), fallback: Object.keys(INTERFACE_STYLES)[0] },
-  // The place of the level: on one bar (1 to 8), on two bars (9 to 13).
-  place: { label: "Place", options: { title: "1 Title", stacked: "2 Two lines", field: "3 Field", stone: "4 Stone", path: "5 Path", tag: "6 Tag", robot: "7 Robot", crumb: "8 Breadcrumb", "bar-plain": "9 Second bar", "bar-columns": "10 Over the columns", "bar-tabs": "11 Map tabs", "bar-goal": "12 With the goal", "bar-levels": "13 All the levels" }, fallback: "stacked" },
+  // The place of the level: on one bar (1 to 8), on two bars (9 to 13), then the combinations of the
+  // two lines (2) and the map tabs (11), on one bar (14 to 17) and on two bars (18 and 19).
+  place: { label: "Place", options: { title: "1 Title", stacked: "2 Two lines", field: "3 Field", stone: "4 Stone", path: "5 Path", tag: "6 Tag", robot: "7 Robot", crumb: "8 Breadcrumb", "bar-plain": "9 Second bar", "bar-columns": "10 Over the columns", "bar-tabs": "11 Map tabs", "bar-goal": "12 With the goal", "bar-levels": "13 All the levels", "mix-right": "14 Tabs on the right", "mix-split": "15 Split at the column", "mix-left": "16 Title after the menus", "mix-block": "17 Tabs in the map block", "bar-mix-center": "18 Bar of tabs only", "bar-mix-left": "19 Second bar with both" }, fallback: "mix-block" },
   // The texts of the bar around their center: tuned by eye on the owner's screen.
   menuOffset: { label: "Menus", options: { up: "-0.5 px", center: "0", down: "+0.5 px", more: "+1 px" }, fallback: "center" },
   barOffset: { label: "Place and maps", options: { up: "-0.5 px", center: "0", down: "+0.5 px", more: "+1 px" }, fallback: "center" },

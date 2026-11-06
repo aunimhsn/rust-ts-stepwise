@@ -26,3 +26,9 @@
 .app-all-levels i.is-done { background: var(--success); }
 .app-all-levels i.is-current { background: var(--accent); box-shadow: 0 0 0 1.5px var(--band-text); }
 .app-second-bar.is-levels { padding-bottom: 0; }
+
+/* 18. A bar for the tabs alone. 19. The two lines over the code, the tabs over the map. */
+.app-second-bar.is-mix-center, .app-second-bar.is-mix-left { gap: 0; padding: 0; }
+.app-second-bar.is-mix-center { height: 33px; }
+.app-second-bar.is-mix-left { height: 44px; }
+.app-window .app-second-bar .app-place.is-stacked { position: static; transform: none; align-items: flex-start; height: auto; }
