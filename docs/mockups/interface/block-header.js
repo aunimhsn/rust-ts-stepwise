@@ -1,13 +1,13 @@
 // The name beside the logo, on the line of the menus. As decided on the sheet of the world elements,
 // the head is a quarter taller than the capitals, and its middle meets the middle of the lowercase
 // letters.
-function appWordmark(fontSize, logo = chosen.logo) {
+function appWordmark(fontSize) {
   const context = document.createElement("canvas").getContext("2d");
   context.font = "600 100px Fredoka, sans-serif";
   const letterHeight = letter => context.measureText(letter).actualBoundingBoxAscent / 100;
   const height = letterHeight("S") * fontSize * 1.25;
   const middleOfText = letterHeight("x") * fontSize / 2 + 0.5 / 44 * fontSize;
-  return `<div class="app-name" style="font-size:${fontSize}px"><img src="interface/logo/${logo}.svg" height="${height.toFixed(1)}" alt="" style="margin-right:${(fontSize * 0.18).toFixed(1)}px;transform:translateY(${(height / 2 - middleOfText).toFixed(2)}px)"><span>stepwise</span></div>`;
+  return `<div class="app-name" style="font-size:${fontSize}px"><img src="world-elements/daylight/logo.svg" height="${height.toFixed(1)}" alt="" style="margin-right:${(fontSize * 0.18).toFixed(1)}px;transform:translateY(${(height / 2 - middleOfText).toFixed(2)}px)"><span>stepwise</span></div>`;
 }
 
 // `shownMap` is the map on the screen (from 1), `passed` the maps that have passed, `menu` the menu

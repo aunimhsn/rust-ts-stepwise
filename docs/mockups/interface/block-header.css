@@ -16,8 +16,3 @@
 .app-window .app-map-button.is-shown { background: var(--chosen); color: var(--on-chosen); }
 .app-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--progress-track); }
 .app-progress i { display: block; height: 100%; background: var(--progress); }
-
-/* The logos compared, side by side. */
-.logo-sheet { padding: 16px 20px; display: grid; gap: 14px; }
-.logo-row { display: grid; grid-template-columns: 104px 190px 370px 50px; align-items: center; }
-.logo-row small { font: 12px system-ui, sans-serif; opacity: .7; }
