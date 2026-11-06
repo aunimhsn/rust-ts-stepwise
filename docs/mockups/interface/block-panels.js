@@ -9,7 +9,7 @@ const appVariables = (where, values, calls) => `
   <div class="app-values"><h4>in ${where}</h4>${values.map(([name, value]) =>
     `<div class="app-value"><span>${name}</span><span>${value}</span></div>`).join("")}</div>
   <h4>Calls</h4>${calls.map(([call, line], index) =>
-    `<div class="app-call ${index === calls.length - 1 ? "is-current" : ""}">${call} · line ${line}</div>`).join("")}`;
+    `<div class="app-call ${index === calls.length - 1 ? "is-current" : ""}">${call} · Ln ${line}</div>`).join("")}`;
 
 const appConsoleError = (place, title, help) =>
   `<div class="app-message"><span class="app-place-link">${place}</span><span><b>${title}</b><br>${help}</span></div>`;

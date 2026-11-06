@@ -280,9 +280,9 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
 
 Everything in the console and the variables panel is in the font of the code, as the editor (Source Code Pro).
 
-- The lines written by `print`, in order.
-- The errors, before running or while running, with their line and column: a click on an error puts the cursor on its position in the editor.
-- The messages of the level: the goals not met, the success.
+- The lines written by `print`, in order, in plain text; a long line goes on to the next one, without scrolling sideways. When the lines fill the block, it scrolls and keeps the last ones in sight.
+- The errors, before running or while running: their place in red, written as in the status bar (`Ln 9, Col 17`), then in bold what happened and under it how to fix it. The whole error lights up on hover; a click puts the cursor on its position in the editor.
+- The messages of the level: a goal not met in bold, with a red flag as on the map, in neutral words; a map passed in green with a check (*"Map 1 passed. Try map 2."*).
 - Cleared at each **Run**.
 - **Run** shows the console tab.
 
@@ -291,7 +291,7 @@ Everything in the console and the variables panel is in the font of the code, as
 Its tab opens by itself when the program pauses (by **Pause**, **Step** or a breakpoint). When the program stops on an error, the console stays shown, with the error, and a dot on the tab **Variables** says that it holds the state at that moment. Otherwise, the tab says *"Pause the program to see its variables."* It shows:
 
 - the variables of the function being run (or of the main program), with their values; the ones changed by the last step stand out;
-- the calls in progress, from the main program to the current function, each with its line; a click on one shows its variables.
+- the calls in progress, from the main program to the current function, each with its line (`paint_side · Ln 5`); a click on one shows its variables.
 
 ### Manual
 
