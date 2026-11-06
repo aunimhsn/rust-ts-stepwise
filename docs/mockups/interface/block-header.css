@@ -14,5 +14,10 @@
 .app-map-button::after { content: ""; position: absolute; left: 7px; right: 7px; bottom: 3px; height: 3px; border-radius: 2px; background: var(--idle); }
 .app-map-button.is-passed::after { background: var(--success); }
 .app-window .app-map-button.is-shown { background: var(--chosen); color: var(--on-chosen); }
-.app-progress { position: absolute; left: 0; right: 0; bottom: 0; height: var(--progress-height, 3px); background: var(--progress-track); }
-.app-progress i { display: block; height: 100%; background: var(--progress); border-radius: var(--progress-round, 0); }
+.app-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--progress-track); }
+.app-progress i { display: block; height: 100%; background: var(--progress); }
+
+/* The logos compared, side by side. */
+.logo-sheet { padding: 16px 20px; display: grid; gap: 14px; }
+.logo-row { display: grid; grid-template-columns: 92px 170px 320px 40px; align-items: center; }
+.logo-row small { font: 12px system-ui, sans-serif; opacity: .7; }

@@ -4,7 +4,7 @@ const appWindow = ({ header, editor, map, panels, overlay = "" }) => `
     ${appHeader(header)}
     <div class="app-body">
       <div class="app-block is-editor">${appEditor(editor)}</div>
-      <div class="app-block is-map">${map}</div>
+      <div class="app-block">${map}</div>
       <div class="app-block">${appPanels(panels)}</div>
     </div>
     ${overlay}

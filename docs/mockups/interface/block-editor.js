@@ -1,6 +1,6 @@
 // The colors of the code: a small highlighter for the samples of the mock-up.
 const CODE_KEYWORDS = new Set(["function", "let", "while", "repeat", "if", "else", "return", "break", "not", "and", "or"]);
-const CODE_VALUES = new Set(["true", "false"]);
+const CODE_VALUES = new Set(["red", "yellow", "blue", "true", "false"]);
 
 function highlightCode(line) {
   return line.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/(#.*$)|(&lt;|"(?:[^"\\]|\\.)*")|\b(\d+)\b|\b([a-z_][a-z0-9_]*)\b(\()?/g,
@@ -10,7 +10,6 @@ function highlightCode(line) {
       if (text) return `<span class="code-string">${text}</span>`;
       if (number) return `<span class="code-number">${number}</span>`;
       if (CODE_KEYWORDS.has(word)) return `<span class="code-keyword">${word}</span>${call ?? ""}`;
-      if (word in PAINT_SHADES) return `<span class="code-value code-paint" style="text-decoration-color:${PAINT_SHADES[word]}">${word}</span>${call ?? ""}`;
       if (CODE_VALUES.has(word)) return `<span class="code-value">${word}</span>${call ?? ""}`;
       return call ? `<span class="code-function">${word}</span>(` : word;
     });
@@ -22,7 +21,7 @@ function highlightCode(line) {
 function appEditor({ lines, next, error, breakpoints = [], main = "play", state, isError = false, steps, cursor }) {
   const row = (text, index) => {
     const number = index + 1;
-    const mark = number === next ? `<span class="app-mark-arrow">${ICONS.next(13)}</span><span class="app-mark-eyes"><i></i><i></i></span>`
+    const mark = number === next ? ICONS.next(13)
       : number === error ? ICONS.close(13)
       : breakpoints.includes(number) ? '<span class="app-breakpoint"></span>' : "";
     const kind = number === next ? "is-next" : number === error ? "is-error" : "";
@@ -38,7 +37,7 @@ function appEditor({ lines, next, error, breakpoints = [], main = "play", state,
       </div>
     </div>
     <div class="app-status ${isError ? "is-failed" : state.startsWith("Paused") ? "is-paused" : ""}">
-      <b class="${isError ? "is-error" : ""}">${state}</b>
+      <b>${state}</b>
       <span>${steps} steps</span>
       <div class="app-speed"><span>Speed</span>${[1, 2, 3, 4, 5].map(speed => `<i class="${speed <= 3 ? "is-on" : ""}"></i>`).join("")}</div>
       <span class="app-cursor">${cursor}</span>

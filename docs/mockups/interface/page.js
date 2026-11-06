@@ -3,15 +3,8 @@
 // One group of tabs per open decision; `fallback` is the choice shown by default.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(INTERFACE_STYLES).map(([key, style]) => [key, style.title])), fallback: Object.keys(INTERFACE_STYLES)[0] },
-  // The ideas tried on Floor Plan and Visor, to compare one by one on the two styles (ideas.css).
-  statusBar: { label: "Status bar", options: { plain: "Plain", state: "Color of the state" }, fallback: "plain" },
-  paint: { label: "Paint in the code", options: { off: "Off", on: "Underlined" }, fallback: "off" },
-  progress: { label: "Progress", options: { thin: "Thin", stroke: "Stroke of paint" }, fallback: "thin" },
-  currentLine: { label: "Current line", options: { band: "Band", stroke: "Stroke" }, fallback: "band" },
-  mark: { label: "Its mark", options: { arrow: "Arrow", visor: "Visor" }, fallback: "arrow" },
+  logo: { label: "Logo", options: Object.fromEntries(Object.entries(LOGOS).map(([key, logo]) => [key, logo.title])), fallback: Object.keys(LOGOS)[0] },
   controls: { label: "Controls", options: { square: "Square", round: "Round", hexagon: "Hexagon" }, fallback: "square" },
-  map: { label: "Map", options: { block: "On a block", wall: "In the wall" }, fallback: "block" },
-  accent: { label: "Accent", options: { amber: "Amber", cyan: "Cyan" }, fallback: "amber" },
 };
 
 const params = new URLSearchParams(location.search);
