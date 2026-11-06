@@ -2,4 +2,8 @@
 .app-window .app-place { position: absolute; left: 50%; top: 4px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; justify-content: center; height: 38px; box-sizing: border-box; padding: 0 12px; background: none; border: 0; border-radius: var(--radius-small); color: var(--band-text); white-space: nowrap; }
 .app-window .app-place.is-open { background: var(--band-hover); }
 .app-place small { color: var(--band-weak); font-size: 10.5px; line-height: 13px; letter-spacing: .05em; text-transform: uppercase; }
+:root[data-chapter-weight="regular"] .app-place small { font-weight: 400; }
+:root[data-chapter-weight="medium"] .app-place small { font-weight: 500; }
+:root[data-chapter-weight="semibold"] .app-place small { font-weight: 600; }
+:root[data-chapter-weight="bold"] .app-place small { font-weight: 700; }
 .app-place b { font: var(--title-weight) 14px/18px var(--font-title); }
