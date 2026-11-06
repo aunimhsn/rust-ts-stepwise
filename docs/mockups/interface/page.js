@@ -3,6 +3,8 @@
 // One group of tabs per open decision; `fallback` is the choice shown by default.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(INTERFACE_STYLES).map(([key, style]) => [key, style.title])), fallback: Object.keys(INTERFACE_STYLES)[0] },
+  // The font of the whole interface, the code apart: the same choices as the boards of the goal.
+  font: { label: "Font", options: Object.fromEntries(Object.entries(FONTS).map(([key, font], index) => [key, `${index + 1} ${font.name}`])), fallback: "manrope" },
 };
 
 const params = new URLSearchParams(location.search);
@@ -14,6 +16,8 @@ const SECTIONS = [];
 
 function render() {
   for (const key of Object.keys(VARIANTS)) document.documentElement.dataset[key] = chosen[key];
+  document.documentElement.style.setProperty("--font-text", fontStack(FONTS[chosen.font].text));
+  document.documentElement.style.setProperty("--font-title", fontStack(FONTS[chosen.font].title));
   document.getElementById("tabs").innerHTML = Object.entries(VARIANTS).map(([key, variant]) =>
     `<div class="group"><span>${variant.label}</span>${Object.entries(variant.options).map(([value, label]) =>
       `<button type="button" data-variant="${key}" data-value="${value}" aria-pressed="${chosen[key] === value}">${label}</button>`).join("")}</div>`).join("");

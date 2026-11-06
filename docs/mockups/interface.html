@@ -13,7 +13,7 @@
     python3 -m http.server 8765 --bind 127.0.0.1
 -->
 <!-- Fonts under the SIL Open Font License, which the application can embed. -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=block">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700;800&family=DM+Sans:wght@400;500;700;800&family=Figtree:wght@400;500;700;800&family=Fredoka:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;700&family=Instrument+Sans:wght@400;500;600;700&family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@400;600&family=Lexend:wght@400;500;700;800&family=Manrope:wght@400;500;600;700;800&family=Nunito+Sans:wght@400;500;700;800&family=Outfit:wght@400;500;700;800&family=Plus+Jakarta+Sans:wght@400;500;700;800&family=Source+Sans+3:wght@400;500;700;800&family=Space+Grotesk:wght@400;500;700&family=Work+Sans:wght@400;500;700;800&display=block">
 <link rel="stylesheet" href="world-elements/page.css">
 <link rel="stylesheet" href="world-elements/map.css">
 <link rel="stylesheet" href="interface/themes.css">
@@ -24,6 +24,7 @@
 <link rel="stylesheet" href="interface/block-map.css">
 <link rel="stylesheet" href="interface/block-panels.css">
 <link rel="stylesheet" href="interface/block-overlays.css">
+<link rel="stylesheet" href="interface/block-goal.css">
 </head>
 <body>
 <p class="page-warning" id="file-warning" hidden>Opened as a file: serve the repository root (see the comment at the top of this page) so that the SVG files load.</p>
@@ -31,6 +32,7 @@
 <main id="sheet"></main>
 <script src="world-elements/themes.js"></script>
 <script src="interface/themes.js"></script>
+<script src="interface/fonts.js"></script>
 <script src="interface/page.js"></script>
 <script src="world-elements/map.js"></script>
 <script src="interface/icons.js"></script>
@@ -40,8 +42,10 @@
 <script src="interface/block-map.js"></script>
 <script src="interface/block-panels.js"></script>
 <script src="interface/block-overlays.js"></script>
+<script src="interface/block-goal.js"></script>
 <script src="interface/window.js"></script>
 <!-- One script per section, the newest first: it is shown at the top of the page. -->
+<script src="interface/section-goal-boards.js"></script>
 <script src="interface/section-paused.js"></script>
 <script src="interface/section-error.js"></script>
 <script src="interface/section-goal.js"></script>

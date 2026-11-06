@@ -1,0 +1,69 @@
+/* The bubble of the goal: two columns, then Let's go along the whole bottom, against its sides. */
+.app-goal { top: 57px; left: 390px; width: 500px; overflow: hidden; }
+.goal-columns { display: flex; align-items: stretch; }
+.goal-main { flex: 1; min-width: 0; padding: 16px 18px 16px; font-family: var(--font-text); }
+.page-section .app-goal h3 { margin: 0; color: var(--text); font: 700 19px/1.25 var(--font-title); text-transform: none; letter-spacing: normal; }
+.goal-chapter { margin: 2px 0 12px; color: var(--weak); font-size: 12px; }
+.goal-text { margin: 0; line-height: 1.45; }
+.goal-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.goal-links .app-chip { display: flex; align-items: center; gap: 5px; }
+
+.goal-new { flex: none; display: flex; flex-direction: column; gap: 6px; width: 132px; box-sizing: border-box; padding: 16px 14px; background: var(--goal-side); color: var(--on-goal-side); font-family: var(--font-text); }
+.goal-new h4 { margin: 0 0 4px; color: var(--goal-side-weak); font: 700 11.5px var(--font-text); letter-spacing: .04em; text-transform: uppercase; }
+
+.app-window .app-goal .app-close { top: 11px; right: 10px; }
+.app-window .app-close { position: absolute; display: flex; padding: 3px; background: none; border: 0; color: var(--weak); }
+.app-window button.goal-go { display: block; width: 100%; height: 42px; padding: 0; background: var(--accent); color: var(--on-accent); border: 0; font: 700 14px var(--font-text); }
+
+/* The boards: each bubble on its own, in the flow of the page. */
+.goal-boards { display: grid; grid-template-columns: repeat(2, 500px); gap: 26px 40px; }
+.goal-board-title { display: block; margin-bottom: 6px; color: #e9ecef; font-size: 14px; font-weight: 700; }
+.app-window.goal-board { width: 500px; height: auto; overflow: visible; background: none; box-shadow: none; }
+.goal-board .app-popup { position: relative; top: 0; left: 0; }
+.goal-group { margin: 26px 0 12px; color: #e9ecef; font-size: 15px; font-weight: 700; }
+
+/* Hot 1. A louder title, a tone of teal in the column, a taller button. */
+.hot-1 .goal-new { background: var(--passed-soft); }
+.page-section .hot-1 h3 { font-size: 25px; font-weight: 800; letter-spacing: -.01em; }
+.app-window .hot-1 button.goal-go { height: 50px; font-size: 16px; font-weight: 800; }
+
+/* Hot 2. The number as a big mark, the column in the slate of the walls. */
+.goal-big { display: flex; align-items: center; gap: 12px; }
+.goal-big span { color: #ffb300; font: 700 46px/1 var(--font-name); }
+.page-section .hot-2 h3 { font: 600 22px/1.15 var(--font-name); }
+.hot-2 .goal-chapter { margin-top: 4px; }
+.hot-2 .goal-new { background: #5d687a; color: #ffffff; }
+.hot-2 .goal-new h4 { color: #d5dbe3; }
+.app-window .hot-2 .app-close { color: #ffffff; }
+
+/* Hot 3. The robot says the title in a bubble. */
+.goal-says { display: flex; align-items: center; gap: 14px; }
+.goal-robot { flex: none; height: 44px; }
+.page-section .hot-3 h3 { position: relative; padding: 8px 14px; background: var(--goal-side); border-radius: 12px; font: 600 16.5px/1.2 var(--font-name); }
+.hot-3 h3::before { content: ""; position: absolute; left: -6px; top: 50%; width: 12px; height: 12px; background: var(--goal-side); transform: translateY(-50%) rotate(45deg); }
+.hot-3 .goal-chapter { margin: 8px 0 10px; }
+.hot-3 .goal-new { background: #222935; color: #ffffff; }
+.hot-3 .goal-new h4 { color: #3fc3ff; }
+.app-window .hot-3 .app-close { color: #ffffff; }
+.app-window .hot-3 button.goal-go { height: 50px; font: 600 18px var(--font-name); }
+
+/* Hot 4. A stroke of paint under the title, a mark of paint on what is new. */
+.page-section .hot-4 h3 { display: inline-block; padding-bottom: 8px; background: linear-gradient(#ffb300, #ffb300) no-repeat 0 100% / 100% 7px; border-radius: 0 0 4px 4px; font: 600 26px/1.15 var(--font-name); }
+.hot-4 .goal-chapter { margin-top: 7px; }
+.hot-4 .goal-new span { position: relative; padding-left: 15px; font-weight: 600; }
+.hot-4 .goal-new span::before { content: ""; position: absolute; left: 0; top: .32em; width: 9px; height: 9px; border-radius: 50%; }
+.hot-4 .goal-new span:nth-of-type(1)::before { background: #dc2f34; }
+.hot-4 .goal-new span:nth-of-type(2)::before { background: #2459d6; }
+.app-window .hot-4 button.goal-go { height: 50px; font: 700 18px var(--font-name); letter-spacing: .01em; }
+
+/* Hot 5. A mission card: a banner, a stamp on what is new, a button in the ink of the robot. */
+.hot-5 .goal-main { padding: 0 0 16px; }
+.goal-banner { padding: 14px 18px; background: #222935; color: #ffffff; }
+.goal-banner small { display: block; color: #ffb300; font: 700 11.5px var(--font-text); letter-spacing: .08em; text-transform: uppercase; }
+.page-section .hot-5 h3 { color: #ffffff; font: 700 30px/1.1 var(--font-name); }
+.hot-5 .goal-text, .hot-5 .goal-links { margin-left: 18px; margin-right: 18px; }
+.hot-5 .goal-text { margin-top: 14px; font-size: 14.5px; }
+.hot-5 .goal-new { justify-content: center; background: #ffb300; color: #222935; font-weight: 700; }
+.hot-5 .goal-new h4 { align-self: flex-start; margin-bottom: 8px; padding: 2px 8px; border: 2px solid #222935; border-radius: 3px; color: #222935; font: 700 14px var(--font-name); transform: rotate(-7deg); }
+.app-window .hot-5 .app-close { color: #222935; }
+.app-window .hot-5 button.goal-go { height: 54px; background: #222935; color: #ffb300; font: 700 19px var(--font-name); }
