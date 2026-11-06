@@ -1,5 +1,5 @@
 /* The bubble of the goal: two columns, then Let's go along the whole bottom, against its sides. */
-.app-goal { top: 57px; left: 390px; width: 500px; overflow: hidden; }
+.app-goal { top: 57px; left: 390px; width: 500px; overflow: hidden; border: 0; }
 .goal-columns { display: flex; align-items: stretch; }
 .goal-main { flex: 1; min-width: 0; padding: 16px 18px 16px; font-family: var(--font-text); }
 .page-section .app-goal h3 { margin: 0; color: var(--text); font: 700 19px/1.25 var(--font-title); text-transform: none; letter-spacing: normal; }
