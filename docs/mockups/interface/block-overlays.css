@@ -1,0 +1,17 @@
+/* What opens over the screen: a menu of the header, the bubble of the goal. */
+.app-popup { position: absolute; z-index: 2; box-sizing: border-box; background: var(--pop); color: var(--text); border: var(--pop-border); border-radius: var(--radius); box-shadow: var(--pop-shadow); }
+.app-dropdown { top: 44px; width: 272px; padding: 5px; }
+.app-menu-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 10px; border-radius: var(--radius-small); }
+.app-menu-row.is-hovered { background: var(--hover); }
+.app-menu-row kbd { color: var(--weak); font: 400 12px var(--font-text); }
+.app-menu-row i { display: flex; color: var(--weak); }
+.app-menu-line { margin: 5px 0; border-top: var(--border); }
+
+.app-goal { top: 52px; left: 420px; width: 440px; padding: 14px 16px; }
+.page-section .app-goal h3 { margin: 0 0 8px; padding-right: 24px; font: var(--title-weight) 16px/1.3 var(--font-title); color: var(--text); text-transform: none; letter-spacing: normal; }
+.app-goal p { margin: 0 0 6px; }
+.app-window .app-close { position: absolute; top: 10px; right: 10px; display: flex; padding: 3px; background: none; border: 0; color: var(--weak); }
+.app-goal-links { display: flex; gap: 8px; margin-top: 12px; }
+.app-goal-links .app-chip { display: flex; align-items: center; gap: 5px; }
+.app-goal-end { display: flex; justify-content: flex-end; margin-top: 12px; }
+.page-slot .app-goal code { color: inherit; font-family: var(--font-code); font-size: .95em; }

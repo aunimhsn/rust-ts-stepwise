@@ -1,6 +1,7 @@
 // Cells and maps drawn from the SVG files of the chosen style, and the paint drawn as a stroke.
 
-const element = name => `world-elements/${chosen.theme}/${name}.svg`;
+// The world is Daylight, chosen in step 1: the page of the interface draws it too.
+const element = name => `world-elements/daylight/${name}.svg`;
 
 // The shade of a paint, decided in step 1b (themes.js).
 const paintShade = color => PAINT_SHADES[color];

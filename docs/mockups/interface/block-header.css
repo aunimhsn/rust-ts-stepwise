@@ -1,0 +1,17 @@
+/* The header: the name, the menus, the place of the level, the maps, the bar of the progress. */
+.app-header { position: relative; flex: none; display: flex; align-items: center; height: 48px; box-sizing: border-box; padding: 0 12px 0 14px; background: var(--band); color: var(--band-text); border-bottom: var(--band-line); }
+.app-menus { display: flex; gap: 2px; margin-left: 28px; }
+.app-window .app-menu { padding: 5px 10px; background: none; border: 0; border-radius: var(--radius-small); color: var(--band-text); font-weight: 500; }
+.app-window .app-menu.is-open { background: var(--band-hover); }
+.app-window .app-place { position: absolute; left: 50%; top: 9px; transform: translateX(-50%); display: flex; align-items: center; gap: 7px; height: 30px; box-sizing: border-box; padding: 0 14px; background: none; border: 0; border-radius: var(--radius-small); color: var(--band-text); white-space: nowrap; }
+.app-window .app-place.is-open { background: var(--band-hover); }
+.app-place b { font: var(--title-weight) 14px var(--font-title); }
+.app-place i { display: flex; color: var(--band-weak); font-style: normal; }
+.app-maps { margin-left: auto; display: flex; align-items: center; gap: 3px; color: var(--band-weak); }
+.app-maps > span { margin-right: 7px; }
+.app-window .app-map-button { position: relative; width: 44px; height: 30px; background: none; border: 0; border-radius: var(--radius-small); color: var(--band-text); font-weight: var(--strong-weight); padding: 0 0 3px; }
+.app-map-button::after { content: ""; position: absolute; left: 7px; right: 7px; bottom: 3px; height: 3px; border-radius: 2px; background: var(--idle); }
+.app-map-button.is-passed::after { background: var(--success); }
+.app-window .app-map-button.is-shown { background: var(--chosen); color: var(--on-chosen); }
+.app-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--progress-track); }
+.app-progress i { display: block; height: 100%; background: var(--progress); }

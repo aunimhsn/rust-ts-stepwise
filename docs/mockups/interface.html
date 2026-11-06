@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Interface mock-up</title>
+<!--
+  Mock-up of the interface (roadmap step 3), from the wireframes of docs/wireframes/. The world
+  keeps the elements of step 1 (world-elements/daylight/); each style only sets the tokens of
+  interface/themes.css.
+
+  Serve the repository root, then open http://127.0.0.1:<port>/docs/mockups/interface.html:
+    python3 -m http.server 8765 --bind 127.0.0.1
+-->
+<!-- Fonts under the SIL Open Font License, which the application can embed. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;600&family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Fraunces:opsz,wght@9..144,600&family=Fredoka:wght@500;600&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Nunito:wght@500;700;800&family=Red+Hat+Mono:wght@400;600&family=Source+Sans+3:wght@400;600&display=block">
+<link rel="stylesheet" href="world-elements/page.css">
+<link rel="stylesheet" href="world-elements/map.css">
+<link rel="stylesheet" href="interface/themes.css">
+<link rel="stylesheet" href="interface/window.css">
+<link rel="stylesheet" href="interface/block-header.css">
+<link rel="stylesheet" href="interface/block-editor.css">
+<link rel="stylesheet" href="interface/block-map.css">
+<link rel="stylesheet" href="interface/block-panels.css">
+<link rel="stylesheet" href="interface/block-overlays.css">
+</head>
+<body>
+<p class="page-warning" id="file-warning" hidden>Opened as a file: serve the repository root (see the comment at the top of this page) so that the SVG files load.</p>
+<nav class="page-tabs" id="tabs" aria-label="Styles and variants"></nav>
+<main id="sheet"></main>
+<script src="world-elements/themes.js"></script>
+<script src="interface/themes.js"></script>
+<script src="interface/page.js"></script>
+<script src="world-elements/map.js"></script>
+<script src="interface/icons.js"></script>
+<script src="interface/block-header.js"></script>
+<script src="interface/block-editor.js"></script>
+<script src="interface/block-map.js"></script>
+<script src="interface/block-panels.js"></script>
+<script src="interface/block-overlays.js"></script>
+<script src="interface/window.js"></script>
+<!-- One script per section, the newest first: it is shown at the top of the page. -->
+<script src="interface/section-paused.js"></script>
+<script src="interface/section-error.js"></script>
+<script src="interface/section-goal.js"></script>
+<script src="interface/section-menu.js"></script>
+<script>render();
+// The name is aligned on the measured capitals of its font: draw again once the fonts have loaded.
+document.fonts.ready.then(render);</script>
+</body>
+</html>

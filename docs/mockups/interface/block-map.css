@@ -1,0 +1,4 @@
+/* The block of the map: the whole map centered, the button Legend in its corner. */
+.app-world { position: relative; display: grid; place-items: center; height: 100%; background: var(--map-block); }
+.app-world .app-map { box-shadow: var(--map-shadow); }
+.app-world .app-chip { position: absolute; top: 8px; right: 8px; }
