@@ -12,3 +12,7 @@
 
 /* The tabs of the page take several rows: a section stops under them. */
 .page-section { scroll-margin-top: 130px; }
+
+/* The lists at the top of the page. */
+.page-tabs select { padding: 3px 4px; border: 1px solid #3a3f45; border-radius: 4px; background: #24272b; color: #dee2e6; font: inherit; font-size: 13px; cursor: pointer; }
+.page-tabs label.group { cursor: pointer; }

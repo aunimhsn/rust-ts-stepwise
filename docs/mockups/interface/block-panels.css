@@ -5,14 +5,14 @@
 .app-window .app-tab.is-chosen { background: var(--tab-chosen); color: var(--on-tab-chosen); }
 .app-tab.has-dot::after { content: ""; position: absolute; top: 4px; right: 4px; width: 6px; height: 6px; border-radius: 50%; background: var(--error); }
 /* Everything in the panels is in the font of the code, as the editor. */
-.app-panel { flex: 1; min-height: 0; padding: 10px 14px; overflow: hidden; font: 400 13px/20px var(--font-code); font-variant-ligatures: none; }
+.app-panel { flex: 1; min-height: 0; padding: 10px 14px; overflow: hidden; font: 400 13px/20px var(--font-console); font-variant-ligatures: none; }
 .app-weak { color: var(--weak); }
-.app-panel h4 { margin: 0 0 3px; color: var(--weak); font: 500 12px var(--font-code); }
+.app-panel h4 { margin: 0 0 3px; color: var(--weak); font: 500 12px var(--font-console); }
 .app-values { margin-bottom: 10px; }
-.app-value { display: grid; grid-template-columns: 110px 1fr; font: 400 13px/20px var(--font-code); }
-.app-call { margin: 0 -6px; padding: 0 6px; border-radius: var(--radius-small); font: 400 13px/22px var(--font-code); }
+.app-value { display: grid; grid-template-columns: 110px 1fr; }
+.app-call { margin: 0 -6px; padding: 0 6px; border-radius: var(--radius-small); line-height: 22px; }
 .app-call.is-current { background: var(--call-current); font-weight: 600; }
 /* The places take one column, so that the messages of a list line up. */
-.app-message { display: grid; grid-template-columns: 16ch 1fr; gap: 12px; }
-.app-place-link { color: var(--error); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+.app-message { display: grid; grid-template-columns: 14ch 1fr; gap: 12px; }
+.app-place-link { color: var(--error); font-weight: 600; }
 .app-message b { font-weight: var(--strong-weight); }

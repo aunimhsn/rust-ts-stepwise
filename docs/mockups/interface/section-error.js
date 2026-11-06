@@ -4,5 +4,5 @@ SECTIONS.push(["Error while running", () => `<div class="page-row"><div class="p
   header: {},
   editor: { lines: SAMPLE_CODE(5), error: 5, state: "Error at line 5", isError: true, steps: 14, cursor: "Ln 5, Col 9" },
   map: appWorld({ painted: ["2,1", "3,1", "4,1", "5,1", "6,1"], robot: "6,1", facing: "east" }),
-  panels: { tab: "Console", dot: true, content: appConsoleError("Line 5, col 9", "The robot bumped into a wall.", "<code>forward()</code> needs a free cell in front of the robot.") },
+  panels: { tab: "Console", dot: true, content: appConsoleError("Ln 5, Col 9", "The robot bumped into a wall.", "<code>forward()</code> needs a free cell in front of the robot.") },
 })}</div></div>`]);

@@ -1,6 +1,6 @@
 /* What opens over the screen: a menu of the header (the bubble of the goal: block-goal.css). */
 .app-popup { position: absolute; z-index: 2; box-sizing: border-box; background: var(--pop); color: var(--text); border: var(--pop-border); border-radius: var(--radius); box-shadow: var(--pop-shadow); }
-.app-dropdown { top: 44px; width: 272px; padding: 5px 0; border: 0; }
+.app-dropdown { top: 49px; width: 272px; padding: 5px 0; border: 0; }
 /* A row selected is a band across the whole width of the menu. */
 .app-menu-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 14px; }
 .app-menu-row.is-hovered, .app-menu-row:hover { background: var(--hover); }
