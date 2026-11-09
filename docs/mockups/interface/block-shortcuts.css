@@ -1,9 +1,23 @@
 /* The veil under a panel in the middle of the screen, and the panel of the shortcuts. */
 .app-veil { position: absolute; inset: 0; z-index: 3; display: grid; place-items: center; background: #0007; }
-.app-shortcuts { position: static; width: 640px; box-sizing: border-box; padding: 18px 22px 20px; }
+.app-shortcuts { position: relative; width: 640px; box-sizing: border-box; padding: 18px 22px 20px; }
 .app-shortcuts-head { display: flex; justify-content: space-between; align-items: center; font: 600 18px var(--font-title); }
-.app-window .app-shortcuts-head button { display: grid; place-items: center; width: 26px; height: 26px; padding: 0; background: none; border: 0; color: var(--weak); }
+/* The cross stands at the same distance from the top and the right borders. */
+.app-window .app-shortcuts-head button { position: absolute; top: 6px; right: 6px; display: grid; place-items: center; width: 26px; height: 26px; padding: 0; background: none; border: 0; color: var(--weak); }
 .app-shortcuts-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 0 34px; margin-top: 8px; }
 .app-shortcuts-group h4 { margin: 12px 0 6px; color: var(--weak); font: 600 11.5px var(--font-text); text-transform: uppercase; letter-spacing: .06em; }
 .app-shortcuts-row { display: flex; justify-content: space-between; gap: 14px; padding: 3px 0; }
 .app-shortcuts-row kbd { color: var(--weak); font: 400 12px var(--font-text); white-space: nowrap; }
+/* Four ways to tell the parts of the panel apart. */
+.is-look-line .app-shortcuts-group h4 { padding-bottom: 4px; border-bottom: 1px solid var(--weak); }
+.is-look-short .app-shortcuts-group h4::after { content: ""; display: block; width: 26px; height: 2px; margin-top: 4px; background: var(--weak); }
+.is-look-band .app-shortcuts-group h4 { margin-left: -8px; margin-right: -8px; padding: 4px 8px; background: var(--hover); }
+.is-look-card .app-shortcuts-columns { gap: 0 14px; }
+.is-look-card .app-shortcuts-column { display: flex; flex-direction: column; gap: 10px; }
+.is-look-card .app-shortcuts-column > .app-shortcuts-group:last-child { flex: 1; }
+.is-look-card .app-shortcuts-group { padding: 2px 12px 10px; background: var(--band); border-radius: var(--radius-small); }
+.is-look-card .app-shortcuts-group h4 { margin-top: 8px; }
+/* The four looks side by side, at their real size. */
+.shortcuts-boards { display: grid; grid-template-columns: repeat(2, 640px); gap: 22px 24px; }
+.app-window.shortcuts-board { width: 640px; height: auto; background: none; box-shadow: none; }
+.shortcuts-board .app-shortcuts { box-shadow: none; }

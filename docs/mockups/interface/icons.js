@@ -15,12 +15,19 @@ const ICONS = {
   chevron: size => appIcon(size, '<path d="m6 3.5 4.5 4.5L6 12.5"/>'),
   close: size => appIcon(size, '<path d="m4 4 8 8M12 4l-8 8"/>'),
   next: size => appIcon(size, '<path d="M4.5 3.5 11 8l-6.5 4.5Z"/>', "currentColor"),
-  // The other three directions of the chevron, for the keys of the keyboard.
+  // The arrows of the keyboard, as printed on its keys.
+  arrowUp: size => appIcon(size, '<path d="M8 13.2V2.8M3.8 7 8 2.8 12.2 7"/>'),
+  arrowDown: size => appIcon(size, '<path d="M8 2.8v10.4M3.8 9 8 13.2 12.2 9"/>'),
+  // The other three directions of the chevron, for the pairs of keys of the command menu.
   chevronLeft: size => appIcon(size, '<path d="M10 3.5 5.5 8l4.5 4.5"/>'),
   chevronUp: size => appIcon(size, '<path d="m3.5 10.25 4.5-4.5 4.5 4.5"/>'),
   chevronDown: size => appIcon(size, '<path d="m3.5 5.75 4.5 4.5 4.5-4.5"/>'),
 };
 
-// A shortcut as text, its arrow keys drawn as chevrons so that they keep the weight of the other icons.
-const KEY_ARROWS = { "↑": "chevronUp", "↓": "chevronDown", "←": "chevronLeft", "→": "chevron" };
-const appKeyLabel = key => key.replace(/[↑↓←→]/g, arrow => `<span class="app-key-arrow">${ICONS[KEY_ARROWS[arrow]](13)}</span>`);
+// A shortcut as text, its arrow keys drawn as icons so that they keep the weight of the other icons. A
+// single key shows the arrow printed on the keyboard; the pairs of keys of the command menu, chevrons.
+const KEY_ARROWS = { "↑": "arrowUp", "↓": "arrowDown" };
+const KEY_CHEVRONS = { "↑": "chevronUp", "↓": "chevronDown", "←": "chevronLeft", "→": "chevron" };
+const drawKeys = (keys, icons) => keys.replace(/[↑↓←→]/g, mark => `<span class="app-key-arrow">${ICONS[icons[mark]](13)}</span>`);
+const appKeyLabel = key => drawKeys(key, KEY_ARROWS);
+const appKeyPair = keys => drawKeys(keys, KEY_CHEVRONS);
