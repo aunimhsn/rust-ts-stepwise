@@ -16,7 +16,6 @@ const ICONS = {
   close: size => appIcon(size, '<path d="m4 4 8 8M12 4l-8 8"/>'),
   next: size => appIcon(size, '<path d="M4.5 3.5 11 8l-6.5 4.5Z"/>', "currentColor"),
   search: size => appIcon(size, '<circle cx="7" cy="7" r="4.6"/><path d="m10.4 10.4 3.6 3.6"/>'),
-  copy: size => appIcon(size, '<rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 3.2V3a.5.5 0 0 0-.5-.5H3a.5.5 0 0 0-.5.5v7c0 .3.2.5.5.5h.2"/>'),
   // A page opened elsewhere: an arrow out of its box.
   external: size => appIcon(size, '<path d="M9.5 2.5h4v4M13.5 2.5 7.5 8.5"/><path d="M11.5 9.5v3a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h3"/>'),
   // The arrows of the keyboard, as printed on its keys.

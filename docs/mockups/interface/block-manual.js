@@ -56,11 +56,11 @@ function manualMap(entry, frame) {
   return appMap(frame.rows, extras, MANUAL_CELL, frame.links);
 }
 
-// An example: its code with Copy, and the small map where it plays, with the console when it prints.
+// An example: its code, to type again rather than copy, and the small map where it plays, with the console when it prints.
 function manualExample(entry, step = 0) {
   const frame = MANUAL_FRAMES[entry.id][step];
   return `<div class="manual-example" data-example="${entry.id}" data-frame="${step}">
-    <div class="manual-code"><pre>${entry.lines.map((line, index) => `<span class="manual-line ${frame.line === index ? "is-on" : ""}">${highlightCode(line) || " "}</span>`).join("")}</pre><button type="button" class="app-chip manual-copy">${ICONS.copy(13)}<span>Copy</span></button></div>
+    <div class="manual-code"><pre>${entry.lines.map((line, index) => `<span class="manual-line ${frame.line === index ? "is-on" : ""}">${highlightCode(line) || " "}</span>`).join("")}</pre></div>
     <div class="manual-stage"><div class="manual-map">${manualMap(entry, frame)}</div>${entry.lines.some(line => line.startsWith("print")) ? `<div class="manual-out">${frame.out.join("<br>") || " "}</div>` : ""}</div>
   </div>`;
 }
@@ -79,7 +79,7 @@ const manualCategory = ({ category, text, entries }) => `<h2 data-anchor="${cate
 const MANUAL_LEAD = "The built-in functions move the robot, paint, carry an item, look around the robot and write in the console. A call always has its parentheses, even without a value: <code>forward()</code>.";
 
 // The search field: a flat field, as the one of the codes; × clears it.
-const manualSearch = query => `<label class="manual-search">${ICONS.search(15)}<input type="text" placeholder="Search the manual" value="${query}" spellcheck="false" autocomplete="off"><button type="button" class="manual-clear" title="Clear the search (Esc)" ${query ? "" : "hidden"}>${ICONS.close(13)}</button></label>`;
+const manualSearch = query => `<label class="manual-search"><span class="manual-search-icon">${ICONS.search(15)}</span><input type="text" placeholder="Search the manual" value="${query}" spellcheck="false" autocomplete="off"><button type="button" class="manual-clear" title="Clear the search (Esc)" ${query ? "" : "hidden"}>${ICONS.close(13)}</button></label>`;
 
 // The results of a search, grouped by their place in the manual; the match is marked in each name.
 function manualResults(query, chosen = 0) {
@@ -111,8 +111,8 @@ function manualWindow({ size = [1280, 720], back = "18. Paint a square", query =
   return `<div class="app-window manual-window ${size[0] >= LARGE_FROM ? "is-large" : ""}" style="width:${size[0]}px;height:${size[1]}px">
     <header class="app-header">
       ${appWordmark(21)}
-      <span class="manual-crumb">${ICONS.chevron(12)}<span>Manual</span></span>
-      ${back ? `<button type="button" class="app-menu manual-back">${ICONS.arrowLeft(14)}<span>Back to ${back}</span></button>` : ""}
+      <span class="manual-crumb">Manual</span>
+      ${back ? `<button type="button" class="manual-back"><span>Back to ${back}</span></button>` : ""}
     </header>
     <div class="manual-body">
       <aside class="manual-side">${manualSearch(query)}<div class="manual-list">${manualList(query, "Move", chosen)}</div></aside>
@@ -157,17 +157,6 @@ setInterval(() => {
     if (out) out.innerHTML = frame.out.join("<br>") || " ";
   }
 }, 700);
-
-// Copy: the code of the example goes to the clipboard, and the button says so for a moment.
-document.addEventListener("click", event => {
-  const button = event.target.closest?.(".manual-copy");
-  if (!button) return;
-  const entry = MANUAL_ENTRIES[button.closest(".manual-example").dataset.example];
-  navigator.clipboard?.writeText(entry.lines.join("\n")).catch(() => {});
-  button.classList.add("is-done");
-  button.innerHTML = `${ICONS.check(13)}<span>Copied</span>`;
-  setTimeout(() => { button.classList.remove("is-done"); button.innerHTML = `${ICONS.copy(13)}<span>Copy</span>`; }, 1500);
-});
 
 // The scroll of a page or of the drawer, and the place of a heading or an entry in it.
 const manualScroller = node => node.closest(".manual-window")?.querySelector(".manual-content") ?? node.closest(".manual-drawer")?.querySelector(".manual-drawer-scroll");
