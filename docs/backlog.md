@@ -21,6 +21,7 @@ The ideas, polish and edge cases found along the way that the current step doesn
 - A mouse cursor of our own on the map or the buttons, such as a small pincer of the robot, drawn by hand; never in the editor, whose I-beam stays the one of the system, and it may take away the larger or contrasted cursors that some learners set.
 - A divider to drag between the code and the map, as in VS Code: interesting, but it needs a design of its own (limits, double-click to reset, the size saved) and its integration in every screen.
 - A choice **Follow the system** for the theme of the settings: secondary for a website.
+- **Ctrl+K Ctrl+C** and **Ctrl+K Ctrl+U** to comment and uncomment, as in VS Code, if learners on a QWERTY keyboard miss a shortcut without punctuation. Set aside for now: two sequences to learn instead of one toggle, and a pause inside a sequence lets Ctrl+U reach the browser, which opens the source of the page.
 
 ## Content
 

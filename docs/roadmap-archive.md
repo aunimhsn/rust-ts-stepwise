@@ -29,3 +29,9 @@ In `docs/wireframes/states.excalidraw`, from the level screen: running (Pause fi
 ### 2d. Messages (#9)
 
 In `docs/wireframes/states.excalidraw`: the storage refused (a banner of one line under the header), the window too small and the phone, the browser too old, and the files that can't load when offline, each message replacing the screen under the logo.
+
+## 3. Mock-up
+
+### 3a. Style of the interface (#11)
+
+The level screen (paused, an error while running, a menu, the goal) in 3 or 4 styles around the world of step 1; Day Desk and Night Desk kept as the two themes; the logo reworked so that the name lines up with the menus.

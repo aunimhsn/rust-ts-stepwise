@@ -10,6 +10,13 @@
 .app-panel h4 { margin: 0 0 3px; color: var(--weak); font: var(--code-weight) 12px var(--font-code); }
 .app-values { margin-bottom: 10px; }
 .app-value { display: grid; grid-template-columns: 110px 1fr; }
+/* A value changed by the last step stands out. */
+.app-value.is-changed { margin: 0 -6px; padding: 0 6px; background: var(--accent-soft); border-radius: var(--radius-small); font-weight: var(--code-strong-weight); }
+.app-call:hover { background: var(--call-current); cursor: pointer; }
+/* From about 1600 pixels wide: the two panels side by side, without tabs. */
+.app-panels.is-side { display: grid; grid-template-columns: 1fr 1fr; }
+.app-side { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.app-side-title { flex: none; padding: 9px 14px 5px; color: var(--on-tab-chosen); font-weight: 500; }
 .app-call { margin: 0 -6px; padding: 0 6px; border-radius: var(--radius-small); line-height: 22px; }
 .app-call.is-current { background: var(--call-current); font-weight: var(--code-strong-weight); }
 /* The places take one column, so that the messages of a list line up. */

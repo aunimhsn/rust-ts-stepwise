@@ -1,5 +1,5 @@
 /* The elements of the console. Each kind of message leaves a little room around it. */
-.console-prints + .app-message, .console-prints + .console-note, .app-message + .app-message, .console-note + .console-note { margin-top: 8px; }
+.app-message + .console-fix, .console-prints + .app-message, .console-prints + .console-note, .app-message + .app-message, .console-note + .console-note { margin-top: 8px; }
 .console-prints div { white-space: pre-wrap; overflow-wrap: anywhere; }
 
 /* An error is one big link to its place in the code. */

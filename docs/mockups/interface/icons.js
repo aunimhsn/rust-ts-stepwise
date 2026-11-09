@@ -3,6 +3,8 @@ const appIcon = (size, body, fill = "none") => `<svg width="${size}" height="${s
 
 const ICONS = {
   play: size => appIcon(size, '<path d="M5 3.2 12.6 8 5 12.8Z"/>', "currentColor"),
+  pause: size => appIcon(size, '<path d="M5.5 3.4v9.2M10.5 3.4v9.2" stroke-width="2.4"/>'),
+  diamond: size => appIcon(size, '<path d="M8 2.2 13.8 8 8 13.8 2.2 8Z"/>'),
   // An arrow down onto a dot, as the "step into" of the developer tools.
   step: size => appIcon(size, '<path d="M8 1.8v6.6M5 5.6l3 3 3-3"/><circle cx="8" cy="12.9" r="1.5" fill="currentColor" stroke="none"/>'),
   reset: size => appIcon(size, '<path d="M3.2 8a4.8 4.8 0 1 0 1.5-3.5"/><path d="M4.4 1.9v2.8h2.8"/>'),
