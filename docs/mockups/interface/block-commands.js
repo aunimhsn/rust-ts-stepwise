@@ -15,13 +15,13 @@ function appCommandMenu({ category, counts, groups, chosen: command, details, le
   const side = details ? `<div class="app-commands-name">${details.name}</div>
     <p>${details.text}</p>
     <pre class="app-commands-example">${details.example.map(highlightCode).join("\n")}</pre>
-    <a class="app-commands-more">Read more ${ICONS.chevron(11)}</a>` : "";
+    <button type="button" class="app-primary app-commands-more">${VARIANTS.more.options[chosen.more].replace(/^\d+ · /, "")}</button>` : "";
   return `<div class="app-popup app-commands" style="left:${left}px;top:${top}px">
     <div class="app-commands-columns">
       <div class="app-commands-categories">${categories}</div>
       <div class="app-commands-list">${empty ? `<div class="app-commands-empty">${empty}</div>` : rows}</div>
       <div class="app-commands-details">${side}</div>
     </div>
-    <div class="app-commands-hints"><span><kbd>↑ ↓</kbd> move</span><span><kbd>← →</kbd> category</span><span><kbd>Tab</kbd> or <kbd>Enter</kbd> insert</span><span><kbd>Esc</kbd> close</span><span>type to filter</span></div>
+    <div class="app-commands-hints" style="--hints-top:${chosen.hints}px"><span><kbd>↑ ↓</kbd> move</span><span><kbd>← →</kbd> category</span><span><kbd>Tab</kbd> or <kbd>Enter</kbd> insert</span><span><kbd>Esc</kbd> close</span><span>type to filter</span></div>
   </div>`;
 }
