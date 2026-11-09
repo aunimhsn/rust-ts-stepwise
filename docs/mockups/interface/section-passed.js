@@ -3,11 +3,13 @@
 const WHOLE_SQUARE = [...SAMPLE_SQUARE, "2,1"];
 const FOUR_PRINTS = () => consolePrints("Sides done: 1", "Sides done: 2", "Sides done: 3", "Sides done: 4");
 
-const passedWindow = ({ maps, state, message }) => appWindow({
+const passedWindow = ({ header, maps, state, message, overlay }) => appWindow({
+  header,
   maps,
   editor: { lines: SAMPLE_CODE(), state, tone: "passed", steps: 58, cursor: "Ln 13, Col 32" },
   map: appWorld({ painted: WHOLE_SQUARE, robot: "2,1", facing: "east", lit: "success" }),
   panels: { tab: "Console", content: FOUR_PRINTS() + consolePassed(message) },
+  overlay,
 });
 
 SECTIONS.push(["A map passed, the level done", () => `<div class="page-row">

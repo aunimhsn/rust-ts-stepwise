@@ -1,0 +1,9 @@
+/* A confirmation: a small panel in the middle of the screen, over the veil of block-shortcuts.css. */
+.app-confirm { position: relative; width: 440px; box-sizing: border-box; padding: 20px 22px; }
+.confirm-question { font: 600 18px/1.3 var(--font-title); }
+.app-confirm p { margin: 8px 0 0; color: var(--weak); line-height: 1.45; }
+.confirm-buttons { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+.app-window .confirm-buttons .app-chip { padding: 6px 16px; }
+
+/* The action can't be undone: the red paint of the robot, with a white text. */
+.app-confirm button.app-primary { background: var(--danger); color: var(--on-danger); }

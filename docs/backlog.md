@@ -16,12 +16,13 @@ The ideas, polish and edge cases found along the way that the current step doesn
 - The home screen in the mock-up (step 3): the path painted up to the level to play and drawn as a ghost after it, as the paint and the goal marks of the map.
 - The robot of the home screen walking along the path to the stone clicked, or another animation of the choice; to tune with the mock-up.
 - The scene of the level to play on the home screen, without giving the solution: a teaser of its goals, the robot saying them, or a funny moment (the robot dozing off, then *"Ah, functions!"*); to discuss with the mock-up.
-- The robot as a mascot in the interface, with expressions (a smile, a wink, a level up, a graduation cap) on the success panel, the home screen or the end of a chapter; drafts in the history of step 1b of `docs/mockups/world-elements/`. First, with the mock-up of the success panel (step 3): a smile, or a small animation of the head of the robot as the panel appears.
+- The robot as a mascot in the interface, with expressions (a smile, a wink, a level up, a graduation cap) on the success panel, the home screen or the end of a chapter; drafts in the history of step 1b of `docs/mockups/world-elements/`.
 - A setting that draws a pattern inside each paint stroke (dots, stripes…), for learners with a color blindness.
 - A mouse cursor of our own on the map or the buttons, such as a small pincer of the robot, drawn by hand; never in the editor, whose I-beam stays the one of the system, and it may take away the larger or contrasted cursors that some learners set.
 - A divider to drag between the code and the map, as in VS Code: interesting, but it needs a design of its own (limits, double-click to reset, the size saved) and its integration in every screen.
 - A choice **Follow the system** for the theme of the settings: secondary for a website.
 - **Ctrl+K Ctrl+C** and **Ctrl+K Ctrl+U** to comment and uncomment, as in VS Code, if learners on a QWERTY keyboard miss a shortcut without punctuation. Set aside for now: two sequences to learn instead of one toggle, and a pause inside a sequence lets Ctrl+U reach the browser, which opens the source of the page.
+- Export and import of the progress in a file, so that a learner can go on from another computer without a teacher (the level codes are for the teacher alone). A file could circulate between classmates too, but far less easily than a word dictated.
 
 ## Content
 
