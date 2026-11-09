@@ -1,16 +1,26 @@
 // A window of the level screen: the header, the editor on the left, the map above the panels.
-// `maps` gives the tabs of the map: the map shown and the maps that have passed.
-const appWindow = ({ header, maps = {}, editor, map, panels, overlay = "" }) => `
-  <div class="app-window">
-    ${appHeader(header)}
+// `maps` gives the tabs of the map: the map shown and the maps that have passed. `size` is the window
+// in pixels: from about 1600 wide, the editor stops at about 80 characters. `sandbox` removes what
+// belongs to a goal.
+const LARGE_FROM = 1600;
+const EDITOR_LARGEST = 768;
+
+const appWindow = ({ header, maps = {}, editor, map, panels, overlay = "", size = [1280, 720], sandbox = false }) => {
+  const [width, height] = size;
+  const large = width >= LARGE_FROM;
+  const style = large ? `width:${width}px;height:${height}px;--crossing:${EDITOR_LARGEST}px` : "";
+  return `
+  <div class="app-window ${large ? "is-large" : ""}" style="${style}">
+    ${appHeader({ ...header, sandbox })}
     <div class="app-body">
       <div class="app-block is-editor">${appEditor(editor)}</div>
-      <div class="app-block is-map">${appMapRow(maps.shown ?? 1, maps.passed ?? [])}${map}</div>
+      <div class="app-block is-map">${appMapRow(maps.shown ?? 1, maps.passed ?? [], sandbox)}${map}</div>
       <div class="app-block">${appPanels(panels)}</div>
     </div>
-    ${appLevelMark()}
+    ${sandbox ? "" : appLevelMark()}
     ${overlay}
   </div>`;
+};
 
 // The sample program of the level: the code of the wireframes, with its map below.
 const SAMPLE_CODE = (side = 3) => [

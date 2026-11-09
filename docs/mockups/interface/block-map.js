@@ -2,8 +2,8 @@
 const SAMPLE_WALLS = ["7,0", "7,1", "7,2", "0,6", "1,6", "8,5"];
 const SAMPLE_SQUARE = ["2,1", "3,1", "4,1", "5,1", "5,2", "5,3", "5,4", "4,4", "3,4", "2,4", "2,3", "2,2"];
 
-// The row on top of the block of the map: a tab per map, then the button Legend.
-const appMapRow = (shownMap, passed) => `<div class="app-map-row">${[1, 2, 3].map(number =>
+// The row on top of the block of the map: a tab per map, none in the sandbox, then the button Legend.
+const appMapRow = (shownMap, passed, sandbox = false) => `<div class="app-map-row">${(sandbox ? [] : [1, 2, 3]).map(number =>
   `<button type="button" class="app-map-tab ${number === shownMap ? "is-shown" : ""} ${passed.includes(number) ? "is-passed" : ""}">Map ${number}</button>`).join("")}<button type="button" class="app-chip">Legend</button></div>`;
 
 // The life of the map, cell by cell, in units out of 64 for a cell. The lines: a thicker line every five
@@ -45,13 +45,31 @@ function appMapLife(rows) {
   return extras;
 }
 
+// A map from its rows, with its lines and shadows; `marks` adds to each cell what appCell draws on it.
+function appRowsWorld(rows, marks, size, links) {
+  const extras = appMapLife(rows);
+  for (const [cell, mark] of Object.entries(marks)) extras[cell] = { ...extras[cell], ...mark };
+  return `<div class="app-world">${appMap(rows, extras, size, links)}</div>`;
+}
+
+// The sides of a cell of the goal where its stroke goes on: toward the cells before and after it on the
+// square, never toward a paint beside it that isn't part of the goal.
+function squareGoalSides(index) {
+  const point = cell => cell.split(",").map(Number);
+  const [x, y] = point(SAMPLE_SQUARE[index]);
+  return [-1, 1].map(step => point(SAMPLE_SQUARE[(index + step + SAMPLE_SQUARE.length) % SAMPLE_SQUARE.length]))
+    .map(([nx, ny]) => nx > x ? "e" : nx < x ? "w" : ny > y ? "s" : "n");
+}
+
 // `painted` lists the cells painted in red, in the order of the path of the robot; `robot` is its
-// cell and `facing` its direction.
-function appWorld({ painted = [], robot, facing }) {
+// cell and `facing` its direction. `lit` is the end of a run (success or failure), `missed` the cells
+// of the goals not met, `size` the side of a cell.
+function appWorld({ painted = [], robot, facing, lit, missed = [], size = 48 }) {
   const rows = Array.from({ length: 7 }, (_, y) => Array.from({ length: 10 }, (_, x) =>
     SAMPLE_WALLS.includes(`${x},${y}`) ? "#" : painted.includes(`${x},${y}`) ? "r" : ".").join(""));
-  const extras = appMapLife(rows);
-  for (const cell of SAMPLE_SQUARE) extras[cell] = { ...extras[cell], goalPaint: "red" };
-  extras[robot] = { ...extras[robot], robot: facing };
-  return `<div class="app-world">${appMap(rows, extras, 48, pathLinks(...painted))}</div>`;
+  const marks = {};
+  SAMPLE_SQUARE.forEach((cell, index) => { marks[cell] = { goalPaint: "red", goalAround: squareGoalSides(index) }; });
+  for (const cell of missed) marks[cell] = { ...marks[cell], missed: true };
+  marks[robot] = { ...marks[robot], robot: facing, lit };
+  return appRowsWorld(rows, marks, size, pathLinks(...painted));
 }

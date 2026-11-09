@@ -7,11 +7,12 @@ const consoleBoards = () => [
   ["The lines of print", { content: consolePrints(...CONSOLE_PRINTS) }],
   ["Every kind of value, and a long line", { content: consolePrints("3 true red", "x: 12 y: 4", "A long line goes on to the next one without leaving the block, and nothing has to scroll sideways to read it.") }],
   ["A long output: the last lines in sight", { content: consoleLast(consolePrints(...CONSOLE_LONG)) }],
-  ["A syntax error, before running", { content: appConsoleError("Ln 9, Col 17", "Expected ':' at the end of the while line.", "Add ':' after the condition.") }],
+  ["A syntax error, before running", { content: appConsoleError("Ln 9, Col 17", "Expected ':' at the end of the while line.", "Add ':' after the condition.") + consoleFix(1) }],
   ["Several errors, before running", { content: [
     appConsoleError("Ln 8, Col 5", "The name sids doesn't exist.", "Declare it with let, or check its spelling."),
     appConsoleError("Ln 10, Col 5", "paint_side takes 1 value, not 2.", "Remove a value from the call."),
     appConsoleError("Ln 14, Col 10", "Names use snake_case: paint_side, not paintSide.", "Rename this function."),
+    consoleFix(3),
   ].join("") }],
   ["An error while running, after some lines", { dot: true, content: consolePrints("Sides done: 1") + appConsoleError("Ln 5, Col 9", "The robot bumped into a wall.", "forward() needs a free cell in front of the robot.") }],
   ["A value that can't be used", { dot: true, content: appConsoleError("Ln 6, Col 15", "You can't divide by zero.", "sides is 0 here: check its value before dividing.") }],

@@ -13,6 +13,8 @@
 .app-line.is-next .app-mark { color: var(--current-mark); }
 .app-line.is-error { background: var(--error-soft); }
 .app-line.is-error .app-number, .app-line.is-error .app-mark { color: var(--error); font-weight: var(--code-strong-weight); }
+/* A breakpoint on the next line: the dot and the arrow side by side, before the numbers of two digits. */
+.app-mark.has-both { left: 3px; align-items: center; }
 .app-breakpoint { width: 11px; height: 11px; border-radius: 50%; background: var(--breakpoint); }
 
 .code-comment { color: var(--code-comment); font-style: var(--code-comment-style); }
@@ -25,13 +27,47 @@
 .app-controls { position: absolute; right: 12px; bottom: 12px; display: flex; gap: 8px; }
 .app-window .app-control { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; background: var(--control); color: var(--on-control); border: var(--control-border); border-radius: var(--control-radius); box-shadow: var(--control-shadow); }
 .app-window .app-control.is-main { background: var(--accent); color: var(--on-accent); }
+.app-window .app-control { position: relative; }
+.app-window .app-control.is-off > svg { opacity: .35; }
+.app-window .app-control.is-off { cursor: not-allowed; }
+/* While the learner types, so that they can read the code behind; the mouse brings them back. */
+.app-controls.is-pale { opacity: .3; }
+/* Each control names itself on hover, with its shortcut. */
+.app-tip { display: none; position: absolute; right: 0; bottom: calc(100% + 8px); padding: 6px 10px; background: var(--pop); color: var(--text); border: var(--pop-border); border-radius: var(--radius-small); box-shadow: var(--pop-shadow); font: 400 var(--size-text)/1.4 var(--font-text); text-align: left; white-space: nowrap; }
+.app-control:hover .app-tip, .app-control.is-hovered .app-tip { display: block; }
+.app-tip b { font-weight: var(--strong-weight); }
+.app-tip kbd { margin-left: 12px; color: var(--weak); font: 400 12px var(--font-text); }
+.app-tip small { display: block; color: var(--weak); font-size: 12.5px; }
+
+/* The thin line at the 80th column: past the width of the editor on a small window. */
+.app-ruler { position: absolute; top: 0; bottom: 0; left: calc(66px + 80ch); border-left: 1px solid var(--hover); }
+/* What the checks found in the code, under its letters. */
+.app-text { position: relative; }
+.app-underline { position: absolute; top: calc(var(--line-code) - 4px); height: 4px; pointer-events: none; }
+.app-underline.is-error { background: var(--error); -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='4'%3E%3Cpath d='M0 3 Q1.5 0 3 2 T6 3' fill='none' stroke='black' stroke-width='1.3'/%3E%3C/svg%3E") repeat-x; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='4'%3E%3Cpath d='M0 3 Q1.5 0 3 2 T6 3' fill='none' stroke='black' stroke-width='1.3'/%3E%3C/svg%3E") repeat-x; }
+.app-underline.is-long { background: radial-gradient(circle at 1.5px 2px, var(--weak) 1.1px, transparent 1.4px) 0 0 / 4px 4px repeat-x; }
+.app-hover-note { top: calc(var(--line-code) + 2px); padding: 6px 10px; border-radius: var(--radius-small); font: var(--code-weight) 13px/20px var(--font-code); white-space: nowrap; }
+.app-hover-note b { font-weight: var(--code-strong-weight); }
+
+/* The boards of the controls, in the corner of an editor at its real size. */
+.controls-boards { display: grid; grid-template-columns: repeat(4, 340px); gap: 22px 0; }
+.controls-board-title { display: block; margin-bottom: 5px; color: #e9ecef; font-size: 13px; font-weight: 700; }
+.app-window.controls-board { width: 330px; height: 150px; box-shadow: none; }
+.controls-board .app-code { height: 100%; padding: 0; }
+.controls-board .app-code::before { display: none; }
 
 .app-status { flex: none; display: flex; align-items: center; gap: 22px; height: 30px; box-sizing: border-box; padding: 0 12px; background: var(--status); color: var(--on-status); border-top: var(--status-line); font-size: 12.5px; white-space: nowrap; }
 .app-status b { color: var(--status-strong); font-weight: var(--strong-weight); }
-/* The bar takes the color of the state of the program, as in a code editor. */
-.app-status.is-paused { background: var(--status-paused); color: var(--on-status-paused); }
+.app-status-errors { color: var(--error); font-weight: var(--strong-weight); }
+/* The bar takes the color of the state of the program, as in a code editor. The flash: the learner
+   tried to type while the program runs. */
+.app-status.is-paused, .app-status.is-flash { background: var(--status-paused); color: var(--on-status-paused); }
 .app-status.is-failed { background: var(--status-failed); color: var(--on-status-failed); }
-.app-status.is-paused b, .app-status.is-failed b { color: inherit; }
+.app-status.is-paused b, .app-status.is-failed b, .app-status.is-flash b { color: inherit; }
+/* The end of a run without error: open decision (the tabs "Bar at the end"). */
+:root:not([data-end-bar="1"]) .app-status.is-passed { background: var(--passed); color: var(--on-passed); }
+:root[data-end-bar="3"] .app-status.is-missed { background: var(--status-failed); color: var(--on-status-failed); }
+:root:not([data-end-bar="1"]) .app-status.is-passed b, :root[data-end-bar="3"] .app-status.is-missed b { color: inherit; }
 .app-speed { display: flex; align-items: center; gap: 3px; }
 .app-speed span { margin-right: 5px; }
 .app-speed i { width: 9px; height: 13px; box-sizing: border-box; border: 1px solid currentColor; border-radius: 1px; }
