@@ -4,7 +4,6 @@
 // is a list and `range` a slider, both setting the CSS `variable` at once, without redrawing the page.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(INTERFACE_STYLES).map(([key, style]) => [key, style.title])), fallback: Object.keys(INTERFACE_STYLES)[0] },
-  searchLift: { label: "Search text raised by", range: { min: 0, max: 2, step: 0.5 }, unit: "px", variable: "--manual-search-lift", fallback: "1" },
 };
 
 const params = new URLSearchParams(location.search);
