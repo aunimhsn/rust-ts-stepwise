@@ -71,7 +71,6 @@ const manualEntry = entry => `<section class="manual-entry" data-entry="${entry.
   <h3 class="manual-sign">${entry.names.map(name => `<code>${name}</code>`).join("")}</h3>
   <div class="manual-about">
     <p>${entry.text}</p>
-    ${entry.error ? `<p class="manual-error"><b>Error</b><span>${entry.error}</span></p>` : ""}
     ${manualExample(entry)}
   </div>
 </section>`;

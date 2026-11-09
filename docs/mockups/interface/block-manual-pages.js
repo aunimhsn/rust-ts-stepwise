@@ -13,7 +13,6 @@ const MANUAL_REPEAT = (times, steps) => Array.from({ length: times }, () => step
 const MANUAL_COMMANDS = [
   { category: "Move", entries: [
     { id: "forward", names: ["forward()"], text: "Moves the robot one cell forward.",
-      error: "A wall or the edge of the map in front: the robot bumps into it and the program stops.",
       lines: ["forward()", "forward()", "turn_left()", "forward()"],
       map: { rows: MANUAL_FLOOR, robot: [0, 2, "east"] },
       trace: [[0, "forward"], [1, "forward"], [2, "left"], [3, "forward"]] },
@@ -46,12 +45,10 @@ const MANUAL_COMMANDS = [
   ] },
   { category: "Carry", text: "The robot carries one item at a time, in the bay at its back.", entries: [
     { id: "pick_up", names: ["pick_up()"], text: "Picks up the item of the cell of the robot.",
-      error: "No item on the cell, or the robot already carries one: the program stops.",
       lines: ["forward()", "forward()", "pick_up()", "forward()"],
       map: { rows: MANUAL_FLOOR, robot: [0, 1, "east"], items: ["2,1"] },
       trace: [[0, "forward"], [1, "forward"], [2, "pick"], [3, "forward"]] },
     { id: "drop", names: ["drop()"], text: "Drops the item the robot carries on its cell.",
-      error: "The robot carries nothing, or the cell already has an item: the program stops.",
       lines: ["pick_up()", "forward()", "forward()", "forward()", "drop()", "forward()"],
       map: { rows: MANUAL_FLOOR, robot: [0, 1, "east"], items: ["0,1"], slots: ["3,1"] },
       trace: [[0, "pick"], [1, "forward"], [2, "forward"], [3, "forward"], [4, "drop"], [5, "forward"]] },

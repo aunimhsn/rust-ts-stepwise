@@ -83,10 +83,7 @@
 .manual-text p { margin: 0 0 10px; }
 .manual-text code { font: var(--code-weight) .92em var(--font-code); font-variant-ligatures: none; }
 .manual-lead { color: var(--weak); font-size: 15.5px; }
-.manual-error { display: flex; gap: 10px; }
-.manual-error b { flex: none; color: var(--error); font-weight: var(--strong-weight); }
 
-/* An entry: its name, what it does, its error, its example. */
 /* An entry: a card of its own, decided in place of a name on a band or in the margin. */
 .manual-entry { margin-top: 22px; padding: 16px 18px 18px; background: var(--band); border-radius: var(--radius-small); }
 .manual-sign { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 0 0 8px; }
@@ -104,7 +101,6 @@
 .manual-map { flex: none; overflow: hidden; border-radius: 0 var(--radius-small) var(--radius-small) 0; }
 .manual-map .app-map { box-shadow: none; }
 .manual-out { margin-top: auto; padding: 4px 14px; background: var(--hover); color: var(--code-text); font: var(--code-weight) 12.5px/1.5 var(--font-code); min-height: 19px; }
-
 
 /* The drawer, over the map and the panels of the level screen, the code still in view. */
 .manual-drawer { top: 49px; right: 0; bottom: 0; width: 50%; display: flex; flex-direction: column; background: var(--surface); border: 0; border-radius: 0; box-shadow: -12px 0 34px #22293530; }

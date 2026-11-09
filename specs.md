@@ -300,7 +300,7 @@ Its tab opens by itself when the program pauses (by **Pause**, **Step** or a bre
 The manual of the Stepwise language, on its own page, reachable from every screen. Its sections, each with short examples, which the learner types again rather than copies:
 
 1. **Your first program**: one instruction per line, run from top to bottom.
-2. **Commands**: every built-in function, by category (Move, Paint, Carry, Sense, Write), with what it does, its errors and an example; and the colors.
+2. **Commands**: every built-in function, by category (Move, Paint, Carry, Sense, Write), with what it does and an example; and the colors. The entries don't list the errors of a command: the learner meets them by running, the error message tells what happened, and the section **Errors** explains them.
 3. **Indentation and blocks**: the `:` and the four spaces.
 4. **Conditions**: `if`, `else if`, `else`, the comparisons, `and`, `or`, `not`.
 5. **Loops**: `repeat`, `while`, `break`, and how to stop a program that never ends.
@@ -317,7 +317,7 @@ Wireframe: [`docs/wireframes/manual.excalidraw`](docs/wireframes/manual.excalidr
 - **No header**: the column of the sections runs from the top to the bottom of the window, with the logo and the name at its top, and the content goes up to the top of the window. When the manual was opened from a level, **Back to 18. Paint a square** runs along the bottom of the column of the sections, as high as the header of the other screens: an amber button that the robot crosses backward on hover, from right to left. There is no menu bar.
 - **Sections**, on the left: the search field, the magnifier on a small amber square at its start, then the ten sections; the open one is marked, with its categories under it (*Move*, *Paint*…).
 - **Search**: typing filters the list on the left into results grouped by section and category (`paint` keeps *Commands › Paint* with `start_painting(color)`, `stop_painting()` and `is_painting()`, *Commands › Colors* and *The map › Paints*), with their number; the arrow keys move in them, Enter opens the chosen one, Escape clears the search.
-- **Content**, in the middle: the section, then each command on a card of its own, with what it does, its error, an example, without a **Copy** button so that the learner types it, and beside it a small map where the example plays, filling its side of the card.
+- **Content**, in the middle: the section, then each command on a card of its own, with what it does, an example, without a **Copy** button so that the learner types it, and beside it a small map where the example plays, filling its side of the card.
 - **On this page**, on the right: the categories or the headings of the section; a click scrolls smoothly to its anchor, and the one in view is marked while scrolling.
 - **Large screen**: the column of text stays under about 760 pixels wide, to stay readable; the sections on the left and **On this page** on the right stay beside it, the whole centered in the window.
 - **From a level**: every link to the manual (the goal, **Help › Manual**, **Read the manual** in the command menu, an error) opens it in a tab of its own, always the same one, at the right section, so that the code and the map stay open in the tab of the level. **Back to 18. Paint a square** closes that tab and brings the level back.
