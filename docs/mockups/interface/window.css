@@ -20,15 +20,14 @@
 /* The tabs of the page take several rows: a section stops under them. */
 .page-section { scroll-margin-top: 130px; }
 
-/* The scroll bars of the application: the standard properties only (two colors, two widths), so that
-   Firefox, Chrome and Safari draw the same; the browser draws the rest. They inherit from the window. */
-.app-window { scrollbar-color: var(--scroll-thumb) var(--scroll-track); scrollbar-width: var(--scroll-width); }
-:root[data-theme="day-desk"] { --scroll-thumb-color: #b4bcc7; }
-:root[data-theme="night-desk"] { --scroll-thumb-color: #4b5564; }
-/* 1: thin, a grey thumb, no track. */
-:root[data-scrollbar="thin"] { --scroll-thumb: var(--scroll-thumb-color); --scroll-track: transparent; --scroll-width: thin; }
-/* 2: thin, shown only while the mouse is over its zone. */
-:root[data-scrollbar="hover"] { --scroll-thumb: transparent; --scroll-track: transparent; --scroll-width: thin; }
-:root[data-scrollbar="hover"] .app-window :hover { scrollbar-color: var(--scroll-thumb-color) transparent; }
-/* 3: the usual width, a grey thumb, the track in the tone of its zone. */
-:root[data-scrollbar="wide"] { --scroll-thumb: var(--scroll-thumb-color); --scroll-track: transparent; --scroll-width: auto; }
+/* The scroll bars of the application: very thin, an amber thumb on a grey track, as the line of On this
+   page. Chrome and Safari draw them 6 pixels wide, without arrows; Firefox, which only knows the
+   standard properties, as thin as it can (about 8 pixels). Chrome ignores its own rules as soon as the
+   standard ones are set: they only go to Firefox. */
+.app-window ::-webkit-scrollbar { width: 6px; height: 6px; }
+.app-window ::-webkit-scrollbar-track { background: var(--hover); }
+.app-window ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
+.app-window ::-webkit-scrollbar-button { display: none; }
+@supports not selector(::-webkit-scrollbar) {
+  .app-window { scrollbar-color: var(--accent) var(--hover); scrollbar-width: thin; }
+}
