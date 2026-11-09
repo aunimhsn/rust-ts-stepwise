@@ -314,8 +314,8 @@ The manual is searchable (a search field filters its sections and commands), and
 
 Wireframe: [`docs/wireframes/manual.excalidraw`](docs/wireframes/manual.excalidraw). A page of documentation, laid out as the usual ones of programming languages, so that the learner also learns to read them:
 
-- **Header**: the logo and the name, then *"› Manual"*; on the right, when the manual was opened from a level, **Back to 18. Paint a square**. There is no menu bar.
-- **Sections**, on the left: the search field, then the ten sections; the open one is marked, with its categories under it (*Move*, *Paint*…).
+- **No header**: the column of the sections runs from the top to the bottom of the window, with the logo and the name at its top, and the content goes up to the top of the window. When the manual was opened from a level, **Back to 18. Paint a square** fills the top right corner, as high as the header of the other screens: an amber button that the robot crosses backward on hover, from right to left. There is no menu bar.
+- **Sections**, on the left: the search field, the magnifier on a small amber square at its start, then the ten sections; the open one is marked, with its categories under it (*Move*, *Paint*…).
 - **Search**: typing filters the list on the left into results grouped by section and category (`paint` keeps *Commands › Paint* with `start_painting(color)`, `stop_painting()` and `is_painting()`, *Commands › Colors* and *The map › Paints*), with their number; the arrow keys move in them, Enter opens the chosen one, Escape clears the search.
 - **Content**, in the middle: the section, then each command with what it does, an example, without a **Copy** button so that the learner types it, and a small map where the example plays.
 - **On this page**, on the right: the categories or the headings of the section; a click scrolls smoothly to its anchor, and the one in view is marked while scrolling.

@@ -2,15 +2,14 @@
 :root[data-theme="day-desk"] { --manual-field: #e4e8ee; --manual-mark: #ffe9ad; }
 :root[data-theme="night-desk"] { --manual-field: #14181e; --manual-mark: #4a3c17; }
 
-/* The header: the name, then › Manual; Back to the level on the right. */
-.manual-crumb { margin-left: 14px; color: var(--band-weak); font-weight: 500; }
-/* Back to the level: an amber button. On hover, the robot crosses it backward, from right to left,
+/* Back to the level: an amber button in the top right corner, as high as the header of the other
+   screens. On hover, the robot crosses it backward, from right to left,
    leaving a lighter amber behind it, as on Play and Unlock. */
-.app-window .manual-back { position: relative; height: 30px; margin-left: auto; padding: 0 14px; overflow: hidden; background: var(--accent); color: var(--on-accent); border: 0; border-radius: var(--control-radius); font-weight: var(--strong-weight); }
+.app-window .manual-back { position: absolute; z-index: 2; top: 0; right: 0; height: 49px; padding: 0 20px; overflow: hidden; background: var(--accent); color: var(--on-accent); border: 0; border-radius: 0; font-weight: var(--strong-weight); }
 .manual-back span { position: relative; z-index: 1; }
 .manual-back::before, .manual-back::after { content: ""; position: absolute; pointer-events: none; }
 .manual-back::before { inset: 0 0 0 calc(100% + 15px); background: #ffd25e; opacity: 0; transition: opacity .2s, left 0s .2s; }
-.manual-back::after { z-index: 2; right: -32px; top: 2px; width: 26px; height: 26px; background: url(../world-elements/daylight/robot.svg) center / contain no-repeat; transform: rotate(270deg); }
+.manual-back::after { z-index: 2; right: -36px; top: calc(50% - 15px); width: 30px; height: 30px; background: url(../world-elements/daylight/robot.svg) center / contain no-repeat; transform: rotate(270deg); }
 .manual-back:hover::before { left: -15px; opacity: 1; transition: left .85s cubic-bezier(.35, .05, .4, 1), opacity 0s; }
 .manual-back:hover::after { right: calc(100% + 4px); transition: right .85s cubic-bezier(.35, .05, .4, 1); }
 @media (prefers-reduced-motion: reduce) {
@@ -23,9 +22,10 @@
 .manual-body { flex: 1; min-height: 0; display: grid; grid-template-columns: 0 250px minmax(0, 1fr) 200px 0; background: var(--surface); }
 .manual-window.is-large .manual-body { grid-template-columns: 1fr 270px minmax(0, 840px) 230px 1fr; }
 .manual-body::before { content: ""; background: var(--band); }
-.manual-side { display: flex; flex-direction: column; min-height: 0; padding: 14px 0 0; background: var(--band); color: var(--band-text); }
+.manual-side { display: flex; flex-direction: column; min-height: 0; padding: 0; background: var(--band); color: var(--band-text); }
+.manual-name { flex: none; display: flex; align-items: center; height: 49px; padding: 0 14px 3px; box-sizing: border-box; margin-bottom: 8px; }
 .manual-content { position: relative; overflow: hidden auto; }
-.manual-text { box-sizing: border-box; max-width: 840px; padding: 26px 40px 60px; font-size: 14.5px; line-height: 1.6; }
+.manual-text { box-sizing: border-box; max-width: 840px; padding: 30px 40px 60px; font-size: 14.5px; line-height: 1.6; }
 
 /* The search field: flat, without border, darker than its column. */
 .manual-search { position: relative; display: flex; align-items: center; height: 34px; margin: 0 14px 10px; padding: 0 8px 0 0; overflow: hidden; background: var(--manual-field); color: var(--weak); border-radius: var(--radius-small); }
@@ -61,7 +61,7 @@
 .manual-none code { font: var(--code-weight) 13px var(--font-code); }
 
 /* On this page: the categories of the section, the one in view marked. */
-.manual-toc { padding: 30px 18px 0 6px; }
+.manual-toc { padding: 88px 18px 0 6px; }
 .manual-toc b { display: block; margin-bottom: 8px; color: var(--weak); font: 600 11px var(--font-text); letter-spacing: .06em; text-transform: uppercase; }
 .manual-toc a { display: block; padding: 3px 0 3px 12px; color: var(--weak); border-left: 2px solid var(--hover); cursor: pointer; }
 .manual-toc a:hover { color: var(--text); }
