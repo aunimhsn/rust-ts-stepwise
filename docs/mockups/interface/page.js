@@ -7,7 +7,6 @@ const VARIANTS = {
   scrollbar: { label: "Scroll bar", options: { thin: "4 · Thin", hover: "5 · Thin, on hover", wide: "6 · Usual width" }, fallback: "thin" },
   searchLift: { label: "Search text raised by", range: { min: 0, max: 2, step: 0.5 }, unit: "px", variable: "--manual-search-lift", fallback: "1" },
   match: { label: "Search: the match", options: { background: "7 · Amber background", text: "8 · Amber letters" }, fallback: "text" },
-  entry: { label: "Manual: an entry", options: { band: "1 · Name on a band", card: "2 · Card", margin: "3 · Name in the margin" }, fallback: "band" },
 };
 
 const params = new URLSearchParams(location.search);

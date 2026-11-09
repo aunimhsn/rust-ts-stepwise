@@ -2,7 +2,8 @@
 // and its drawer over the level screen. Every window is live: the search filters as one types, the
 // arrows and Enter move in its results, On this page follows the scroll, each example plays on its map.
 
-const MANUAL_CELL = 36;
+// Cells of 48 pixels, as on the level screen: the 5 × 3 map is as high as the longest example, 6 lines.
+const MANUAL_CELL = 48;
 const MANUAL_CATEGORIES = MANUAL_COMMANDS.map(({ category }) => category);
 const MANUAL_DIRECTIONS = ["north", "east", "south", "west"];
 const MANUAL_STEPS = { north: [0, -1], east: [1, 0], south: [0, 1], west: [-1, 0] };
@@ -56,12 +57,13 @@ function manualMap(entry, frame) {
   return appMap(frame.rows, extras, MANUAL_CELL, frame.links);
 }
 
-// An example: its code, to type again rather than copy, and the small map where it plays, with the console when it prints.
+// An example: its code, to type again rather than copy, with the console under it when it prints, and
+// the small map where it plays, filling the rest of the card.
 function manualExample(entry, step = 0) {
   const frame = MANUAL_FRAMES[entry.id][step];
   return `<div class="manual-example" data-example="${entry.id}" data-frame="${step}">
-    <div class="manual-code"><pre>${entry.lines.map((line, index) => `<span class="manual-line ${frame.line === index ? "is-on" : ""}">${highlightCode(line) || " "}</span>`).join("")}</pre></div>
-    <div class="manual-stage"><div class="manual-map">${manualMap(entry, frame)}</div>${entry.lines.some(line => line.startsWith("print")) ? `<div class="manual-out">${frame.out.join("<br>") || " "}</div>` : ""}</div>
+    <div class="manual-code"><pre>${entry.lines.map((line, index) => `<span class="manual-line ${frame.line === index ? "is-on" : ""}">${highlightCode(line) || " "}</span>`).join("")}</pre>${entry.lines.some(line => line.startsWith("print")) ? `<div class="manual-out">${frame.out.join("<br>") || " "}</div>` : ""}</div>
+    <div class="manual-map">${manualMap(entry, frame)}</div>
   </div>`;
 }
 
@@ -106,16 +108,15 @@ const manualList = (query, here, chosen) => query.trim() ? manualResults(query, 
 const manualToc = here => `<nav class="manual-toc"><b>On this page</b>${MANUAL_CATEGORIES.map(category => `<a class="${category === here ? "is-here" : ""}" data-anchor="${category}">${category}</a>`).join("")}</nav>`;
 
 // The page of the manual, without a header: the column of the sections runs from top to bottom with
-// the name at its top, the content up to the top of the window. `back` is the level it was opened from, absent when opened from the home
+// the name at its top, the content up to the top of the window, Back to the level at the bottom of the column. `back` is the level it was opened from, absent when opened from the home
 // screen; `query` a search typed, `chosen` its result chosen with the arrows.
 function manualWindow({ size = [1280, 720], back = "18. Paint a square", query = "", chosen = 0 } = {}) {
   return `<div class="app-window manual-window ${size[0] >= LARGE_FROM ? "is-large" : ""}" style="width:${size[0]}px;height:${size[1]}px">
     <div class="manual-body">
-      <aside class="manual-side"><div class="manual-name">${appWordmark(21)}</div>${manualSearch(query)}<div class="manual-list">${manualList(query, "Move", chosen)}</div></aside>
+      <aside class="manual-side"><div class="manual-name">${appWordmark(21)}</div>${manualSearch(query)}<div class="manual-list">${manualList(query, "Move", chosen)}</div>${back ? `<button type="button" class="manual-back"><span>Back to ${back}</span></button>` : ""}</aside>
       <div class="manual-content"><article class="manual-text"><h1>2. ${MANUAL_SECTIONS[1]}</h1><p class="manual-lead">${MANUAL_LEAD}</p>${MANUAL_COMMANDS.map(manualCategory).join("")}</article></div>
       ${manualToc("Move")}
     </div>
-    ${back ? `<button type="button" class="manual-back"><span>Back to ${back}</span></button>` : ""}
   </div>`;
 }
 

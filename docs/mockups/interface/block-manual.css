@@ -2,10 +2,10 @@
 :root[data-theme="day-desk"] { --manual-field: #e4e8ee; --manual-mark: #ffe9ad; --match-on-list: #8a5a00; --match-on-chosen: #ffb300; }
 :root[data-theme="night-desk"] { --manual-field: #14181e; --manual-mark: #4a3c17; --match-on-list: #ffb300; --match-on-chosen: #8a5a00; }
 
-/* Back to the level: an amber button in the top right corner, as high as the header of the other
-   screens. On hover, the robot crosses it backward, from right to left,
+/* Back to the level: an amber button along the bottom of the column of the sections, as high as the
+   header of the other screens. On hover, the robot crosses it backward, from right to left,
    leaving a lighter amber behind it, as on Play and Unlock. */
-.app-window .manual-back { position: absolute; z-index: 2; top: 0; right: 0; height: 49px; padding: 0 20px; overflow: hidden; background: var(--accent); color: var(--on-accent); border: 0; border-radius: 0; font-weight: var(--strong-weight); }
+.app-window .manual-back { position: relative; flex: none; width: 100%; height: 49px; padding: 0 20px; overflow: hidden; background: var(--accent); color: var(--on-accent); border: 0; border-radius: 0; font-weight: var(--strong-weight); }
 .manual-back span { position: relative; z-index: 1; }
 .manual-back::before, .manual-back::after { content: ""; position: absolute; pointer-events: none; }
 .manual-back::before { inset: 0 0 0 calc(100% + 15px); background: #ffd25e; opacity: 0; transition: opacity .2s, left 0s .2s; }
@@ -67,7 +67,7 @@
 .manual-none code { font: var(--code-weight) 13px var(--font-code); }
 
 /* On this page: the categories of the section, the one in view marked. */
-.manual-toc { padding: 88px 18px 0 6px; }
+.manual-toc { padding: 34px 18px 0 6px; }
 .manual-toc b { display: block; margin-bottom: 8px; color: var(--weak); font: 600 11px var(--font-text); letter-spacing: .06em; text-transform: uppercase; }
 .manual-toc a { display: block; padding: 3px 0 3px 12px; color: var(--weak); border-left: 2px solid var(--hover); cursor: pointer; }
 .manual-toc a:hover { color: var(--text); }
@@ -87,36 +87,24 @@
 .manual-error b { flex: none; color: var(--error); font-weight: var(--strong-weight); }
 
 /* An entry: its name, what it does, its error, its example. */
-.manual-entry { margin-top: 22px; border-radius: var(--radius-small); }
+/* An entry: a card of its own, decided in place of a name on a band or in the margin. */
+.manual-entry { margin-top: 22px; padding: 16px 18px 18px; background: var(--band); border-radius: var(--radius-small); }
 .manual-sign { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 0 0 8px; }
-.manual-sign code { font: var(--code-strong-weight) 15.5px/1.4 var(--font-code); }
+.manual-sign code { font: var(--code-strong-weight) 17px/1.4 var(--font-code); }
 .manual-entry.is-flash { animation: manual-flash 1.6s ease-out; }
 @keyframes manual-flash { from { background: var(--manual-mark); } }
 
 /* The example: its code, and the small map where it plays. No Copy: the learner types it again. */
-.manual-example { display: flex; gap: 0; margin-top: 12px; }
-.manual-code { position: relative; flex: 1; min-width: 0; padding: 10px 0; background: var(--editor-example, var(--band)); border-radius: var(--radius-small) 0 0 var(--radius-small); }
+.manual-example { display: flex; margin-top: 12px; }
+.manual-code { display: flex; flex-direction: column; flex: 1; min-width: 0; padding: 10px 0 0; background: var(--surface); border-radius: var(--radius-small) 0 0 var(--radius-small); }
 .manual-code pre { margin: 0; font: var(--code-weight) 13.5px/21px var(--font-code); font-variant-ligatures: none; color: var(--code-text); }
 .manual-line { display: block; padding: 0 14px; }
 .manual-line.is-on { background: var(--current); }
-.manual-stage { flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; width: 230px; padding: 12px 0; background: var(--map-block); border-radius: 0 var(--radius-small) var(--radius-small) 0; }
-.manual-stage .app-map { box-shadow: 0 4px 14px #22293538; }
-.manual-out { align-self: stretch; margin: 0 25px; padding: 4px 8px; background: var(--editor); color: var(--code-text); border-radius: var(--radius-small); font: var(--code-weight) 12.5px/1.5 var(--font-code); min-height: 19px; }
+/* The map fills its side of the example, without a frame or a shadow. */
+.manual-map { flex: none; overflow: hidden; border-radius: 0 var(--radius-small) var(--radius-small) 0; }
+.manual-map .app-map { box-shadow: none; }
+.manual-out { margin-top: auto; padding: 4px 14px; background: var(--hover); color: var(--code-text); font: var(--code-weight) 12.5px/1.5 var(--font-code); min-height: 19px; }
 
-/* Entry 1: the name on a band of the tone of the code, as in the reference of a language. */
-:root[data-entry="band"] .manual-sign { padding: 6px 12px; background: var(--band); border-left: 3px solid var(--accent); border-radius: var(--radius-small); }
-:root[data-entry="band"] .manual-about { padding: 0 2px; }
-
-/* Entry 2: each entry on a card of its own. */
-:root[data-entry="card"] .manual-entry { padding: 16px 18px 18px; background: var(--band); }
-:root[data-entry="card"] .manual-code { --editor-example: var(--surface); }
-:root[data-entry="card"] .manual-sign code { font-size: 17px; }
-
-/* Entry 3: the name in the margin, what it does beside it, a line between two entries. */
-:root[data-entry="margin"] .manual-entry { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 0 18px; padding-top: 18px; border-top: 1px solid var(--hover); border-radius: 0; }
-:root[data-entry="margin"] .manual-sign { flex-direction: column; gap: 2px; }
-:root[data-entry="margin"] .manual-sign code { font-size: 14.5px; }
-:root[data-entry="margin"] .manual-stage { width: 210px; }
 
 /* The drawer, over the map and the panels of the level screen, the code still in view. */
 .manual-drawer { top: 49px; right: 0; bottom: 0; width: 50%; display: flex; flex-direction: column; background: var(--surface); border: 0; border-radius: 0; box-shadow: -12px 0 34px #22293530; }
