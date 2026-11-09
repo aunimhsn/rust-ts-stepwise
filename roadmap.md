@@ -24,7 +24,7 @@ Design first (phases 3 to 5 of [process.md](process.md), with a sheet of the wor
   - [x] **3c. Keyboard** (#13)
   - [x] **3d. Panels** (#14)
   - [x] **3e. Home screen** (#15)
-  - [ ] **3f. Manual**: a section with its commands and examples, the search and its results, **On this page**, the drawer over the level screen, the large screen.
+  - [x] **3f. Manual**: a section with its commands and examples, the search and its results, **On this page**, the drawer over the level screen, the large screen.
   - [ ] **3g. Settings and messages**: the settings with the theme, the storage refused, the window too small and the phone, the browser too old, offline.
   - [ ] **3h. Animations and sounds**: the animations of the map as mini-scenes to replay and tune, at every speed (each action of the robot, `pick_up()` with its pincer, the end of a run that succeeds or fails), with their sounds, synthesized and CC0 compared by ear.
 - [ ] **4. Design system**: the tokens (colors of the two themes, spacing, radii, typography, motion) in `specs.md`, the fonts and their licenses, the tone of the messages; the mock-up updated to use exactly these tokens; an entry in `design-journal.md`.
