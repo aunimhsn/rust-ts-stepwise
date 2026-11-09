@@ -121,31 +121,29 @@ function manualWindow({ size = [1280, 720], back = "18. Paint a square", query =
       <aside class="manual-side">${back ? `<div class="manual-name">${appWordmark(21)}</div>` : `<a class="manual-name is-home" title="All levels">${appWordmark(21)}</a>`}${manualSearch(query)}<div class="manual-list">${manualList(query, "Move", result)}</div><button type="button" class="manual-back"><span>${back ? `Back to ${back}` : "Back to all levels"}</span></button></aside>
       <div class="manual-content"><article class="manual-text"><h1>2. ${MANUAL_SECTIONS[1]}</h1><p class="manual-lead">${MANUAL_LEAD}</p>${MANUAL_COMMANDS.map(manualCategory).join("")}</article></div>
       ${manualToc("Move")}
-      ${size[0] >= LARGE_FROM ? manualBuddy() : ""}
+      ${size[0] >= MANUAL_BUDDY_FROM ? manualBuddy() : ""}
     </div>
   </div>`;
 }
 
 // On a large screen, the room left on the right: the head of the robot says one sentence per visit,
 // drawn at random; a click on it makes it say another, an easter egg to find. Only to fill the room: it
-// never moves by itself. Kind words, readable by a whole class; the sayings of the Zen of Python signed.
+// never moves by itself. Kind words, readable by a whole class, each on one line: the robot only shows
+// when the room fits the longest (365 pixels at 25 pixels), from about 1840 pixels wide.
+const MANUAL_BUDDY_FROM = 1840;
 const MANUAL_SAYINGS = [
-  ["Explicit is better than implicit.", "The Zen of Python"],
-  ["You read the manual. Most people don't."],
-  ["Four spaces. Not three. Not five. Four."],
-  ["Three turn_left() make a turn_right(). Don't tell anyone."],
-  ["Readability counts.", "The Zen of Python"],
-  ["An error is just your program talking back."],
-  ["No shame in pressing Step. I do it all the time."],
-  ["Simple is better than complex.", "The Zen of Python"],
-  ["I never bump into walls. Well, almost never."],
-  ["Errors should never pass silently.", "The Zen of Python"],
+  "Explicit is better than implicit.",
+  "Reading the manual? Impressive.",
+  "Four spaces. Not three. Four.",
+  "Readability counts.",
+  "Errors talk. Listen to them.",
+  "No shame in pressing Step.",
+  "Simple is better than complex.",
+  "I never bump into walls. Almost.",
+  "Errors should never pass silently.",
 ];
 let manualSaying = 0;
-const manualSays = index => {
-  const [text, source] = MANUAL_SAYINGS[index % MANUAL_SAYINGS.length];
-  return `<p>${text}</p>${source ? `<small>${source}</small>` : ""}`;
-};
+const manualSays = index => `<p>${MANUAL_SAYINGS[index % MANUAL_SAYINGS.length]}</p>`;
 const manualBuddy = () => `<aside class="manual-buddy"><div class="manual-bubble">${manualSays(manualSaying)}</div><button type="button" class="manual-buddy-head" title=""><img src="world-elements/daylight/logo.svg" alt=""></button></aside>`;
 
 document.addEventListener("click", event => {
