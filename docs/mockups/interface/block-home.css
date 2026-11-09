@@ -9,8 +9,8 @@
   --home-tile-sizes: calc(var(--home-grid) * 5) calc(var(--home-grid) * 5), calc(var(--home-grid) * 5) calc(var(--home-grid) * 5), var(--home-grid) var(--home-grid), var(--home-grid) var(--home-grid);
   --home-title: var(--text); --home-idea: var(--weak);
 }
-:root[data-theme="day-desk"] { --home-ground: #e1e5ea; --home-line: #cad1da; --home-five: #22293520; --home-band: #ffffff8c; --home-rim: #f1f3f6; --home-field: #e4e8ee; }
-:root[data-theme="night-desk"] { --home-ground: #262c35; --home-line: #36404d; --home-five: #ffffff14; --home-band: #1e232bd9; --home-rim: #20252d; --home-field: #14181e; }
+:root[data-theme="day-desk"] { --home-ground: #e1e5ea; --home-line: #cad1da; --home-five: #22293520; --home-band: #ffffff8c; --home-rim: #f1f3f6; --home-field: #e4e8ee; --home-tile-shown: #dde2e8; }
+:root[data-theme="night-desk"] { --home-ground: #262c35; --home-line: #36404d; --home-five: #ffffff14; --home-band: #1e232bd9; --home-rim: #20252d; --home-field: #14181e; --home-tile-shown: #465060; }
 
 /* The header: the name, the count in the middle of the window, the three links on the right. */
 .home-count { position: absolute; left: 50%; transform: translateX(-50%); color: var(--band-weak); }
@@ -119,11 +119,12 @@
 /* The maps of the level, then its one button, at the bottom of the panel. */
 .home-bottom { margin-top: auto; }
 .home-maps { display: flex; gap: 8px; }
-/* The tiles speak as the tabs of the map on the level screen: pale teal once passed, full teal when also shown. */
+/* The tiles speak as the tabs of the map on the level screen: pale teal once passed, full teal when also shown.
+   A map shown and not passed is a lighter grey, without border: the amber is kept for the actions. */
 .app-window .home-map { position: relative; width: 74px; height: 26px; box-sizing: border-box; display: grid; place-items: center; padding: 0; background: var(--chip); color: var(--on-chip); border: var(--chip-border); border-radius: var(--radius-small); font-size: 13px; font-weight: 500; }
-.app-window .home-map.is-shown { box-shadow: inset 0 0 0 2px var(--accent); font-weight: var(--strong-weight); }
+.app-window .home-map.is-shown { background: var(--home-tile-shown); font-weight: var(--strong-weight); }
 .app-window .home-map.is-passed { background: var(--passed-soft); color: var(--text); border-color: transparent; }
-.app-window .home-map.is-passed.is-shown { background: var(--passed); color: var(--on-passed); box-shadow: none; }
+.app-window .home-map.is-passed.is-shown { background: var(--passed); color: var(--on-passed); }
 .app-window .home-map.is-locked { background: none; color: var(--weak); border: 1px solid var(--idle); }
 
 /* On hover, the head of the robot rises from behind a tile that can be chosen, its eyes searching: its body
