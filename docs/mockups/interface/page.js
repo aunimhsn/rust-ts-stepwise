@@ -3,7 +3,6 @@
 // One group of tabs per open decision; `fallback` is the choice shown by default.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(INTERFACE_STYLES).map(([key, style]) => [key, style.title])), fallback: Object.keys(INTERFACE_STYLES)[0] },
-  robot: { label: "Disappointed robot", options: { "sad-slanted": "14 · slanted eyes", "sad-round": "15 · dim round eyes", "sad-puzzled": "16 · puzzled" }, fallback: "sad-round" },
 };
 
 const params = new URLSearchParams(location.search);

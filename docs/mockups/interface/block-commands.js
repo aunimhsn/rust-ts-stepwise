@@ -20,7 +20,7 @@ function appCommandMenu({ category, counts, groups, chosen: command, details, le
   return `<div class="app-popup app-commands" style="left:${left}px;top:${top}px">
     <div class="app-commands-columns ${merged ? "is-merged" : ""}">
       <div class="app-commands-categories">${categories}</div>
-      <div class="app-commands-list">${empty ? `<div class="app-commands-empty"><img src="world-elements/daylight/logo-${chosen.robot}.svg" height="56" alt=""><span>${empty}</span></div>` : rows}</div>
+      <div class="app-commands-list">${empty ? `<div class="app-commands-empty"><img src="world-elements/daylight/logo-disappointed.svg" height="56" alt=""><span>${empty}</span></div>` : rows}</div>
       ${merged ? "" : `<div class="app-commands-details">${side}</div>`}
     </div>
     <div class="app-commands-hints"><span><kbd>${appKeyLabel("↑ ↓")}</kbd> move</span><span><kbd>${appKeyLabel("← →")}</kbd> category</span><span><kbd>Tab</kbd> or <kbd>Enter</kbd> insert</span><span><kbd>Esc</kbd> close</span><span>type to search</span></div>

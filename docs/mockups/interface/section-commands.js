@@ -16,7 +16,7 @@ const commandMenuFiltered = options => appCommandMenu({ category: "Paint", count
 const commandBoards = () => [
   ["Control: the statements", appCommandMenu({ category: "Control", groups: [[null, ["if", "else if", "else", "while", "repeat", "break"]]], chosen: "if", details: COMMAND_IF, left: 0, top: 0 })],
   ["Your names: what can be used at the cursor", appCommandMenu({ category: "Your names", groups: [[null, ["paint_side(length)", "sides"]]], chosen: "sides", details: COMMAND_SIDES, left: 0, top: 0 })],
-  ["Nothing found", appCommandMenu({ category: "Move", counts: {}, groups: [], empty: "No command with “pizza”.", left: 0, top: 0 })],
+  ["Nothing found", appCommandMenu({ category: "Move", counts: {}, groups: [], empty: "No command found with “pizza”.", left: 0, top: 0 })],
 ];
 
 // Inserting `if` opens a block: the cursor waits where the condition goes, the next line is indented.
