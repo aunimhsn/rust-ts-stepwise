@@ -18,16 +18,11 @@ const ICONS = {
   // The arrows of the keyboard, as printed on its keys.
   arrowUp: size => appIcon(size, '<path d="M8 13.2V2.8M3.8 7 8 2.8 12.2 7"/>'),
   arrowDown: size => appIcon(size, '<path d="M8 2.8v10.4M3.8 9 8 13.2 12.2 9"/>'),
-  // The other three directions of the chevron, for the pairs of keys of the command menu.
-  chevronLeft: size => appIcon(size, '<path d="M10 3.5 5.5 8l4.5 4.5"/>'),
-  chevronUp: size => appIcon(size, '<path d="m3.5 10.25 4.5-4.5 4.5 4.5"/>'),
-  chevronDown: size => appIcon(size, '<path d="m3.5 5.75 4.5 4.5 4.5-4.5"/>'),
+  arrowLeft: size => appIcon(size, '<path d="M13.2 8H2.8M7 3.8 2.8 8 7 12.2"/>'),
+  arrowRight: size => appIcon(size, '<path d="M2.8 8h10.4M9 3.8 13.2 8 9 12.2"/>'),
 };
 
-// A shortcut as text, its arrow keys drawn as icons so that they keep the weight of the other icons. A
-// single key shows the arrow printed on the keyboard; the pairs of keys of the command menu, chevrons.
-const KEY_ARROWS = { "↑": "arrowUp", "↓": "arrowDown" };
-const KEY_CHEVRONS = { "↑": "chevronUp", "↓": "chevronDown", "←": "chevronLeft", "→": "chevron" };
-const drawKeys = (keys, icons) => keys.replace(/[↑↓←→]/g, mark => `<span class="app-key-arrow">${ICONS[icons[mark]](13)}</span>`);
-const appKeyLabel = key => drawKeys(key, KEY_ARROWS);
-const appKeyPair = keys => drawKeys(keys, KEY_CHEVRONS);
+// A shortcut as text, its arrow keys drawn as the arrows printed on the keyboard: a chevron could be
+// read as a circumflex accent or the letter V.
+const KEY_ARROWS = { "↑": "arrowUp", "↓": "arrowDown", "←": "arrowLeft", "→": "arrowRight" };
+const appKeyLabel = keys => keys.replace(/[↑↓←→]/g, mark => `<span class="app-key-arrow">${ICONS[KEY_ARROWS[mark]](13)}</span>`);

@@ -195,7 +195,7 @@ The menus give every command of the screen, with its shortcut, so that the learn
 
 The previous and the next level are only in the menu, so that a click by mistake never changes the level.
 
-**Help › Keyboard shortcuts** opens a panel in the middle of the screen, over a veil, with the shortcuts of the screen grouped under **Run**, **Manual** and **Edit**; Escape or **×** closes it.
+**Help › Keyboard shortcuts** opens a panel in the middle of the screen, over a veil, with the shortcuts of the screen grouped under **Run**, **Manual** and **Edit**, each title on a gray band; Escape or **×** closes it.
 
 **Goal**: a bubble under the place of the level, which doesn't block the screen: the learner can keep it open while typing, and Escape or a click elsewhere closes it. The head of the robot says the title of the level in a speech bubble, in Fredoka; the number and the chapter stay in the header. Under it, the goal, **Show hint** and **Read the manual**, which opens the manual at the section of the level, both on a slate background that grows lighter on hover. On the right, a dark column, **New**, its title in the cyan of the eyes of the robot, lists what the level brings. **Let's go** closes the bubble: an amber bar along its whole bottom, against its sides, in Fredoka; on hover, the robot crosses it at its own size, over the text, and leaves by the right, its paint covering the whole button behind it. For a learner who asked for less motion, the button only lights up. It opens by itself the first time the learner opens the level.
 
