@@ -3,7 +3,6 @@
 // One group of tabs per open decision; `fallback` is the choice shown by default.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(INTERFACE_STYLES).map(([key, style]) => [key, style.title])), fallback: Object.keys(INTERFACE_STYLES)[0] },
-  largeTitle: { label: "Title on a large screen", options: { 4: "4 · Above the two columns", 5: "5 · In the middle of the window" }, fallback: "4" },
 };
 
 const params = new URLSearchParams(location.search);
