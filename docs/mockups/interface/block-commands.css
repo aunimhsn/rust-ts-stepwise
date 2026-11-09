@@ -12,7 +12,8 @@
 .app-commands-title { padding: 5px 12px 1px; color: var(--weak); font: 600 11px var(--font-text); letter-spacing: .06em; }
 .app-commands-row { padding: 2px 12px; white-space: nowrap; }
 .app-commands-row.is-chosen { background: var(--chosen); color: var(--on-chosen); }
-.app-commands-empty { padding: 8px 12px; color: var(--weak); font: 400 var(--size-text)/1.4 var(--font-text); }
+/* Nothing found: the robot and its message in the middle of the whole space. */
+.app-commands-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; height: 100%; color: var(--weak); font: 400 var(--size-text)/1.4 var(--font-text); }
 .app-commands-details { padding: 10px 14px 10px; overflow: hidden; background: var(--band); color: var(--band-text); }
 .app-commands-name { font: var(--code-strong-weight) 14px var(--font-code); font-variant-ligatures: none; }
 .app-commands-details p { margin: 7px 0 9px; line-height: 1.4; }
