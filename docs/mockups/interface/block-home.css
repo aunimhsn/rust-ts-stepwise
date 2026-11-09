@@ -46,14 +46,13 @@
 .home-disc { position: absolute; inset: 0; display: grid; place-items: center; overflow: hidden; border-radius: 50%; }
 .home-number { position: relative; z-index: 1; }
 
-/* On hover, a level done is a step back: the robot crosses the stone against the direction of the path and
-   paints it, with the mechanics of Let's go. */
-.home-stone.is-done { --cross-start: calc(100% + 4px); --cross-end: -34px; --cross-turn: -90deg; --paint-start: 0 0 0 calc(100% + 15px); --paint-end: 0 0 0 -15px; }
-.home-stone.is-done.is-row-west { --cross-start: -34px; --cross-end: calc(100% + 4px); --cross-turn: 90deg; --paint-start: 0 calc(100% + 15px) 0 0; --paint-end: 0 -15px 0 0; }
-.home-stone.is-done .home-disc::before { content: ""; position: absolute; inset: var(--paint-start); background: #a6ecd8; opacity: 0; transition: opacity .2s, inset 0s .2s; }
-.home-stone.is-done .home-disc::after { content: ""; position: absolute; z-index: 2; left: var(--cross-start); top: calc(50% - 15px); width: 30px; height: 30px; background: url(../world-elements/daylight/robot.svg) center / contain no-repeat; transform: rotate(var(--cross-turn)); }
-.home-stone.is-done:hover .home-disc::before { inset: var(--paint-end); opacity: 1; transition: inset .6s cubic-bezier(.35, .05, .4, 1), opacity 0s; }
-.home-stone.is-done:hover .home-disc::after { left: var(--cross-end); transition: left .6s cubic-bezier(.35, .05, .4, 1); }
+/* On hover, a level done hops once, and the robot with it when it stands on it. The invisible area keeps the
+   mouse on the stone while it is in the air or squashed, so that the hop never starts over by itself. */
+.home-stone.is-done:hover { transform-origin: 50% 100%; animation: home-hop .5s cubic-bezier(.3, .7, .4, 1); }
+.home-stone.is-done:hover::before { content: ""; position: absolute; inset: -8px -2px -14px; }
+.home-path:has(.home-stone.is-done[aria-pressed="true"]:hover) .home-robot { animation: home-ride .5s cubic-bezier(.3, .7, .4, 1); }
+@keyframes home-hop { 30% { transform: translateY(-13px) scale(.95, 1.06); } 60% { transform: scale(1.12, .86); } 80% { transform: translateY(-3px); } }
+@keyframes home-ride { 30% { transform: translateY(-15px); } 60% { transform: translateY(6px); } 80% { transform: translateY(-3px); } }
 
 /* On hover, the level to play takes the visor of the robot instead of its number: its eyes search around. */
 .home-stone.is-play .home-disc::before { content: ""; position: absolute; left: calc(50% - 16px); top: calc(50% - 8px); width: 32px; height: 16px; background: #222935; border-radius: 8px; transform: scale(0); transition: transform .22s cubic-bezier(.3, 1.6, .5, 1); }
@@ -116,5 +115,5 @@
 @media (prefers-reduced-motion: reduce) {
   .home-robot { transition: none; }
   .home-scene.is-play .app-robot > * { animation: none; }
-  .home-number, .home-disc::before, .home-disc::after { animation: none !important; transition: none !important; }
+  .home-stone, .home-robot, .home-number, .home-disc::before, .home-disc::after { animation: none !important; transition: none !important; }
 }
