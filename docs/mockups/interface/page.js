@@ -5,7 +5,6 @@
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(INTERFACE_STYLES).map(([key, style]) => [key, style.title])), fallback: Object.keys(INTERFACE_STYLES)[0] },
   searchLift: { label: "Search text raised by", range: { min: 0, max: 2, step: 0.5 }, unit: "px", variable: "--manual-search-lift", fallback: "1" },
-  match: { label: "Search: the match", options: { background: "7 · Amber background", text: "8 · Amber letters" }, fallback: "text" },
 };
 
 const params = new URLSearchParams(location.search);

@@ -1,6 +1,6 @@
 /* The manual: the sections on the left, the content in the middle, On this page on the right. */
-:root[data-theme="day-desk"] { --manual-field: #e4e8ee; --manual-mark: #ffe9ad; --match-on-list: #8a5a00; --match-on-chosen: #ffb300; }
-:root[data-theme="night-desk"] { --manual-field: #14181e; --manual-mark: #4a3c17; --match-on-list: #ffb300; --match-on-chosen: #8a5a00; }
+:root[data-theme="day-desk"] { --manual-field: #e4e8ee; --manual-mark: #ffe9ad; }
+:root[data-theme="night-desk"] { --manual-field: #14181e; --manual-mark: #4a3c17; }
 
 /* Back to the level: an amber button along the bottom of the column of the sections, as high as the
    header of the other screens. On hover, the robot crosses it backward, from right to left,
@@ -55,13 +55,8 @@
 .manual-result.is-code { font: var(--code-weight) 13.5px/1.5 var(--font-code); font-variant-ligatures: none; }
 .manual-result:hover { background: var(--band-hover); }
 .manual-result.is-chosen { background: var(--chosen); color: var(--on-chosen); }
-/* The match in each name, in amber: 7, an amber background behind dark letters; 8, letters in amber,
-   bright on a dark background, dark on a light one, so that they keep their contrast. The result
-   chosen with the arrows is inverted, as the row chosen in the command menu. */
-.manual-result mark { background: none; color: inherit; font-weight: var(--code-strong-weight); }
-:root[data-match="background"] .manual-result mark { background: var(--accent); color: var(--on-accent); border-radius: 2px; box-shadow: 0 0 0 1px var(--accent); }
-:root[data-match="text"] .manual-result mark { color: var(--match-on-list); }
-:root[data-match="text"] .manual-result.is-chosen mark { color: var(--match-on-chosen); }
+/* The match in each name: an amber background behind dark letters, readable on every background. */
+.manual-result mark { background: var(--accent); color: var(--on-accent); font-weight: var(--code-strong-weight); border-radius: 2px; box-shadow: 0 0 0 1px var(--accent); }
 .manual-none { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 30px 22px; color: var(--band-weak); text-align: center; }
 .manual-none p { margin: 6px 0 0; color: var(--band-text); font-weight: var(--strong-weight); }
 .manual-none code { font: var(--code-weight) 13px var(--font-code); }
