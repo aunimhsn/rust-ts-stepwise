@@ -37,7 +37,7 @@
   --chosen: #1b2028; --on-chosen: #f6f7f9;
   --passed: #5fd0b0; --on-passed: #222935; --passed-soft: color-mix(in srgb, #5fd0b0 28%, var(--band)); --passed-text: #09795f; --danger: #dc2f34; --on-danger: #ffffff;
   --control: #ffffff; --on-control: #1b2028; --control-border: none; --control-shadow: 0 1px 5px #22293538; --control-radius: 3px;
-  --chip: #ffffff; --on-chip: #1b2028; --chip-border: 1px solid #c3cad3;
+  --chip: #e3e7ec; --on-chip: #1b2028; --chip-border: none;
   --editor: #fafbfc; --gutter: #fafbfc; --gutter-text: #939daa; --gutter-line: none; --editor-rules: none;
   --current: #ffe9ad; --current-mark: #8a5a00; --breakpoint: #cf3a44; --select: #bcd4f5;
   --code-text: #1b2028; --code-comment: #6e7a8a; --code-comment-style: normal; --code-keyword: #2d5cc2; --code-keyword-weight: var(--code-weight); --code-function: #09795f; --code-string: #8f5f06; --code-number: #b34c1c; --code-value: #b34c1c;

@@ -43,3 +43,7 @@ Every state of a run (ready, running, typing refused, paused on a breakpoint, er
 ### 3c. Keyboard (#13)
 
 The four menus, the keyboard shortcuts of the controls decided (checked against those of the browsers, such as F5 and F11, on an AZERTY keyboard), the shortcuts of comfort of the editor (see [Code editor](../specs.md#code-editor)), the command menu.
+
+### 3d. Panels (#14)
+
+The success panel, with the robot that paints its top and turns into the logo; the legend of the map; the two confirmations. The level codes became the teacher's alone: the interface never shows them.

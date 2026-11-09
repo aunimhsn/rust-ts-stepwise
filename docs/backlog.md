@@ -32,6 +32,10 @@ The ideas, polish and edge cases found along the way that the current step doesn
 - More paints than `red`, `yellow` and `blue`, if a level needs them.
 - The same map solved twice, the second time with a constraint (e.g. first with `forward()` written out, then with a loop and at most a given number of lines), so that the learner feels what a control structure brings; close to the challenges of the shortest code.
 
+## Tooling
+
+- An `animation-reviewer` subagent, to decide at step 3h: like `code-reviewer`, it recommends without changing anything, once per pull request that touches the animations. It checks what can be measured, the taste staying with the owner: the time an element is really visible for its size, a hover that never restarts by itself, the stacking order, the state at rest in both themes, a fallback for each animation when the learner asked for less motion, and the match with `specs.md`.
+
 ## Distribution
 
 - A paid version on Steam, once version 1 has been tried by real learners: 60 to 100 levels with optional challenges (fewest steps, shortest code), a desktop application built with Tauri around the same Rust core and Svelte interface, Steam achievements, the Steam Direct fee and a store page. The free website would stay as its demo; the levels, drawings and sounds of the paid version could take a license of their own, since MIT and Apache let anyone rebuild the game.
