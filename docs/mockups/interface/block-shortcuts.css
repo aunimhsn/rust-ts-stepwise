@@ -1,0 +1,9 @@
+/* The veil under a panel in the middle of the screen, and the panel of the shortcuts. */
+.app-veil { position: absolute; inset: 0; z-index: 3; display: grid; place-items: center; background: #0007; }
+.app-shortcuts { position: static; width: 640px; box-sizing: border-box; padding: 18px 22px 20px; }
+.app-shortcuts-head { display: flex; justify-content: space-between; align-items: center; font: 600 18px var(--font-title); }
+.app-window .app-shortcuts-head button { display: grid; place-items: center; width: 26px; height: 26px; padding: 0; background: none; border: 0; color: var(--weak); }
+.app-shortcuts-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 0 34px; margin-top: 8px; }
+.app-shortcuts-group h4 { margin: 12px 0 6px; color: var(--weak); font: 600 11.5px var(--font-text); text-transform: uppercase; letter-spacing: .06em; }
+.app-shortcuts-row { display: flex; justify-content: space-between; gap: 14px; padding: 3px 0; }
+.app-shortcuts-row kbd { color: var(--weak); font: 400 12px var(--font-text); white-space: nowrap; }

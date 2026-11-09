@@ -45,7 +45,13 @@
 .app-text { position: relative; }
 .app-underline { position: absolute; top: calc(var(--line-code) - 4px); height: 4px; pointer-events: none; }
 .app-underline.is-error { background: var(--error); -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='4'%3E%3Cpath d='M0 3 Q1.5 0 3 2 T6 3' fill='none' stroke='black' stroke-width='1.3'/%3E%3C/svg%3E") repeat-x; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='4'%3E%3Cpath d='M0 3 Q1.5 0 3 2 T6 3' fill='none' stroke='black' stroke-width='1.3'/%3E%3C/svg%3E") repeat-x; }
+/* Ctrl held: the name under the mouse, a link. */
+.app-underline.is-link { top: calc(var(--line-code) - 3px); height: 1.5px; background: var(--code-text); }
 .app-underline.is-long { background: radial-gradient(circle at 1.5px 2px, var(--weak) 1.1px, transparent 1.4px) 0 0 / 4px 4px repeat-x; }
+/* The selection, behind the letters of the line. */
+.app-text { isolation: isolate; }
+.app-selection { position: absolute; left: 14px; top: 0; height: var(--line-code); background: var(--select); z-index: -1; }
+.app-caret { position: absolute; top: 2px; bottom: 2px; width: 2px; margin-left: -1px; background: var(--code-text); }
 .app-hover-note { top: calc(var(--line-code) + 2px); padding: 6px 10px; border-radius: var(--radius-small); font: var(--code-weight) 13px/20px var(--font-code); white-space: nowrap; }
 .app-hover-note b { font-weight: var(--code-strong-weight); }
 
