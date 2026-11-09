@@ -35,3 +35,7 @@ In `docs/wireframes/states.excalidraw`: the storage refused (a banner of one lin
 ### 3a. Style of the interface (#11)
 
 The level screen (paused, an error while running, a menu, the goal) in 3 or 4 styles around the world of step 1; Day Desk and Night Desk kept as the two themes; the logo reworked so that the name lines up with the menus.
+
+### 3b. States and sizes of the window (#12)
+
+Every state of a run (ready, running, typing refused, paused on a breakpoint, errors before running, goal not met, a map and the level done), the three controls with their hover, the variables panel, the sandbox, the large screen and the largest map.
