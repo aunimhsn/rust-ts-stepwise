@@ -107,12 +107,15 @@ const manualList = (query, here, chosen) => query.trim() ? manualResults(query, 
 const manualToc = here => `<nav class="manual-toc"><b>On this page</b>${MANUAL_CATEGORIES.map(category => `<a class="${category === here ? "is-here" : ""}" data-anchor="${category}">${category}</a>`).join("")}</nav>`;
 
 // The page of the manual, without a header: the column of the sections runs from top to bottom with
-// the name at its top, the content up to the top of the window, Back to the level at the bottom of the column. `back` is the level it was opened from, absent when opened from the home
-// screen; `query` a search typed, `chosen` its result chosen with the arrows.
-function manualWindow({ size = [1280, 720], back = "18. Paint a square", query = "", chosen = 0 } = {}) {
+// the name at its top, the content up to the top of the window, the way back at the bottom of the
+// column. `back` is the level it was opened from, in a tab of its own; null when it was opened from the
+// home screen, in the same tab: the button then leads to it, named as the menu Level › All levels, and
+// so does the logo.
+// `query` is a search typed, `result` its result chosen with the arrows.
+function manualWindow({ size = [1280, 720], back = "18. Paint a square", query = "", result = 0 } = {}) {
   return `<div class="app-window manual-window ${size[0] >= LARGE_FROM ? "is-large" : ""}" style="width:${size[0]}px;height:${size[1]}px">
     <div class="manual-body">
-      <aside class="manual-side"><div class="manual-name">${appWordmark(21)}</div>${manualSearch(query)}<div class="manual-list">${manualList(query, "Move", chosen)}</div>${back ? `<button type="button" class="manual-back"><span>Back to ${back}</span></button>` : ""}</aside>
+      <aside class="manual-side">${back ? `<div class="manual-name">${appWordmark(21)}</div>` : `<a class="manual-name is-home" title="All levels">${appWordmark(21)}</a>`}${manualSearch(query)}<div class="manual-list">${manualList(query, "Move", result)}</div><button type="button" class="manual-back"><span>${back ? `Back to ${back}` : "Back to all levels"}</span></button></aside>
       <div class="manual-content"><article class="manual-text"><h1>2. ${MANUAL_SECTIONS[1]}</h1><p class="manual-lead">${MANUAL_LEAD}</p>${MANUAL_COMMANDS.map(manualCategory).join("")}</article></div>
       ${manualToc("Move")}
     </div>

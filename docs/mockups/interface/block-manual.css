@@ -23,6 +23,9 @@
 .manual-window.is-large .manual-body { grid-template-columns: 1fr 270px minmax(0, 840px) 230px 1fr; }
 .manual-body::before { content: ""; background: var(--band); }
 .manual-side { display: flex; flex-direction: column; min-height: 0; padding: 0; background: var(--band); color: var(--band-text); }
+/* Opened from the home screen, the name leads back to it. */
+a.manual-name { color: inherit; text-decoration: none; cursor: pointer; }
+a.manual-name:hover { background: var(--band-hover); }
 .manual-name { flex: none; display: flex; align-items: center; height: 49px; padding: 0 14px 3px; box-sizing: border-box; margin-bottom: 8px; }
 .manual-content { position: relative; overflow: hidden auto; }
 .manual-text { box-sizing: border-box; max-width: 840px; padding: 30px 40px 60px; font-size: 14.5px; line-height: 1.6; }

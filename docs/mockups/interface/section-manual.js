@@ -12,7 +12,8 @@ SECTIONS.push(["Manual", () => `
     <div class="page-slot"><span>1280 × 720, 2. Commands, opened from a level: scroll it, click On this page, type in the search</span>${manualWindow()}</div>
     <div class="page-slot"><span>1280 × 720, paint typed: the results by place, the arrows move in them, Enter opens the one chosen</span>${manualWindow({ query: "paint" })}</div>
     <div class="page-slot"><span>1280 × 720, a search that finds nothing</span>${manualWindow({ query: "pizza" })}</div>
+    <div class="page-slot"><span>1280 × 720, opened from the home screen: the button and the logo lead back to it</span>${manualWindow({ back: null })}</div>
     <div class="page-slot"><span>1280 × 720, Ctrl+click on forward(): the drawer over the map and the panels, the code still in view</span>${manualDrawerWindow()}</div>
   </div>
   <h3>Large screen</h3>
-  <div class="page-slot"><span>1920 × 1080, opened from the home screen: no way back to a level; the column of text stays under about 760 pixels</span>${manualWindow({ size: [1920, 1080], back: null })}</div>`]);
+  <div class="page-slot"><span>1920 × 1080, opened from the home screen, in the same tab: the button and the logo lead back to it; the column of text stays under about 760 pixels</span>${manualWindow({ size: [1920, 1080], back: null })}</div>`]);
