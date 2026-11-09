@@ -1,0 +1,78 @@
+/* The hover effects of the stones, to compare. A window carries one class for the stones done
+   (done-hN) and one for the stone to play (play-hN), so that the two can be mixed. */
+.home-stone.is-done { --fx: var(--passed); --fx-paint: #a6ecd8; }
+.home-stone.is-play { --fx: var(--accent); --fx-paint: #ffd25e; }
+
+/* 8 · Lift */
+.done-h8 .home-stone.is-done, .play-h8 .home-stone.is-play { transition: transform .15s ease-out, box-shadow .15s ease-out; }
+.done-h8 .home-stone.is-done:hover, .play-h8 .home-stone.is-play:hover { transform: translateY(-3px) scale(1.08); box-shadow: 0 7px 14px #0006; }
+
+/* 9 · Ring */
+.done-h9 .home-stone.is-done, .play-h9 .home-stone.is-play { transition: box-shadow .15s ease-out; }
+.done-h9 .home-stone.is-done:hover, .play-h9 .home-stone.is-play:hover { box-shadow: 0 0 0 3px var(--home-rim), 0 0 0 5.5px var(--fx); }
+
+/* 10 · Glow */
+.done-h10 .home-stone.is-done, .play-h10 .home-stone.is-play { transition: box-shadow .2s ease-out, filter .2s ease-out; }
+.done-h10 .home-stone.is-done:hover, .play-h10 .home-stone.is-play:hover { filter: brightness(1.12); box-shadow: 0 0 18px 5px color-mix(in srgb, var(--fx) 70%, transparent); }
+
+/* 11 · Hop */
+.done-h11 .home-stone.is-done:hover, .play-h11 .home-stone.is-play:hover { transform-origin: 50% 100%; animation: hover-hop .5s cubic-bezier(.3, .7, .4, 1); }
+@keyframes hover-hop { 30% { transform: translateY(-13px) scale(.95, 1.06); } 60% { transform: scale(1.12, .86); } 80% { transform: translateY(-3px); } }
+
+/* 12 · Robot crossing: the mechanics of Let's go and Play, at the size of the stone. */
+.done-h12 .is-done .home-disc::before, .play-h12 .is-play .home-disc::before { content: ""; position: absolute; inset: 0 calc(100% + 15px) 0 0; background: var(--fx-paint); opacity: 0; transition: opacity .2s, right 0s .2s; }
+.done-h12 .is-done .home-disc::after, .play-h12 .is-play .home-disc::after { content: ""; position: absolute; z-index: 2; left: -34px; top: calc(50% - 15px); width: 30px; height: 30px; background: url(../world-elements/daylight/robot.svg) center / contain no-repeat; transform: rotate(90deg); }
+.done-h12 .is-done:hover .home-disc::before, .play-h12 .is-play:hover .home-disc::before { right: -15px; opacity: 1; transition: right .6s cubic-bezier(.35, .05, .4, 1), opacity 0s; }
+.done-h12 .is-done:hover .home-disc::after, .play-h12 .is-play:hover .home-disc::after { left: calc(100% + 4px); transition: left .6s cubic-bezier(.35, .05, .4, 1); }
+
+/* 13 · Face: the visor, then the eyes on it. */
+.done-h13 .is-done .home-disc::before, .play-h13 .is-play .home-disc::before { content: ""; position: absolute; left: calc(50% - 16px); top: calc(50% - 8px); width: 32px; height: 16px; background: #222935; border-radius: 8px; transform: scale(0); transition: transform .22s cubic-bezier(.3, 1.6, .5, 1); }
+.done-h13 .is-done .home-disc::after, .play-h13 .is-play .home-disc::after { content: ""; position: absolute; left: calc(50% - 16px); top: calc(50% - 8px); width: 32px; height: 16px; background: radial-gradient(circle at 10px 8px, #3fc3ff 3.4px, transparent 3.9px), radial-gradient(circle at 22px 8px, #3fc3ff 3.4px, transparent 3.9px); opacity: 0; }
+.done-h13 .is-done .home-number, .play-h13 .is-play .home-number { transition: opacity .1s; }
+.done-h13 .is-done:hover .home-number, .play-h13 .is-play:hover .home-number { opacity: 0; }
+.done-h13 .is-done:hover .home-disc::before, .play-h13 .is-play:hover .home-disc::before { transform: none; }
+.done-h13 .is-done:hover .home-disc::after, .play-h13 .is-play:hover .home-disc::after { opacity: 1; animation: hover-look 2.2s .2s ease-in-out infinite; }
+@keyframes hover-look { 0%, 12%, 100% { transform: none; } 22%, 40% { transform: translateX(-3px); } 50%, 72% { transform: translateX(3px); } 84% { transform: none; } 90% { transform: scaleY(.12); } 96% { transform: none; } }
+
+/* 14 · Paint burst: the drops are the shadows of one small dot, thrown outward. */
+.done-h14 .home-stone.is-done:hover, .play-h14 .home-stone.is-play:hover { animation: hover-pop .5s cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes hover-pop { 0% { transform: scale(.8); } 45% { transform: scale(1.25); } 100% { transform: none; } }
+.done-h14 .home-stone.is-done:hover::after, .play-h14 .home-stone.is-play:hover::after { content: ""; position: absolute; left: calc(50% - 3px); top: calc(50% - 3px); width: 6px; height: 6px; border-radius: 50%; pointer-events: none; box-shadow: 62px 0 0 3px #dc2f34, 54px 31px 0 1px #ffb300, 31px 54px 0 3px #2459d6, 0 62px 0 1px #5fd0b0, -31px 54px 0 3px #ffb300, -54px 31px 0 1px #dc2f34, -62px 0 0 3px #5fd0b0, -54px -31px 0 2px #2459d6, -31px -54px 0 1px #dc2f34, 0 -62px 0 3px #ffb300, 31px -54px 0 1px #2459d6, 54px -31px 0 2px #5fd0b0; animation: hover-burst .7s ease-out both; }
+@keyframes hover-burst { 0% { transform: scale(0); opacity: 1; } 70% { opacity: 1; } 100% { transform: scale(1.35); opacity: 0; } }
+
+/* 15 · Party */
+.done-h15 .home-stone.is-done:hover, .play-h15 .home-stone.is-play:hover { animation: hover-party .6s ease-in-out infinite alternate; }
+@keyframes hover-party { from { transform: scale(1.1) rotate(-7deg); box-shadow: 0 0 10px 2px #ffb30099; } to { transform: scale(1.22) rotate(7deg); box-shadow: 0 0 22px 8px #dc2f3499; } }
+.done-h15 .is-done:hover .home-disc::before, .play-h15 .is-play:hover .home-disc::before { content: ""; position: absolute; inset: -8px; background: conic-gradient(#dc2f34, #ffb300, #5fd0b0, #2459d6, #dc2f34); animation: hover-spin .8s linear infinite; }
+@keyframes hover-spin { to { transform: rotate(360deg); } }
+.done-h15 .is-done:hover .home-number, .play-h15 .is-play:hover .home-number { color: #ffffff; font-weight: 800; text-shadow: 0 1px 3px #000a; }
+.done-h15 .is-done:hover .home-squares i, .play-h15 .is-play:hover .home-squares i { animation: hover-dance .36s ease-in-out infinite alternate; }
+.done-h15 .is-done:hover .home-squares i:nth-child(2), .play-h15 .is-play:hover .home-squares i:nth-child(2) { animation-delay: .12s; }
+.done-h15 .is-done:hover .home-squares i:nth-child(3), .play-h15 .is-play:hover .home-squares i:nth-child(3) { animation-delay: .24s; }
+@keyframes hover-dance { to { transform: translateY(-7px) rotate(45deg); } }
+
+/* 16 · Earthquake: everything around the stone reacts, the stone itself keeps still under the mouse. */
+.done-h16 .home-stone.is-done:hover, .play-h16 .home-stone.is-play:hover { transform: scale(1.28); }
+.done-h16 .home-stone.is-done:hover::after, .play-h16 .home-stone.is-play:hover::after { content: ""; position: absolute; inset: -4px; border: 3px solid var(--fx); border-radius: 50%; pointer-events: none; animation: hover-wave .7s ease-out infinite; }
+@keyframes hover-wave { from { transform: scale(.9); opacity: 1; } to { transform: scale(2.5); opacity: 0; } }
+.done-h16 .home-path:has(.is-done:hover) .home-stone:not(:hover), .play-h16 .home-path:has(.is-play:hover) .home-stone:not(:hover) { animation: hover-quake .22s linear infinite; }
+.done-h16 .home-path:has(.is-done:hover) .home-stone:nth-of-type(even):not(:hover), .play-h16 .home-path:has(.is-play:hover) .home-stone:nth-of-type(even):not(:hover) { animation-direction: reverse; }
+@keyframes hover-quake { 0%, 100% { transform: none; } 25% { transform: translate(-2.5px, 1.5px) rotate(-3deg); } 50% { transform: translate(2px, -2px) rotate(2deg); } 75% { transform: translate(-1.5px, -1px) rotate(3deg); } }
+.done-h16 .home-path:has(.is-done:hover) .home-line path, .play-h16 .home-path:has(.is-play:hover) .home-line path { stroke-dasharray: 20 12; animation: hover-run .45s linear infinite; }
+@keyframes hover-run { to { stroke-dashoffset: -32; } }
+.done-h16 .home-path:has(.is-done:hover) .home-robot, .play-h16 .home-path:has(.is-play:hover) .home-robot { animation: hover-jump .5s ease-in-out infinite alternate; }
+@keyframes hover-jump { to { transform: translateY(-18px) rotate(14deg); } }
+
+/* The board that shows every effect side by side: the bursts may leave their card. */
+.app-window.hover-card { position: relative; width: 340px; height: 124px; overflow: visible; background-color: var(--home-ground); }
+.hover-card:hover { z-index: 5; }
+.hover-card .home-path { margin: 0; }
+.hover-card .home-band { left: 6px; top: 6px; width: 328px; }
+.hover-card .home-stone:hover .home-tip { display: none; }
+.hover-name { display: block; color: #e9ecef; font-size: 14px; font-weight: 700; }
+.hover-text { display: block; width: 340px; min-height: 34px; margin-bottom: 6px; color: #adb5bd; font-size: 12px; }
+
+/* Nothing moves for a learner who asked for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  .home-stone, .home-stone *, .home-stone::before, .home-stone::after, .home-disc::before, .home-disc::after, .home-robot, .home-line path { animation: none !important; transition: none !important; }
+}

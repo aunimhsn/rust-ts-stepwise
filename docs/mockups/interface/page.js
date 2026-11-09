@@ -1,9 +1,13 @@
 // The tabs of the page and its sections. The address keeps the choices (?theme=…).
 
+const homeHoverOptions = () => Object.fromEntries(HOME_HOVERS.flatMap(([, hovers]) => hovers.map(([number, name]) => [number, `${number} · ${name}`])));
+
 // One control per open decision; `fallback` is the choice shown by default. Tabs by default; `select`
 // is a list and `range` a slider, both setting the CSS `variable` at once, without redrawing the page.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(INTERFACE_STYLES).map(([key, style]) => [key, style.title])), fallback: Object.keys(INTERFACE_STYLES)[0] },
+  homeHoverDone: { label: "Hover · level done", options: homeHoverOptions(), fallback: "8" },
+  homeHoverPlay: { label: "Hover · level to play", options: homeHoverOptions(), fallback: "12" },
 };
 
 const params = new URLSearchParams(location.search);

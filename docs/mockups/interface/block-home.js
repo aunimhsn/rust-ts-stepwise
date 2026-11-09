@@ -60,7 +60,7 @@ const homeSquares = ({ number, maps }) => `<span class="home-squares">${Array.fr
   return `<i class="${passed ? "is-passed" : status === "locked" ? "is-locked" : ""}"></i>`;
 }).join("")}</span>`;
 
-const homeStone = (stone, chosen, tip) => `<button type="button" class="home-stone is-${homeStatus(stone.number)} ${stone.number === tip ? "is-tip" : ""} ${stone.x > 640 ? "is-tip-left" : ""}" style="left:${stone.x}px;top:${stone.y}px" data-level="${stone.number}" aria-pressed="${stone.number === chosen}">${stone.number}${homeSquares(stone)}<span class="home-tip">${stone.number}. ${stone.title}</span></button>`;
+const homeStone = (stone, chosen, tip) => `<button type="button" class="home-stone is-${homeStatus(stone.number)} ${stone.number === tip ? "is-tip" : ""} ${stone.x > 640 ? "is-tip-left" : ""}" style="left:${stone.x}px;top:${stone.y}px" data-level="${stone.number}" aria-pressed="${stone.number === chosen}"><span class="home-disc"><span class="home-number">${stone.number}</span></span>${homeSquares(stone)}<span class="home-tip">${stone.number}. ${stone.title}</span></button>`;
 
 const homeRobotPlace = stone => `left:${stone.x}px;top:${stone.y - 22}px`;
 
@@ -94,8 +94,11 @@ function homeTwoSquares() {
   return appRowsWorld(homeFloor(["5,0", "5,1", "9,6"]), marks, HOME_CELL);
 }
 
+// Eyelids over the eyes of the robot, to blink while it waits (block-home.css).
+const HOME_EYELIDS = '<svg class="home-eyelids" viewBox="0 0 64 64" aria-hidden="true"><rect x="22" y="20" width="20" height="7" fill="#222935"/></svg>';
+
 const HOME_SCENES = {
-  play: () => appWorld({ robot: SAMPLE_SQUARE[0], facing: "east", size: HOME_CELL }),
+  play: () => appWorld({ robot: SAMPLE_SQUARE[0], facing: "east", size: HOME_CELL }).replace(/(robot\.svg" alt="">)/, `$1${HOME_EYELIDS}`),
   done: homeSpiral,
   locked: homeTwoSquares,
 };
@@ -118,7 +121,7 @@ const homeCode = codeError => `<div class="home-code">
 </div>`;
 
 const HOME_BUTTONS = {
-  play: () => `<button type="button" class="app-primary home-go">Play ${ICONS.play(13)}</button>`,
+  play: () => '<button type="button" class="goal-go home-play"><span>Play</span></button>',
   done: () => '<button type="button" class="app-chip home-go">Play again</button>',
   locked: () => '<button type="button" class="home-go is-locked" disabled>Locked</button>',
 };
@@ -130,7 +133,7 @@ function homePanel(chapters, stone, codeError) {
   return `<aside class="home-panel">
     <p class="home-chapter">${stone.chapter + 1}. ${chapters[stone.chapter].name}</p>
     <h3>${stone.number}. ${stone.title}</h3>
-    <div class="home-scene">${HOME_SCENES[status]()}</div>
+    <div class="home-scene is-${status}">${HOME_SCENES[status]()}</div>
     <p class="home-goal">${text}</p>
     ${status === "locked" ? homeCode(codeError) : ""}
     <div class="home-bottom">${homeMapChips(stone)}${HOME_BUTTONS[status]()}</div>
@@ -139,12 +142,12 @@ function homePanel(chapters, stone, codeError) {
 
 // `chosen` is the level shown on the right, `tip` a stone hovered, `long` the path with more levels
 // than fit, and `size` the window in pixels.
-function homeWindow({ chosen = HOME_TO_PLAY, tip, long = false, codeError = false, size = [1280, 720] } = {}) {
+function homeWindow({ chosen: level = HOME_TO_PLAY, tip, long = false, codeError = false, size = [1280, 720] } = {}) {
   const chapters = long ? HOME_MORE : HOME_CHAPTERS;
   const { stones, bands, height } = homeLayout(chapters);
-  const shown = stones[chosen - 1];
+  const shown = stones[level - 1];
   const done = HOME_TO_PLAY - 1;
-  return `<div class="app-window home-window" ${long ? "data-long" : ""} style="width:${size[0]}px;height:${size[1]}px">
+  return `<div class="app-window home-window done-h${chosen.homeHoverDone} play-h${chosen.homeHoverPlay}" ${long ? "data-long" : ""} style="width:${size[0]}px;height:${size[1]}px">
     <header class="app-header">
       ${appWordmark(21)}
       <span class="home-count">${done} of ${stones.length} levels done</span>
@@ -158,7 +161,7 @@ function homeWindow({ chosen = HOME_TO_PLAY, tip, long = false, codeError = fals
           <path class="is-ghost" d="${homeStretch(stones.slice(HOME_TO_PLAY - 1))}"/>
           <path d="${homeStretch(stones.slice(0, HOME_TO_PLAY))}"/>
         </svg>
-        ${stones.map(stone => homeStone(stone, chosen, tip)).join("")}
+        ${stones.map(stone => homeStone(stone, level, tip)).join("")}
         <img class="home-robot" src="world-elements/daylight/robot.svg" alt="" style="${homeRobotPlace(shown)}">
       </div></div>
       ${homePanel(chapters, shown, codeError)}
@@ -171,6 +174,7 @@ document.addEventListener("click", event => {
   const clicked = event.target.closest?.(".home-stone");
   if (!clicked) return;
   const screen = clicked.closest(".home-window");
+  if (!screen) return;
   const chapters = "long" in screen.dataset ? HOME_MORE : HOME_CHAPTERS;
   const stone = homeLayout(chapters).stones[Number(clicked.dataset.level) - 1];
   screen.querySelectorAll(".home-stone").forEach(other => other.setAttribute("aria-pressed", other === clicked));
