@@ -32,11 +32,11 @@
 .home-line path { fill: none; stroke: var(--home-paint); stroke-width: var(--home-path); stroke-linecap: round; }
 .home-line path.is-ghost { opacity: .35; }
 
-/* A stone: filled when done, bold when it is the level to play, dashed when locked. */
+/* A stone: filled when done, bold when it is the level to play, outlined in grey when locked. */
 .app-window .home-stone { position: absolute; display: block; box-sizing: border-box; width: 44px; height: 44px; margin: -22px 0 0 -22px; padding: 0; border-radius: 50%; font: 600 15px/1 var(--font-text); }
 .app-window .home-stone.is-done { background: var(--passed); color: var(--on-passed); border: 0; }
 .app-window .home-stone.is-play { background: #ffffff; color: #222935; border: 3.5px solid var(--accent); font-weight: 800; }
-.app-window .home-stone.is-locked { background: var(--home-rim); color: var(--home-idea); border: 1.5px dashed var(--home-idea); }
+.app-window .home-stone.is-locked { background: var(--home-rim); color: var(--home-idea); border: 1.5px solid var(--home-idea); }
 .app-window .home-stone:focus-visible { outline: 2px solid var(--home-title); outline-offset: 2px; }
 .app-window .home-stone:hover { z-index: 4; }
 /* The robot stays on top of the stone it stands on; the other stones keep their title over it. */
@@ -46,14 +46,13 @@
 .home-disc { position: absolute; inset: 0; display: grid; place-items: center; overflow: hidden; border-radius: 50%; }
 .home-number { position: relative; z-index: 1; }
 
-/* On hover, a level done hops once and throws up the robot standing on it, which lands after the stone. The
-   invisible area keeps the mouse on the stone while it is in the air or squashed, so that the hop never
-   starts over by itself. */
+
+/* On hover, a thin ring closes around a level done. The robot hops on the level done it stands on when the
+   mouse is over it, so also when a click has just sent it there. */
+.home-stone.is-done { transition: box-shadow .15s ease-out; }
+.home-stone.is-done:hover { box-shadow: 0 0 0 3px var(--home-rim), 0 0 0 5.5px var(--passed); }
 .home-path:has(.home-stone.is-done[aria-pressed="true"]:hover) .home-robot { animation: home-thrown .85s ease-in-out; }
 @keyframes home-thrown { 0%, 12% { transform: none; } 48% { transform: translateY(-40px) rotate(-10deg); } 78% { transform: translateY(5px) rotate(4deg); } 90% { transform: translateY(-5px); } 100% { transform: none; } }
-.home-stone.is-done:hover { transform-origin: 50% 100%; animation: home-hop .5s cubic-bezier(.3, .7, .4, 1); }
-.home-stone.is-done:hover::before { content: ""; position: absolute; inset: -8px -2px -14px; }
-@keyframes home-hop { 30% { transform: translateY(-13px) scale(.95, 1.06); } 60% { transform: scale(1.12, .86); } 80% { transform: translateY(-3px); } }
 
 /* On hover, the level to play takes the visor of the robot instead of its number: its eyes search around. */
 .home-stone.is-play .home-disc::before { content: ""; position: absolute; left: calc(50% - 16px); top: calc(50% - 8px); width: 32px; height: 16px; background: #222935; border-radius: 8px; transform: scale(0); transition: transform .22s cubic-bezier(.3, 1.6, .5, 1); }
@@ -70,7 +69,7 @@
 .app-window .is-locked .home-squares { top: 36.5px; }
 .home-squares i { box-sizing: border-box; width: 12px; height: 12px; background: var(--idle); border-radius: 2px; box-shadow: 0 0 0 2px var(--home-rim); }
 .home-squares i.is-passed { background: var(--passed); }
-.home-squares i.is-locked { background: var(--home-rim); border: 1px dashed var(--home-idea); }
+.home-squares i.is-locked { background: var(--home-rim); border: 1px solid var(--home-idea); }
 
 /* Its title, on hover. */
 .home-tip { display: none; position: absolute; left: calc(100% + 8px); top: 50%; padding: 4px 10px; background: var(--pop); color: var(--text); border: var(--pop-border); border-radius: var(--radius-small); box-shadow: var(--pop-shadow); font: 500 13px/1.3 var(--font-text); white-space: nowrap; transform: translateY(-50%); }
@@ -110,7 +109,7 @@
 .app-window .home-map.is-shown { box-shadow: inset 0 0 0 2px var(--accent); font-weight: var(--strong-weight); }
 .app-window .home-map.is-passed { background: var(--passed-soft); color: var(--text); border-color: transparent; }
 .app-window .home-map.is-passed.is-shown { background: var(--passed); color: var(--on-passed); box-shadow: none; }
-.app-window .home-map.is-locked { background: none; color: var(--weak); border: 1px dashed var(--idle); }
+.app-window .home-map.is-locked { background: none; color: var(--weak); border: 1px solid var(--idle); }
 
 /* On hover, the head of the robot rises from behind a tile that can be chosen, its eyes searching: its body
    only, without its tracks, with some white under the visor. It is taller than the tile, so it is hidden at
@@ -125,7 +124,7 @@
 .app-window button.home-go { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; height: 50px; margin-top: 12px; padding: 0; font-size: 15px; }
 /* Play: the button of Let's go (block-goal.css), with the robot that crosses it on hover. */
 .app-window button.home-play { margin-top: 12px; border-radius: var(--control-radius); box-shadow: var(--control-shadow); }
-.app-window button.home-go.is-locked { background: var(--hover); color: var(--weak); border: 1px dashed var(--idle); border-radius: var(--control-radius); cursor: default; }
+.app-window button.home-go.is-locked { background: var(--hover); color: var(--weak); border: 0; border-radius: var(--control-radius); cursor: default; }
 
 @media (prefers-reduced-motion: reduce) {
   .home-robot { transition: none; }

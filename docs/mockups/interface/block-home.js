@@ -18,7 +18,11 @@ const HOME_MORE = [...HOME_CHAPTERS, ...["Go further", "Long roads", "Big maps",
 
 const HOME_TO_PLAY = 18;
 const HOME_MAPS_PASSED = 1;
-const homeStatus = number => number < HOME_TO_PLAY ? "done" : number === HOME_TO_PLAY ? "play" : "locked";
+// The progress of the window being drawn: the last level done, and the last level open, a code opening
+// every level up to its own without marking them done.
+let homeDone = HOME_TO_PLAY - 1;
+let homeOpen = HOME_TO_PLAY;
+const homeStatus = number => number <= homeDone ? "done" : number <= homeOpen ? "play" : "locked";
 
 // The rows of the path: stones 105 apart, 24 more between two chapters. A chapter that doesn't fit
 // goes to the next row, which starts under the end of the previous one, after a half-turn.
@@ -56,7 +60,7 @@ const homeStretch = stones => stones.length < 2 ? "" : `M${stones[0].x} ${stones
 // One small square per map, astride the bottom of the stone.
 const homeSquares = ({ number, maps }) => `<span class="home-squares">${Array.from({ length: maps }, (_, index) => {
   const status = homeStatus(number);
-  const passed = status === "done" || (status === "play" && index < HOME_MAPS_PASSED);
+  const passed = status === "done" || (number === HOME_TO_PLAY && status === "play" && index < HOME_MAPS_PASSED);
   return `<i class="${passed ? "is-passed" : status === "locked" ? "is-locked" : ""}"></i>`;
 }).join("")}</span>`;
 
@@ -126,12 +130,12 @@ const HOME_GOALS = {
 };
 
 // The map shown when a level is chosen: the first one of a level done, the first not passed of the level to play.
-const homeFirstMap = ({ number, maps }) => homeStatus(number) === "play" ? Math.min(HOME_MAPS_PASSED, maps - 1) : 0;
+const homeFirstMap = ({ number, maps }) => number === HOME_TO_PLAY && homeStatus(number) === "play" ? Math.min(HOME_MAPS_PASSED, maps - 1) : 0;
 
 // A tile is a button only when there is a map to choose: more than one, in a level open.
 const homeMapChips = ({ number, maps }, shown) => `<div class="home-maps">${Array.from({ length: maps }, (_, index) => {
   const status = homeStatus(number);
-  const passed = status === "done" || (status === "play" && index < HOME_MAPS_PASSED);
+  const passed = status === "done" || (number === HOME_TO_PLAY && status === "play" && index < HOME_MAPS_PASSED);
   const state = passed ? "is-passed" : status === "locked" ? "is-locked" : "";
   if (status === "locked" || maps === 1) return `<span class="home-map ${state} ${status === "locked" ? "" : "is-shown"}">Map ${index + 1}</span>`;
   return `<button type="button" class="home-map ${state} ${index === shown ? "is-shown" : ""}" data-map="${index}" aria-pressed="${index === shown}">Map ${index + 1}</button>`;
@@ -152,7 +156,7 @@ const HOME_BUTTONS = {
 
 function homePanel(chapters, stone, codeError, map = homeFirstMap(stone)) {
   const status = homeStatus(stone.number);
-  const toPlay = homeLayout(chapters).stones[HOME_TO_PLAY - 1];
+  const toPlay = homeLayout(chapters).stones[homeOpen - 1];
   const text = status === "locked" ? `Finish ${toPlay.number}. ${toPlay.title} to open this level.` : HOME_GOALS[status];
   return `<aside class="home-panel">
     <p class="home-chapter">${stone.chapter + 1}. ${chapters[stone.chapter].name}</p>
@@ -165,13 +169,14 @@ function homePanel(chapters, stone, codeError, map = homeFirstMap(stone)) {
 }
 
 // `chosen` is the level shown on the right, `tip` a stone hovered, `long` the path with more levels
-// than fit, and `size` the window in pixels.
-function homeWindow({ chosen: level = HOME_TO_PLAY, tip, long = false, codeError = false, size = [1280, 720] } = {}) {
+// than fit, `size` the window in pixels, `done` the last level done and `open` the last level open.
+function homeWindow({ chosen: level = HOME_TO_PLAY, tip, long = false, codeError = false, size = [1280, 720], done = HOME_TO_PLAY - 1, open = HOME_TO_PLAY } = {}) {
+  homeDone = done;
+  homeOpen = open;
   const chapters = long ? HOME_MORE : HOME_CHAPTERS;
   const { stones, bands, height } = homeLayout(chapters);
   const shown = stones[level - 1];
-  const done = HOME_TO_PLAY - 1;
-  return `<div class="app-window home-window" ${long ? "data-long" : ""} style="width:${size[0]}px;height:${size[1]}px">
+  return `<div class="app-window home-window" data-done="${done}" data-open="${open}" ${long ? "data-long" : ""} style="width:${size[0]}px;height:${size[1]}px">
     <header class="app-header">
       ${appWordmark(21)}
       <span class="home-count">${done} of ${stones.length} levels done</span>
@@ -182,8 +187,8 @@ function homeWindow({ chosen: level = HOME_TO_PLAY, tip, long = false, codeError
       <div class="home-scroll"><div class="home-path" style="height:${height}px">
         ${bands.map(({ left, right, top, chapter, number }) => `<div class="home-band" style="left:${left}px;top:${top}px;width:${right - left}px"><b>${number}. ${chapter.name}</b><span>${chapter.idea}</span></div>`).join("")}
         <svg class="home-line" aria-hidden="true">
-          <path class="is-ghost" d="${homeStretch(stones.slice(HOME_TO_PLAY - 1))}"/>
-          <path d="${homeStretch(stones.slice(0, HOME_TO_PLAY))}"/>
+          <path class="is-ghost" d="${homeStretch(stones.slice(open - 1))}"/>
+          <path d="${homeStretch(stones.slice(0, open))}"/>
         </svg>
         ${stones.map(stone => homeStone(stone, level, tip)).join("")}
         <img class="home-robot" src="world-elements/daylight/robot.svg" alt="" style="${homeRobotPlace(shown)}">
@@ -193,12 +198,19 @@ function homeWindow({ chosen: level = HOME_TO_PLAY, tip, long = false, codeError
   </div>`;
 }
 
+// The windows don't share their progress: a click takes back the one of its window before drawing.
+function homeScreenChapters(screen) {
+  homeDone = Number(screen.dataset.done);
+  homeOpen = Number(screen.dataset.open);
+  return "long" in screen.dataset ? HOME_MORE : HOME_CHAPTERS;
+}
+
 // A click on a map tile shows that map in the panel; Play would open the level on it.
 document.addEventListener("click", event => {
   const tile = event.target.closest?.(".home-map[data-map]");
   const screen = tile?.closest(".home-window");
   if (!screen) return;
-  const chapters = "long" in screen.dataset ? HOME_MORE : HOME_CHAPTERS;
+  const chapters = homeScreenChapters(screen);
   const level = screen.querySelector('.home-stone[aria-pressed="true"]').dataset.level;
   screen.querySelector(".home-panel").outerHTML = homePanel(chapters, homeLayout(chapters).stones[Number(level) - 1], false, Number(tile.dataset.map));
 });
@@ -209,7 +221,7 @@ document.addEventListener("click", event => {
   if (!clicked) return;
   const screen = clicked.closest(".home-window");
   if (!screen) return;
-  const chapters = "long" in screen.dataset ? HOME_MORE : HOME_CHAPTERS;
+  const chapters = homeScreenChapters(screen);
   const stone = homeLayout(chapters).stones[Number(clicked.dataset.level) - 1];
   screen.querySelectorAll(".home-stone").forEach(other => other.setAttribute("aria-pressed", other === clicked));
   screen.querySelector(".home-robot").style.cssText = homeRobotPlace(stone);
