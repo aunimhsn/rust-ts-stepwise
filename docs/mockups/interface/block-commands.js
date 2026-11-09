@@ -22,6 +22,6 @@ function appCommandMenu({ category, counts, groups, chosen: command, details, le
       <div class="app-commands-list">${empty ? `<div class="app-commands-empty">${empty}</div>` : rows}</div>
       <div class="app-commands-details">${side}</div>
     </div>
-    <div class="app-commands-hints"><span><kbd>${appKeyLabel("↑ ↓")}</kbd> move</span><span><kbd>${appKeyLabel("← →")}</kbd> category</span><span><kbd>Tab</kbd> or <kbd>Enter</kbd> insert</span><span><kbd>Esc</kbd> close</span>${chosen.filter === "none" ? "" : `<span>${VARIANTS.filter.options[chosen.filter].replace(/^\d+ · /, "")}</span>`}</div>
+    <div class="app-commands-hints"><span><kbd>${appKeyLabel("↑ ↓")}</kbd> move</span><span><kbd>${appKeyLabel("← →")}</kbd> category</span><span><kbd>Tab</kbd> or <kbd>Enter</kbd> insert</span><span><kbd>Esc</kbd> close</span><span>type to search</span></div>
   </div>`;
 }
