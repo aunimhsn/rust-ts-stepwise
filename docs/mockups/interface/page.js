@@ -3,7 +3,6 @@
 // One group of tabs per open decision; `fallback` is the choice shown by default.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(INTERFACE_STYLES).map(([key, style]) => [key, style.title])), fallback: Object.keys(INTERFACE_STYLES)[0] },
-  endBar: { label: "Bar at the end", options: { 1: "1 · Neutral", 2: "2 · Teal when passed", 3: "3 · Teal when passed, red when missed" }, fallback: "2" },
   largeTitle: { label: "Title on a large screen", options: { 4: "4 · Above the two columns", 5: "5 · In the middle of the window" }, fallback: "4" },
 };
 

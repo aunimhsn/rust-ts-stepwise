@@ -34,8 +34,8 @@ function appControls({ main = "run", stepOff = false, pale = false, tip } = {}) 
 // `next` is the line of the next step, `error` the line of an error while running, `breakpoints` the
 // lines with a breakpoint. `underlines` lists { line, col, length, kind }: an error, or "long" for the
 // dots past the 80th column; `hint` is the message shown on hover, { line, col, title, help }.
-// `controls` gives appControls. `state` and `tone` give the status bar (paused, failed, flash, passed,
-// missed), `errors` the number of errors, `steps` its counter, `cursor` its position.
+// `controls` gives appControls. `state` and `tone` give the status bar (paused, failed, flash, passed),
+// `errors` the number of errors, `steps` its counter, `cursor` its position.
 function appEditor({ lines, next, error, breakpoints = [], underlines = [], hint, controls, state, tone = "", errors, steps, cursor }) {
   const row = (text, index) => {
     const number = index + 1;

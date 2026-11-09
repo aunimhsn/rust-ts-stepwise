@@ -64,10 +64,10 @@
 .app-status.is-paused, .app-status.is-flash { background: var(--status-paused); color: var(--on-status-paused); }
 .app-status.is-failed { background: var(--status-failed); color: var(--on-status-failed); }
 .app-status.is-paused b, .app-status.is-failed b, .app-status.is-flash b { color: inherit; }
-/* The end of a run without error: open decision (the tabs "Bar at the end"). */
-:root:not([data-end-bar="1"]) .app-status.is-passed { background: var(--passed); color: var(--on-passed); }
-:root[data-end-bar="3"] .app-status.is-missed { background: var(--status-failed); color: var(--on-status-failed); }
-:root:not([data-end-bar="1"]) .app-status.is-passed b, :root[data-end-bar="3"] .app-status.is-missed b { color: inherit; }
+/* A map or the level passed: the teal of the tabs of the maps. A goal not met keeps the neutral bar: it
+   isn't an error of the program, and the flags of the map already say it. */
+.app-status.is-passed { background: var(--passed); color: var(--on-passed); }
+.app-status.is-passed b { color: inherit; }
 .app-speed { display: flex; align-items: center; gap: 3px; }
 .app-speed span { margin-right: 5px; }
 .app-speed i { width: 9px; height: 13px; box-sizing: border-box; border: 1px solid currentColor; border-radius: 1px; }
