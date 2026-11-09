@@ -3,16 +3,14 @@
 /* The ground under the path: the grid of the map, in the tones of each theme. `rim` is the solid color
    that detaches a stone and its squares from the path. */
 :root {
-  --home-paint: #ffb300; --home-grid: 40px; --home-lines: 50%;
+  --home-paint: #ffb300; --home-path: 14px; --home-grid: 40px; --home-lines: 50%;
   --home-grid-line: color-mix(in srgb, var(--home-line) var(--home-lines), transparent);
   --home-tiles: linear-gradient(90deg, var(--home-five) 2px, transparent 0), linear-gradient(var(--home-five) 2px, transparent 0), linear-gradient(90deg, var(--home-grid-line) 1px, transparent 0), linear-gradient(var(--home-grid-line) 1px, transparent 0);
   --home-tile-sizes: calc(var(--home-grid) * 5) calc(var(--home-grid) * 5), calc(var(--home-grid) * 5) calc(var(--home-grid) * 5), var(--home-grid) var(--home-grid), var(--home-grid) var(--home-grid);
   --home-title: var(--text); --home-idea: var(--weak);
 }
-:root[data-theme="day-desk"] { --home-ground: #e1e5ea; --home-line: #cad1da; --home-five-color: #22293520; --home-band: #ffffff8c; --home-rim: #f1f3f6; }
-:root[data-theme="night-desk"] { --home-ground: #262c35; --home-line: #36404d; --home-five-color: #ffffff14; --home-band: #1e232bd9; --home-rim: #20252d; }
-:root[data-home-fives="on"] { --home-five: var(--home-five-color); }
-:root[data-home-fives="off"] { --home-five: transparent; }
+:root[data-theme="day-desk"] { --home-ground: #e1e5ea; --home-line: #cad1da; --home-five: #22293520; --home-band: #ffffff8c; --home-rim: #f1f3f6; }
+:root[data-theme="night-desk"] { --home-ground: #262c35; --home-line: #36404d; --home-five: #ffffff14; --home-band: #1e232bd9; --home-rim: #20252d; }
 :root[data-home-ground="rooms"] { --home-ground: #5d687a; --home-tiles: none; --home-band: #e1e5ea; --home-band-tiles: url("../world-elements/daylight/floor.svg"); --home-rim: #e1e5ea; --home-title: #222935; --home-idea: #5d687a; }
 
 /* The header: the name, the count in the middle of the window, the three links on the right. */

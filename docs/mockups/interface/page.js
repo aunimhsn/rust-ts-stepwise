@@ -4,8 +4,6 @@
 // is a list and `range` a slider, both setting the CSS `variable` at once, without redrawing the page.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(INTERFACE_STYLES).map(([key, style]) => [key, style.title])), fallback: Object.keys(INTERFACE_STYLES)[0] },
-  homeFives: { label: "Thicker line every 5 cells", options: { on: "4 · With, as on the map", off: "5 · Without" }, fallback: "on" },
-  homePath: { label: "Width of the path", range: { min: 4, max: 28, step: 1 }, variable: "--home-path", unit: "px", fallback: "14" },
 };
 
 const params = new URLSearchParams(location.search);
