@@ -64,7 +64,7 @@ function manualExample(entry, step = 0) {
   const frame = MANUAL_FRAMES[entry.id][step];
   const prints = entry.lines.some(line => line.startsWith("print"));
   return `<div class="manual-example ${prints ? "has-console" : ""}" data-example="${entry.id}" data-frame="${step}">
-    <div class="manual-code"><pre>${entry.lines.map((line, index) => `<span class="manual-line ${frame.line === index ? "is-on" : ""}">${highlightCode(line) || " "}</span>`).join("")}</pre><button type="button" class="app-chip manual-replay">${ICONS.reset(13)}<span>Replay</span></button></div>
+    <div class="manual-code"><pre>${entry.lines.map((line, index) => `<span class="manual-line ${frame.line === index ? "is-on" : ""}">${highlightCode(line) || " "}</span>`).join("")}</pre><button type="button" class="manual-run" title="Run the example" aria-label="Run the example">${ICONS.play(14)}</button><button type="button" class="manual-stop" title="Stop and go back to the start" aria-label="Stop">${ICONS.stop(14)}</button></div>
     <div class="manual-map">${manualMap(entry, frame)}</div>
     ${prints ? `<div class="manual-console"><b>Console</b><div class="manual-out">${frame.out.join("<br>")}</div></div>` : ""}
   </div>`;
@@ -174,8 +174,9 @@ const MANUAL_HAND = '<svg class="manual-hand" width="17" height="21" viewBox="0 
 
 // ——— The life of the windows ———
 
-// An example plays once, one step every 0.7 s, when it comes into view; then it stays on its last step
-// and Replay plays it again. Seventeen maps moving at once would disturb the reading.
+// An example never plays by itself: three maps moving at once can't be followed. ▶ plays it, one step
+// every 0.7 s, and gives way to ■, which stops it and puts the map back at its start; at the end, the
+// map stays on its last step and ▶ comes back, fading in, to play it again.
 function manualDraw(example, step) {
   const entry = MANUAL_ENTRIES[example.dataset.example];
   const frame = MANUAL_FRAMES[entry.id][step];
@@ -188,40 +189,31 @@ function manualDraw(example, step) {
 
 function manualPlay(example) {
   example.classList.remove("is-done");
-  example.dataset.playing = "1";
-  example.dataset.wait = 1;
+  example.classList.add("is-playing");
   manualDraw(example, 0);
 }
 
-const manualWatch = new IntersectionObserver(seen => {
-  for (const { target, isIntersecting } of seen) {
-    if (isIntersecting && !target.dataset.played) { target.dataset.played = "1"; manualPlay(target); }
-  }
-}, { threshold: 0.7 });
+function manualStop(example, ended) {
+  example.classList.remove("is-playing");
+  example.classList.toggle("is-done", ended);
+  if (!ended) manualDraw(example, 0);
+  example.querySelectorAll(".manual-line").forEach(line => line.classList.remove("is-on"));
+}
 
 setInterval(() => {
-  // The page is drawn again at each change of a control: watch the new examples.
-  for (const example of document.querySelectorAll(".manual-example:not([data-watched])")) {
-    example.dataset.watched = "1";
-    manualWatch.observe(example);
-  }
-  for (const example of document.querySelectorAll('.manual-example[data-playing="1"]')) {
-    const wait = Number(example.dataset.wait ?? 0);
-    if (wait > 0) { example.dataset.wait = wait - 1; continue; }
+  for (const example of document.querySelectorAll(".manual-example.is-playing")) {
     const last = MANUAL_FRAMES[example.dataset.example].length - 1;
     const step = Number(example.dataset.frame) + 1;
+    if (step > last) { manualStop(example, true); continue; }
     manualDraw(example, step);
-    if (step === last) {
-      example.dataset.playing = "0";
-      example.classList.add("is-done");
-      example.querySelectorAll(".manual-line").forEach(line => line.classList.remove("is-on"));
-    }
   }
 }, 700);
 
 document.addEventListener("click", event => {
-  const replay = event.target.closest?.(".manual-replay");
-  if (replay) manualPlay(replay.closest(".manual-example"));
+  const run = event.target.closest?.(".manual-run");
+  if (run) manualPlay(run.closest(".manual-example"));
+  const stop = event.target.closest?.(".manual-stop");
+  if (stop) manualStop(stop.closest(".manual-example"), false);
 });
 
 // The scroll of a page or of the drawer, and the place of a heading or an entry in it.

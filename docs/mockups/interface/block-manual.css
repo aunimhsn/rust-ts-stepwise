@@ -133,11 +133,17 @@ a.manual-name:hover { background: var(--band-hover); }
 /* The hand on forward(), line 5 of the code: past the margin and eight spaces. */
 .manual-hand-place { position: absolute; z-index: 3; left: calc(52px + 14px + 12ch); top: 150px; font: var(--code-weight) var(--size-code) var(--font-code); pointer-events: none; }
 
-/* Replay: once the example has played, in the corner of its code. */
-.app-window .manual-replay { position: absolute; right: 8px; bottom: 8px; display: none; align-items: center; gap: 5px; background: var(--surface); color: var(--weak); }
-.app-window .manual-replay:hover { color: var(--text); }
+/* ▶ in the corner of the code, amber as Run on the level screen; ■ in its place while the example plays.
+   At the end, ▶ comes back fading in. */
 .manual-code { position: relative; }
-.manual-example.is-done .manual-replay { display: flex; }
+.app-window .manual-run, .app-window .manual-stop { position: absolute; right: 8px; bottom: 8px; display: grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: var(--control-radius); }
+.app-window .manual-run { background: var(--accent); color: var(--on-accent); }
+.app-window .manual-stop { display: none; background: var(--control); color: var(--on-control); box-shadow: var(--control-shadow); }
+.manual-example.is-playing .manual-run { display: none; }
+.manual-example.is-playing .manual-stop { display: grid; }
+.manual-example.is-done .manual-run { animation: manual-fade-in .8s ease-out; }
+@keyframes manual-fade-in { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .manual-example.is-done .manual-run { animation: none; } }
 
 /* The robot of the large screen, centered in the room left on the right, its speech bubble above it;
    the size of the head (80 px) and of the words (25 px) tuned by eye; each sentence on one line. */
