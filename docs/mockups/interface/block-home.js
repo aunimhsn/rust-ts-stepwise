@@ -141,11 +141,22 @@ const homeMapChips = ({ number, maps }, shown) => `<div class="home-maps">${Arra
   return `<button type="button" class="home-map ${state} ${index === shown ? "is-shown" : ""}" data-map="${index}" aria-pressed="${index === shown}">Map ${index + 1}</button>`;
 }).join("")}</div>`;
 
-const homeCode = codeError => `<div class="home-code">
+// The field of a code is empty (or being typed), wrong or right; the code of the samples is GREEN-OWL.
+const HOME_GOOD_CODE = "GREEN-OWL";
+const homeCodeNote = (state, stone) => ({
+  empty: ["", "A code unlocks its level and every level before it."],
+  wrong: ["home-code-error", "No level has this code. Check its two words."],
+  right: ["home-code-ok", `Right code: it unlocks ${stone.number}. ${stone.title}.`],
+}[state]);
+
+function homeCode(state, stone) {
+  const [noteClass, note] = homeCodeNote(state, stone);
+  return `<div class="home-code ${state === "right" ? "is-right" : ""}">
   <label for="home-code-field">Have a code?</label>
-  <div class="home-code-row"><input class="${codeError ? "is-wrong" : ""}" spellcheck="false" autocomplete="off" placeholder="GREEN-OWL" value="${codeError ? "BLUE-OWL" : ""}"><button type="button" class="app-chip">Open</button></div>
-  ${codeError ? '<p class="home-code-error">No level has this code. Check its two words.</p>' : "<p>A code opens its level and every level before it.</p>"}
+  <div class="home-code-row"><input class="${state === "wrong" ? "is-wrong" : ""}" spellcheck="false" autocomplete="off" placeholder="${HOME_GOOD_CODE}" value="${{ empty: "", wrong: "BLUE-OWL", right: HOME_GOOD_CODE }[state]}"><button type="button" class="app-chip home-unlock"><span>Unlock</span></button></div>
+  <p class="${noteClass}">${note}</p>
 </div>`;
+}
 
 const homePlay = () => '<button type="button" class="goal-go home-play"><span>Play</span></button>';
 const HOME_BUTTONS = {
@@ -154,23 +165,24 @@ const HOME_BUTTONS = {
   locked: () => '<button type="button" class="home-go is-locked" disabled>Locked</button>',
 };
 
-function homePanel(chapters, stone, codeError, map = homeFirstMap(stone)) {
+function homePanel(chapters, stone, code, map = homeFirstMap(stone)) {
   const status = homeStatus(stone.number);
   const toPlay = homeLayout(chapters).stones[homeOpen - 1];
-  const text = status === "locked" ? `Finish ${toPlay.number}. ${toPlay.title} to open this level.` : HOME_GOALS[status];
+  const text = status === "locked" ? `Finish ${toPlay.number}. ${toPlay.title} to unlock this level.` : HOME_GOALS[status];
   return `<aside class="home-panel">
     <p class="home-chapter">${stone.chapter + 1}. ${chapters[stone.chapter].name}</p>
     <h3>${stone.number}. ${stone.title}</h3>
     <div class="home-scene is-${status}">${HOME_SCENES[status](map)}</div>
     <p class="home-goal">${text}</p>
-    ${status === "locked" ? homeCode(codeError) : ""}
+    ${status === "locked" ? homeCode(code, stone) : ""}
     <div class="home-bottom">${homeMapChips(stone, map)}${HOME_BUTTONS[status]()}</div>
   </aside>`;
 }
 
 // `chosen` is the level shown on the right, `tip` a stone hovered, `long` the path with more levels
-// than fit, `size` the window in pixels, `done` the last level done and `open` the last level open.
-function homeWindow({ chosen: level = HOME_TO_PLAY, tip, long = false, codeError = false, size = [1280, 720], done = HOME_TO_PLAY - 1, open = HOME_TO_PLAY } = {}) {
+// than fit, `code` the state of the field of a code, `size` the window in pixels, `done` the last level
+// done and `open` the last level open.
+function homeWindow({ chosen: level = HOME_TO_PLAY, tip, long = false, code = "empty", size = [1280, 720], done = HOME_TO_PLAY - 1, open = HOME_TO_PLAY } = {}) {
   homeDone = done;
   homeOpen = open;
   const chapters = long ? HOME_MORE : HOME_CHAPTERS;
@@ -193,7 +205,7 @@ function homeWindow({ chosen: level = HOME_TO_PLAY, tip, long = false, codeError
         ${stones.map(stone => homeStone(stone, level, tip)).join("")}
         <img class="home-robot" src="world-elements/daylight/robot.svg" alt="" style="${homeRobotPlace(shown)}">
       </div></div>
-      ${homePanel(chapters, shown, codeError)}
+      ${homePanel(chapters, shown, code)}
     </div></div>
   </div>`;
 }
@@ -205,6 +217,39 @@ function homeScreenChapters(screen) {
   return "long" in screen.dataset ? HOME_MORE : HOME_CHAPTERS;
 }
 
+// The field of a code: the button lights up as soon as the code is right, whatever its case. A wrong code
+// shows only on Unlock or Enter, so that a code still being typed is never blamed.
+const homeScreenStone = screen => homeLayout(homeScreenChapters(screen)).stones[Number(screen.querySelector('.home-stone[aria-pressed="true"]').dataset.level) - 1];
+const homeCodeIsRight = box => box.querySelector("input").value.trim().toUpperCase() === HOME_GOOD_CODE;
+
+function homeShowCode(box, state) {
+  const [noteClass, note] = homeCodeNote(state, homeScreenStone(box.closest(".home-window")));
+  box.classList.toggle("is-right", state === "right");
+  box.querySelector("input").classList.toggle("is-wrong", state === "wrong");
+  box.querySelector("p").className = noteClass;
+  box.querySelector("p").textContent = note;
+}
+
+// A right code redraws the window: the level is open, and in the samples the code is the one of the level chosen.
+function homeTryCode(box) {
+  if (!homeCodeIsRight(box)) { homeShowCode(box, "wrong"); return; }
+  const screen = box.closest(".home-window");
+  const stone = homeScreenStone(screen);
+  screen.outerHTML = homeWindow({ chosen: stone.number, done: Number(screen.dataset.done), open: Math.max(stone.number, Number(screen.dataset.open)), long: "long" in screen.dataset, size: [parseInt(screen.style.width, 10), parseInt(screen.style.height, 10)] });
+}
+
+document.addEventListener("input", event => {
+  const box = event.target.closest?.(".home-window .home-code");
+  if (box) homeShowCode(box, homeCodeIsRight(box) ? "right" : "empty");
+});
+document.addEventListener("click", event => {
+  const button = event.target.closest?.(".home-window .home-unlock");
+  if (button) homeTryCode(button.closest(".home-code"));
+});
+document.addEventListener("keydown", event => {
+  if (event.key === "Enter" && event.target.closest?.(".home-window .home-code input")) homeTryCode(event.target.closest(".home-code"));
+});
+
 // A click on a map tile shows that map in the panel; Play would open the level on it.
 document.addEventListener("click", event => {
   const tile = event.target.closest?.(".home-map[data-map]");
@@ -212,7 +257,7 @@ document.addEventListener("click", event => {
   if (!screen) return;
   const chapters = homeScreenChapters(screen);
   const level = screen.querySelector('.home-stone[aria-pressed="true"]').dataset.level;
-  screen.querySelector(".home-panel").outerHTML = homePanel(chapters, homeLayout(chapters).stones[Number(level) - 1], false, Number(tile.dataset.map));
+  screen.querySelector(".home-panel").outerHTML = homePanel(chapters, homeLayout(chapters).stones[Number(level) - 1], "empty", Number(tile.dataset.map));
 });
 
 // A click on a stone chooses its level: the robot goes there and the panel shows it; only Play opens it.
@@ -225,5 +270,5 @@ document.addEventListener("click", event => {
   const stone = homeLayout(chapters).stones[Number(clicked.dataset.level) - 1];
   screen.querySelectorAll(".home-stone").forEach(other => other.setAttribute("aria-pressed", other === clicked));
   screen.querySelector(".home-robot").style.cssText = homeRobotPlace(stone);
-  screen.querySelector(".home-panel").outerHTML = homePanel(chapters, stone, false);
+  screen.querySelector(".home-panel").outerHTML = homePanel(chapters, stone, "empty");
 });
