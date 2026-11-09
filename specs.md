@@ -167,7 +167,7 @@ Wireframe: [`docs/wireframes/home-screen.excalidraw`](docs/wireframes/home-scree
 - **Level chosen**, on the right: its chapter, its number and title, a scene of its map, its goal, its maps with their state, and one button. The screen opens with the level to play chosen.
   - **Level to play**: the starting map with its goal marks and the robot waiting (it blinks, looks around), never the solution; **Play**.
   - **Level done**: the learner's own program replayed on its first map; **Play again**.
-  - **Level locked**: the starting map, still, and *"Finish 18. Paint a square to open this level."*; under it, *"Have a code?"*, a field and **Open** (see [Level codes](#levels-and-progression)); the button is greyed.
+  - **Level locked**: the starting map, still, and *"Finish 18. Paint a square to open this level."*; under it, *"Have a code?"*, a field and **Open** (see [Level codes](#levels-and-progression)); a code that opens no level stays in the field, framed in red, with *"No level has this code. Check its two words."* under it; the button is greyed.
 - **Large screen**: the path and the panel keep their size, centered in the window; the room left serves the levels added later before the path scrolls.
 - **More levels**: the path is laid out from the list of levels, so that adding levels or chapters needs no new design; when they no longer fit, the path scrolls.
 

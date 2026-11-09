@@ -4,7 +4,10 @@
 // is a list and `range` a slider, both setting the CSS `variable` at once, without redrawing the page.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(INTERFACE_STYLES).map(([key, style]) => [key, style.title])), fallback: Object.keys(INTERFACE_STYLES)[0] },
-  homeGround: { label: "Ground of the path", options: { desk: "1 · The desk", floor: "2 · The floor of the world", rooms: "3 · Rooms in the walls" }, fallback: "desk" },
+  homeGround: { label: "Ground of the path", options: { desk: "1 · The desk", floor: "2 · The floor of the world", rooms: "3 · Rooms in the walls" }, fallback: "floor" },
+  homeFives: { label: "Thicker line every 5 cells", options: { on: "4 · With, as on the map", off: "5 · Without" }, fallback: "on" },
+  homeGrid: { label: "Size of the grid", range: { min: 16, max: 64, step: 1 }, variable: "--home-grid", unit: "px", fallback: "28" },
+  homeLines: { label: "Strength of the lines", range: { min: 0, max: 100, step: 5 }, variable: "--home-lines", unit: "%", fallback: "100" },
   homePaint: { label: "Paint of the path", select: true, variable: "--home-paint", options: { "#ffb300": "Yellow", "#dc2f34": "Red", "#2459d6": "Blue", "#5fd0b0": "Teal" }, fallback: "#ffb300" },
   homePath: { label: "Width of the path", range: { min: 4, max: 28, step: 1 }, variable: "--home-path", unit: "px", fallback: "14" },
 };

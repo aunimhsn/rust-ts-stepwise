@@ -3,7 +3,17 @@
 /* The ground under the path, an open decision: only these tokens differ. `rim` is the solid color
    that detaches a stone and its squares from the path. */
 :root[data-home-ground="desk"] { --home-ground: var(--map-block); --home-tiles: none; --home-band: var(--surface); --home-band-tiles: none; --home-rim: var(--surface); --home-title: var(--text); --home-idea: var(--weak); }
-:root[data-home-ground="floor"] { --home-ground: #e1e5ea; --home-tiles: url("../world-elements/daylight/floor.svg"); --home-band: #ffffff8c; --home-band-tiles: none; --home-rim: #f1f3f6; --home-title: #222935; --home-idea: #5d687a; }
+:root[data-home-ground="floor"] {
+  --home-grid-line: color-mix(in srgb, var(--home-line) var(--home-lines), transparent);
+  --home-tiles: linear-gradient(90deg, var(--home-five) 2px, transparent 0), linear-gradient(var(--home-five) 2px, transparent 0), linear-gradient(90deg, var(--home-grid-line) 1px, transparent 0), linear-gradient(var(--home-grid-line) 1px, transparent 0);
+  --home-tile-sizes: calc(var(--home-grid) * 5) calc(var(--home-grid) * 5), calc(var(--home-grid) * 5) calc(var(--home-grid) * 5), var(--home-grid) var(--home-grid), var(--home-grid) var(--home-grid);
+  --home-band-tiles: none; --home-title: var(--text); --home-idea: var(--weak);
+}
+/* The floor of the world in each theme: a grid, the same one as on the map, in the tones of the desk. */
+:root[data-home-ground="floor"][data-theme="day-desk"] { --home-ground: #e1e5ea; --home-line: #cad1da; --home-five-color: #22293520; --home-band: #ffffff8c; --home-rim: #f1f3f6; }
+:root[data-home-ground="floor"][data-theme="night-desk"] { --home-ground: #262c35; --home-line: #36404d; --home-five-color: #ffffff14; --home-band: #1e232bd9; --home-rim: #20252d; }
+:root[data-home-fives="on"] { --home-five: var(--home-five-color); }
+:root[data-home-fives="off"] { --home-five: transparent; }
 :root[data-home-ground="rooms"] { --home-ground: #5d687a; --home-tiles: none; --home-band: #e1e5ea; --home-band-tiles: url("../world-elements/daylight/floor.svg"); --home-rim: #e1e5ea; --home-title: #222935; --home-idea: #5d687a; }
 
 /* The header: the name, the count in the middle of the window, the three links on the right. */
@@ -11,7 +21,7 @@
 .home-links { display: flex; gap: 2px; margin-left: auto; }
 
 /* The path and the panel keep their size, centered in the window. */
-.home-stage { flex: 1; min-height: 0; display: flex; justify-content: center; background: var(--home-ground) var(--home-tiles) center / 28px; }
+.home-stage { flex: 1; min-height: 0; display: flex; justify-content: center; background-color: var(--home-ground); background-image: var(--home-tiles); background-size: var(--home-tile-sizes, auto); background-position: center; }
 .home-center { flex: none; display: flex; align-items: center; width: 1280px; height: 100%; }
 .home-scroll { flex: none; display: flex; flex-direction: column; width: 900px; height: 100%; overflow: hidden auto; }
 .home-path { position: relative; flex: none; width: 900px; margin: auto 0; }

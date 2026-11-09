@@ -1,7 +1,7 @@
 // Section: the home screen. Every window is live: a click on a stone chooses its level.
 // The scene and the goal of a level are those of the three samples, 18, 13 and 19.
 
-SECTIONS.unshift(["Home screen", () => `
+SECTIONS.push(["Home screen", () => `
   <div class="page-row">
     <div class="page-slot"><span>1280 × 720, the level to play chosen, as the screen opens: click a stone</span>${homeWindow()}</div>
     <div class="page-slot"><span>1280 × 720, a level done chosen, the title of a stone hovered</span>${homeWindow({ chosen: 13, tip: 9 })}</div>
