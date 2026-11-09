@@ -3,6 +3,7 @@
 // One group of tabs per open decision; `fallback` is the choice shown by default.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(INTERFACE_STYLES).map(([key, style]) => [key, style.title])), fallback: Object.keys(INTERFACE_STYLES)[0] },
+  nothing: { label: "Nothing found", options: { merged: "12 · without the dark column", kept: "13 · with the dark column" }, fallback: "merged" },
 };
 
 const params = new URLSearchParams(location.search);

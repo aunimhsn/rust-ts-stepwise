@@ -1,6 +1,8 @@
 /* The command menu: one fixed panel of three columns, which never changes shape while moving in it. */
 .app-commands { display: flex; flex-direction: column; width: 630px; height: 306px; overflow: hidden; }
 .app-commands-columns { flex: 1; min-height: 0; display: grid; grid-template-columns: 142px 202px 1fr; }
+/* Nothing found: the message takes the place of the commands and of their details. */
+.app-commands-columns.is-merged { grid-template-columns: 142px 1fr; }
 .app-commands-categories { padding: 5px 0; background: var(--band); color: var(--band-text); }
 .app-commands-category { display: flex; justify-content: space-between; align-items: center; padding: 2.5px 12px; }
 .app-commands-category.is-chosen { background: var(--tab-chosen); color: var(--on-tab-chosen); font-weight: var(--strong-weight); }
