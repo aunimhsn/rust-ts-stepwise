@@ -1,0 +1,65 @@
+/* The success panel: the stroke painted by the robot, what the learner did, then its buttons along
+   the whole bottom, as Let's go in the bubble of the goal. */
+.app-success { position: relative; width: 520px; overflow: hidden; border: 0; animation: success-rise .22s ease-out both; }
+@keyframes success-rise { from { opacity: 0; transform: translateY(10px); } }
+
+/* The top of the panel, in three acts. Without animation, only the end shows: the stroke, the title, the logo. */
+.success-top { position: relative; height: 76px; }
+
+/* 1. The robot enters by the right and leaves by the left, the stroke behind it. Both have the same
+   timing, and the left end of the stroke is always under the center of the robot. */
+.success-band { position: absolute; top: 0; right: 0; width: calc(100% + 40px); height: 76px; background: var(--accent); border-radius: 38px 0 0 38px; animation: success-paint 1s .1s cubic-bezier(.35, .05, .4, 1) both; }
+@keyframes success-paint { from { width: 0; } }
+.success-crossing { position: absolute; top: 6px; left: -72px; width: 64px; height: 64px; transform: rotate(-90deg); animation: success-cross 1s .1s cubic-bezier(.35, .05, .4, 1) both; }
+@keyframes success-cross { from { left: calc(100% - 32px); } }
+.success-crossing img { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+/* The title is aligned on the text of the panel, and appears once the robot has passed; the head
+   lands against the right end, at the same place whatever the length of the title. */
+.success-heading { position: absolute; inset: 0 24px; display: flex; align-items: center; justify-content: space-between; color: var(--on-accent); }
+.success-band-title { font: 600 30px/1 var(--font-name); white-space: nowrap; animation: success-fade .25s .75s both; }
+@keyframes success-fade { from { opacity: 0; } }
+
+/* 2. It comes back from above, seen from the top as on the map, and lands with a small squash. */
+.success-head { flex: none; width: 64px; height: 64px; transform-origin: 50% 100%; animation: success-drop .55s 1.15s cubic-bezier(.3, .7, .4, 1) both; }
+@keyframes success-drop { 0% { transform: translateY(-96px); } 72% { transform: translateY(3px) scaleY(.93); } 100% { transform: none; } }
+
+/* 3. It becomes the logo: the body grows into the head, the visor widens, the bay and the round eyes
+   fade, and the happy eyes and the smile are drawn. */
+.head-body { animation: head-body .5s 1.65s ease-in-out both; }
+@keyframes head-body { from { x: 16px; y: 14px; width: 32px; height: 36px; rx: 9px; stroke-width: 1.5px; } }
+.head-visor { animation: head-visor .5s 1.65s ease-in-out both; }
+@keyframes head-visor { from { x: 20px; y: 18px; width: 24px; height: 11px; rx: 5.5px; } }
+.head-bay, .head-dot { opacity: 0; animation: head-gone .3s 1.65s both; }
+@keyframes head-gone { from { opacity: 1; } }
+.head-line { stroke-dasharray: 1; animation: head-draw .35s 1.9s ease-out both; }
+@keyframes head-draw { from { stroke-dashoffset: 1; opacity: 0; } 15% { opacity: 1; } }
+
+/* The level and its maps, in the teal of the maps that have passed. */
+.success-level { margin: 14px 24px 0; color: var(--weak); font-size: 16px; }
+.success-level b { color: var(--text); font-weight: var(--strong-weight); }
+.success-level span { color: var(--passed-text); font-weight: var(--strong-weight); }
+/* Facts, never a score: the numbers stay in the size of the text. */
+.success-numbers { margin: 6px 24px 0; color: var(--weak); font-size: 14.5px; }
+.success-numbers b { color: var(--text); font-weight: var(--strong-weight); }
+
+/* You used: a comment and the words of the editor, across the whole width. */
+.used-code { margin-top: 14px; padding: 10px 24px 12px; background: var(--goal-bubble); font: var(--code-weight) 16.5px/1.5 var(--font-code); }
+.used-code > span { color: var(--code-comment); }
+.used-code > div { display: flex; flex-wrap: wrap; gap: 0 18px; }
+.used-code i { color: var(--code-function); font-style: normal; }
+.used-code i.is-keyword { color: var(--code-keyword); }
+
+/* The two other choices share the bottom of the panel, without a line, in the tone of the header. */
+.success-others { display: flex; background: var(--band); }
+.app-window .success-others button { flex: 1; height: 38px; padding: 0; background: none; border: 0; color: var(--band-text); font-weight: 500; }
+.app-window .success-others button:hover { background: var(--band-hover); }
+
+/* Nothing moves for a learner who asked for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  .app-success, .success-band, .success-crossing, .success-band-title, .success-head, .success-head * { animation: none; }
+}
+
+/* The panel alone, in the flow of the page. */
+.app-window.success-board { width: 520px; height: auto; overflow: visible; background: none; box-shadow: none; }
+.page-replay { margin-bottom: 12px; padding: 4px 10px; border: 1px solid #3a3f45; border-radius: 4px; background: #24272b; color: #dee2e6; font: inherit; cursor: pointer; }

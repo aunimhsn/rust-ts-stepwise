@@ -2,9 +2,10 @@
 const SAMPLE_WALLS = ["7,0", "7,1", "7,2", "0,6", "1,6", "8,5"];
 const SAMPLE_SQUARE = ["2,1", "3,1", "4,1", "5,1", "5,2", "5,3", "5,4", "4,4", "3,4", "2,4", "2,3", "2,2"];
 
-// The row on top of the block of the map: a tab per map, none in the sandbox, then the button Legend.
-const appMapRow = (shownMap, passed, sandbox = false) => `<div class="app-map-row">${(sandbox ? [] : [1, 2, 3]).map(number =>
-  `<button type="button" class="app-map-tab ${number === shownMap ? "is-shown" : ""} ${passed.includes(number) ? "is-passed" : ""}">Map ${number}</button>`).join("")}<button type="button" class="app-chip">Legend</button></div>`;
+// The row on top of the block of the map: a tab per map, none in the sandbox, then the button Legend,
+// `legend` being "new" while it carries its dot and "open" while its bubble is open.
+const appMapRow = (shownMap, passed, sandbox = false, legend) => `<div class="app-map-row">${(sandbox ? [] : [1, 2, 3]).map(number =>
+  `<button type="button" class="app-map-tab ${number === shownMap ? "is-shown" : ""} ${passed.includes(number) ? "is-passed" : ""}">Map ${number}</button>`).join("")}<button type="button" class="app-chip ${legend === "open" ? "is-open" : ""}">Legend${legend === "new" ? '<i class="legend-dot"></i>' : ""}</button></div>`;
 
 // The life of the map, cell by cell, in units out of 64 for a cell. The lines: a thicker line every five
 // cells, counted from the cell at the bottom left, half of it on each side of the edge between two cells.

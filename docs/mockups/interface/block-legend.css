@@ -1,0 +1,21 @@
+/* The legend: a bubble under its button, against the right end of the window. It blocks nothing. */
+.app-legend { top: 87px; right: 8px; width: 340px; padding: 14px 16px 16px; border: 0; }
+.legend-head { margin-bottom: 8px; font: 600 16px var(--font-title); }
+/* The cross stands at the same distance from the top and the right borders. */
+.app-window .legend-head button { position: absolute; top: 6px; right: 6px; display: grid; place-items: center; width: 26px; height: 26px; padding: 0; background: none; border: 0; color: var(--weak); }
+
+.legend-row { display: flex; align-items: center; gap: 12px; padding: 3px 0; line-height: 1.25; }
+.legend-row .app-cell { flex: none; }
+.legend-row b { font-weight: var(--strong-weight); }
+.legend-row span { display: block; color: var(--weak); font-size: 12.5px; }
+/* What this level brings: the dark and the cyan of the column New of the goal. */
+.legend-new { display: inline-block; margin-left: 7px; padding: 1px 6px; background: var(--goal-side); color: var(--goal-new-title); border-radius: var(--radius-small); font: 700 10px/1.4 var(--font-text); font-style: normal; letter-spacing: .05em; text-transform: uppercase; vertical-align: 1px; }
+.legend-link { margin-top: 10px; }
+
+/* The button of the legend: open, and its dot while the map has new elements not yet seen. */
+.app-window .app-map-row .app-chip.is-open { background: var(--band-hover); }
+.legend-dot { display: inline-block; width: 8px; height: 8px; margin-left: 7px; border-radius: 50%; background: var(--goal-new-title); vertical-align: 0; }
+
+/* The legend alone, in the flow of the page. */
+.app-window.legend-board { width: 340px; height: auto; overflow: visible; background: none; box-shadow: none; }
+.legend-board .app-popup { position: relative; top: 0; right: 0; }
