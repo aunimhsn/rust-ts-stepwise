@@ -39,3 +39,7 @@ The level screen (paused, an error while running, a menu, the goal) in 3 or 4 st
 ### 3b. States and sizes of the window (#12)
 
 Every state of a run (ready, running, typing refused, paused on a breakpoint, errors before running, goal not met, a map and the level done), the three controls with their hover, the variables panel, the sandbox, the large screen and the largest map.
+
+### 3c. Keyboard (#13)
+
+The four menus, the keyboard shortcuts of the controls decided (checked against those of the browsers, such as F5 and F11, on an AZERTY keyboard), the shortcuts of comfort of the editor (see [Code editor](../specs.md#code-editor)), the command menu.
