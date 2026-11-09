@@ -4,7 +4,6 @@
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(INTERFACE_STYLES).map(([key, style]) => [key, style.title])), fallback: Object.keys(INTERFACE_STYLES)[0] },
   step: { label: "Step", options: Object.fromEntries(Object.entries(STEP_PROPOSALS).map(([key, proposal]) => [key, proposal.title])), fallback: "f8" },
-  more: { label: "Manual button", options: { "read-more": "6 · Read more", "read-manual": "7 · Read the manual", "see-manual": "8 · See it in the manual" }, fallback: "read-manual" },
   hints: { label: "Hints lower by", options: { "0.0": "0 px", "0.5": "0.5 px", "1.0": "1 px", "1.5": "1.5 px" }, fallback: "1.0" },
 };
 

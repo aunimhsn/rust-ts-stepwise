@@ -15,7 +15,7 @@ function appCommandMenu({ category, counts, groups, chosen: command, details, le
   const side = details ? `<div class="app-commands-name">${details.name}</div>
     <p>${details.text}</p>
     <pre class="app-commands-example">${details.example.map(highlightCode).join("\n")}</pre>
-    <button type="button" class="app-primary app-commands-more">${VARIANTS.more.options[chosen.more].replace(/^\d+ · /, "")}</button>` : "";
+    <button type="button" class="app-primary app-commands-more">Read the manual</button>` : "";
   return `<div class="app-popup app-commands" style="left:${left}px;top:${top}px">
     <div class="app-commands-columns">
       <div class="app-commands-categories">${categories}</div>
