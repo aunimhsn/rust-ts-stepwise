@@ -99,9 +99,8 @@
 /* A code is two short words: the field holds 18 characters, and the button takes the rest of the row. */
 .home-code-row .app-chip { flex: 1; }
 .home-code input { flex: none; width: 180px; box-sizing: border-box; height: 32px; padding: 0 10px; background: var(--home-field); color: var(--text); border: 0; border-radius: var(--radius-small); font: var(--code-weight) 14px var(--font-code); }
-/* The field stays flat: a line of amber under the text says that it has the focus, and the code itself takes
-   the color of its state. */
-.home-code input:focus { outline: none; box-shadow: inset 0 -2px 0 var(--accent); }
+/* The field stays flat, even with the focus, which its cursor shows; the code itself takes the color of its state. */
+.home-code input:focus { outline: none; }
 .home-code input.is-wrong { color: var(--error); }
 .home-code.is-right input { color: var(--passed-text); }
 
