@@ -4,6 +4,8 @@
 // is a list and `range` a slider, both setting the CSS `variable` at once, without redrawing the page.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(INTERFACE_STYLES).map(([key, style]) => [key, style.title])), fallback: Object.keys(INTERFACE_STYLES)[0] },
+  buddyHead: { label: "Robot of the large screen: head", range: { min: 80, max: 240, step: 10 }, unit: "px", variable: "--buddy-head", fallback: "140" },
+  buddyText: { label: "its words", range: { min: 16, max: 32, step: 1 }, unit: "px", variable: "--buddy-text", fallback: "22" },
 };
 
 const params = new URLSearchParams(location.search);

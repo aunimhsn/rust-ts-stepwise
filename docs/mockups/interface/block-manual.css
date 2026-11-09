@@ -139,14 +139,15 @@ a.manual-name:hover { background: var(--band-hover); }
 .manual-code { position: relative; }
 .manual-example.is-done .manual-replay { display: flex; }
 
-/* The robot of the large screen, in the room left on the right, and its speech bubble above it. */
-.manual-buddy { display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: 10px; padding: 0 40px 70px 30px; }
-.manual-bubble { position: relative; max-width: 280px; padding: 12px 16px; background: var(--band); color: var(--text); border-radius: 14px; font: 500 16px/1.35 var(--font-name); }
-.manual-bubble::after { content: ""; position: absolute; left: 26px; bottom: -9px; border: 10px solid transparent; border-bottom: 0; border-top-color: var(--band); }
+/* The robot of the large screen, centered in the room left on the right, its speech bubble above it;
+   the size of the head and of the words tuned by eye. */
+.manual-buddy { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: calc(var(--buddy-text, 22px) * .7); padding: 0 40px; }
+.manual-bubble { position: relative; max-width: calc(var(--buddy-text, 22px) * 17); padding: .7em 1em; background: var(--band); color: var(--text); border-radius: .8em; font: 500 var(--buddy-text, 22px)/1.35 var(--font-name); text-align: center; }
+.manual-bubble::after { content: ""; position: absolute; left: calc(50% - 12px); bottom: -11px; border: 12px solid transparent; border-bottom: 0; border-top-color: var(--band); }
 .manual-bubble p { margin: 0; }
-.manual-bubble small { display: block; margin-top: 4px; color: var(--weak); font: 400 12px var(--font-text); }
+.manual-bubble small { display: block; margin-top: .3em; color: var(--weak); font: 400 calc(var(--buddy-text, 22px) * .6) var(--font-text); }
 .manual-bubble.is-new { animation: manual-pop .25s cubic-bezier(.3, 1.6, .5, 1); }
 @keyframes manual-pop { from { transform: scale(.9); } }
-.app-window .manual-buddy-head { padding: 0; margin-left: 8px; background: none; border: 0; cursor: pointer; }
-.manual-buddy-head img { display: block; height: 64px; }
+.app-window .manual-buddy-head { padding: 0; background: none; border: 0; cursor: pointer; }
+.manual-buddy-head img { display: block; height: var(--buddy-head, 140px); }
 @media (prefers-reduced-motion: reduce) { .manual-bubble.is-new { animation: none; } }
