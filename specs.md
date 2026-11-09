@@ -189,7 +189,7 @@ The menus give every command of the screen, with its shortcut, so that the learn
 | Menu | Commands |
 |---|---|
 | **Level** | Goal, Previous level, Next level (greyed until the level is done), All levels (the home screen), Sandbox, Restore starting code…. |
-| **Edit** | Undo, Redo, Commands (the command menu), Toggle breakpoint, Remove all breakpoints. |
+| **Edit** | Undo, Redo, Comment lines, Move line up, Move line down, Commands (the command menu), Toggle breakpoint, Remove all breakpoints. |
 | **Run** | Run / Pause / Resume, Step, Reset, Speed. |
 | **Help** | Manual, Look up in the manual (F1, the word at the cursor), Legend of the map, Keyboard shortcuts. |
 
@@ -233,6 +233,7 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
 - The code of each level is saved in the browser as the learner types, and comes back when they return to the level. **Level › Restore starting code…** puts the level back in its first state, after a confirmation: the starting code, and no breakpoint (a breakpoint belongs to a line of the code, which no longer exists). The confirmations of **Restore starting code** and **Clear all progress** are small panels in the middle of the screen, over a veil (wireframe: [`docs/wireframes/overlays.excalidraw`](docs/wireframes/overlays.excalidraw)): the question, what is lost, *"This can't be undone."*, then **Cancel** and the action, which is the main button: Enter confirms, Escape cancels, as everywhere. Its message doesn't name the breakpoints: *"Your code will be replaced by the starting code of the level, as the first time. This can't be undone."*
 - Syntax highlighting of the keywords, the names, the numbers, the texts, the colors and the comments.
 - Tab inserts four spaces; a new line after a line ending with `:` is indented four spaces more; Backspace at the start of an indentation removes four spaces.
+- A few shortcuts of comfort, as in a code editor: **Tab** and **Shift+Tab** indent and unindent the selected lines; **Ctrl+:** comments or uncomments the current or selected lines; **Alt+↑** and **Alt+↓** move the line. AZERTY is the keyboard of reference, so the menu **Edit** shows **Ctrl+:**. **Ctrl+/**, the same command on a QWERTY keyboard, works everywhere as well, without any setting, and **Help › Keyboard shortcuts** mentions it. Multiple cursors, Ctrl+D and find and replace aren't part of it: the programs are short.
 - Errors underlined, with their message on hover (see [Checks before running](#checks-before-running)).
 - **Ctrl+click** (Cmd+click on a Mac), as in a code editor: holding Ctrl underlines the name under the mouse; a click on a built-in function or a keyword opens its entry of the manual in a drawer (see [Manual](#manual)), and a click on a function of the program puts the cursor on its definition. **F1** does the same for the word at the cursor, for the keyboard. **Help › Keyboard shortcuts** and the section **Your first program** of the manual mention it.
 - A thin vertical line at the 80th column. A longer line is underlined with dots, as advice and not as an error, with *"Lines are easier to read under 80 characters."* on hover; the program still runs. The manual explains it in **Conventions**.
