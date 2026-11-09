@@ -46,13 +46,14 @@
 .home-disc { position: absolute; inset: 0; display: grid; place-items: center; overflow: hidden; border-radius: 50%; }
 .home-number { position: relative; z-index: 1; }
 
-/* On hover, a level done hops once, and the robot with it when it stands on it. The invisible area keeps the
-   mouse on the stone while it is in the air or squashed, so that the hop never starts over by itself. */
+/* On hover, a level done hops once and throws up the robot standing on it, which lands after the stone. The
+   invisible area keeps the mouse on the stone while it is in the air or squashed, so that the hop never
+   starts over by itself. */
+.home-path:has(.home-stone.is-done[aria-pressed="true"]:hover) .home-robot { animation: home-thrown .85s ease-in-out; }
+@keyframes home-thrown { 0%, 12% { transform: none; } 48% { transform: translateY(-40px) rotate(-10deg); } 78% { transform: translateY(5px) rotate(4deg); } 90% { transform: translateY(-5px); } 100% { transform: none; } }
 .home-stone.is-done:hover { transform-origin: 50% 100%; animation: home-hop .5s cubic-bezier(.3, .7, .4, 1); }
 .home-stone.is-done:hover::before { content: ""; position: absolute; inset: -8px -2px -14px; }
-.home-path:has(.home-stone.is-done[aria-pressed="true"]:hover) .home-robot { animation: home-ride .5s cubic-bezier(.3, .7, .4, 1); }
 @keyframes home-hop { 30% { transform: translateY(-13px) scale(.95, 1.06); } 60% { transform: scale(1.12, .86); } 80% { transform: translateY(-3px); } }
-@keyframes home-ride { 30% { transform: translateY(-15px); } 60% { transform: translateY(6px); } 80% { transform: translateY(-3px); } }
 
 /* On hover, the level to play takes the visor of the robot instead of its number: its eyes search around. */
 .home-stone.is-play .home-disc::before { content: ""; position: absolute; left: calc(50% - 16px); top: calc(50% - 8px); width: 32px; height: 16px; background: #222935; border-radius: 8px; transform: scale(0); transition: transform .22s cubic-bezier(.3, 1.6, .5, 1); }
@@ -104,9 +105,23 @@
 /* The maps of the level, then its one button, at the bottom of the panel. */
 .home-bottom { margin-top: auto; }
 .home-maps { display: flex; gap: 8px; }
-.home-map { width: 74px; height: 26px; box-sizing: border-box; display: grid; place-items: center; background: var(--chip); color: var(--on-chip); border: var(--chip-border); border-radius: var(--radius-small); font-size: 13px; font-weight: 500; }
-.home-map.is-passed { background: var(--passed); color: var(--on-passed); border-color: transparent; }
-.home-map.is-locked { background: none; color: var(--weak); border: 1px dashed var(--idle); }
+/* The tiles speak as the tabs of the map on the level screen: pale teal once passed, full teal when also shown. */
+.app-window .home-map { position: relative; width: 74px; height: 26px; box-sizing: border-box; display: grid; place-items: center; padding: 0; background: var(--chip); color: var(--on-chip); border: var(--chip-border); border-radius: var(--radius-small); font-size: 13px; font-weight: 500; }
+.app-window .home-map.is-shown { box-shadow: inset 0 0 0 2px var(--accent); font-weight: var(--strong-weight); }
+.app-window .home-map.is-passed { background: var(--passed-soft); color: var(--text); border-color: transparent; }
+.app-window .home-map.is-passed.is-shown { background: var(--passed); color: var(--on-passed); box-shadow: none; }
+.app-window .home-map.is-locked { background: none; color: var(--weak); border: 1px dashed var(--idle); }
+
+/* On hover, the head of the robot rises from behind a tile that can be chosen, its eyes searching: its body
+   only, without its tracks, with some white under the visor. It is taller than the tile, so it is hidden at
+   rest; the tiles keep a stacking context of their own, so that it stays above the panel and behind its tile. */
+.home-maps { isolation: isolate; }
+.home-map[data-map]::before, .home-map[data-map]::after { content: ""; position: absolute; z-index: -1; pointer-events: none; opacity: 0; transition: transform .22s cubic-bezier(.3, 1.6, .5, 1), opacity .1s; }
+.home-map[data-map]::before { left: calc(50% - 24px); top: 0; width: 48px; height: 29px; background: url(../world-elements/daylight/robot.svg) -21.5px -18.5px / 91px 91px no-repeat; border-radius: 14px 14px 0 0; }
+.home-map[data-map]::after { left: calc(50% - 17.1px); top: 7.2px; width: 34.3px; height: 15.7px; background: radial-gradient(circle at 9.3px 7.9px, #3fc3ff 4px, transparent 4.5px), radial-gradient(circle at 25px 7.9px, #3fc3ff 4px, transparent 4.5px), #222935; border-radius: 7.9px; }
+.home-map[data-map]:hover::before { opacity: 1; transform: translateY(-27px); }
+.home-map[data-map]:hover::after { opacity: 1; transform: translateY(-27px); animation: home-tile-eyes 2.2s .2s ease-in-out infinite; }
+@keyframes home-tile-eyes { 0%, 12%, 100% { background-position: 0 0, 0 0; } 22%, 40% { background-position: -3px 0, -3px 0; } 50%, 72% { background-position: 3px 0, 3px 0; } 84% { background-position: 0 0, 0 0; } }
 .app-window button.home-go { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; height: 50px; margin-top: 12px; padding: 0; font-size: 15px; }
 /* Play: the button of Let's go (block-goal.css), with the robot that crosses it on hover. */
 .app-window button.home-play { margin-top: 12px; border-radius: var(--control-radius); box-shadow: var(--control-shadow); }
@@ -115,5 +130,5 @@
 @media (prefers-reduced-motion: reduce) {
   .home-robot { transition: none; }
   .home-scene.is-play .app-robot > * { animation: none; }
-  .home-stone, .home-robot, .home-number, .home-disc::before, .home-disc::after { animation: none !important; transition: none !important; }
+  .home-stone, .home-robot, .home-number, .home-disc::before, .home-disc::after, .home-map::before, .home-map::after { animation: none !important; transition: none !important; }
 }

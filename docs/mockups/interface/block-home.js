@@ -78,9 +78,26 @@ function homeSpiralCells() {
   return cells;
 }
 
-function homeSpiral() {
+// The ground of each map of a level, the same task on different ground: `shift` moves the square of the
+// goal, `spiral` holds the walls around the drawing of a level done.
+const HOME_MAPS = [
+  { shift: [0, 0], walls: SAMPLE_WALLS, spiral: [] },
+  { shift: [2, 1], walls: ["0,0", "1,0", "0,1", "9,0", "9,1"], spiral: ["0,2", "0,3", "1,2", "1,3"] },
+  { shift: [-1, 1], walls: ["6,0", "6,1", "8,2", "8,3", "8,4", "7,6"], spiral: ["8,4", "9,4", "8,5", "9,5", "0,6", "1,6"] },
+];
+
+function homeSquareMap(map) {
+  const { shift: [dx, dy], walls } = HOME_MAPS[map];
+  const cells = SAMPLE_SQUARE.map(cell => cell.split(",").map(Number)).map(([x, y]) => `${x + dx},${y + dy}`);
+  const marks = {};
+  cells.forEach((cell, index) => { marks[cell] = { goalPaint: "red", goalAround: squareGoalSides(index) }; });
+  marks[cells[0]].robot = "east";
+  return appRowsWorld(homeFloor(walls), marks, HOME_CELL);
+}
+
+function homeSpiral(map) {
   const cells = homeSpiralCells();
-  const rows = homeFloor().map((row, y) => [...row].map((char, x) => cells.includes(`${x},${y}`) ? "b" : char).join(""));
+  const rows = homeFloor(HOME_MAPS[map].spiral).map((row, y) => [...row].map((char, x) => cells.includes(`${x},${y}`) ? "b" : char).join(""));
   return appRowsWorld(rows, { [cells.at(-1)]: { robot: "north" } }, HOME_CELL, pathLinks(...cells));
 }
 
@@ -98,7 +115,7 @@ function homeTwoSquares() {
 const HOME_EYELIDS = '<svg class="home-eyelids" viewBox="0 0 64 64" aria-hidden="true"><rect x="22" y="20" width="20" height="7" fill="#222935"/></svg>';
 
 const HOME_SCENES = {
-  play: () => appWorld({ robot: SAMPLE_SQUARE[0], facing: "east", size: HOME_CELL }).replace(/(robot\.svg" alt="">)/, `$1${HOME_EYELIDS}`),
+  play: map => homeSquareMap(map).replace(/(robot\.svg" alt="">)/, `$1${HOME_EYELIDS}`),
   done: homeSpiral,
   locked: homeTwoSquares,
 };
@@ -108,10 +125,16 @@ const HOME_GOALS = {
   done: "Paint a spiral from the center of the map to its border, with a while loop.",
 };
 
-const homeMapChips = ({ number, maps }) => `<div class="home-maps">${Array.from({ length: maps }, (_, index) => {
+// The map shown when a level is chosen: the first one of a level done, the first not passed of the level to play.
+const homeFirstMap = ({ number, maps }) => homeStatus(number) === "play" ? Math.min(HOME_MAPS_PASSED, maps - 1) : 0;
+
+// A tile is a button only when there is a map to choose: more than one, in a level open.
+const homeMapChips = ({ number, maps }, shown) => `<div class="home-maps">${Array.from({ length: maps }, (_, index) => {
   const status = homeStatus(number);
   const passed = status === "done" || (status === "play" && index < HOME_MAPS_PASSED);
-  return `<span class="home-map ${passed ? "is-passed" : status === "locked" ? "is-locked" : ""}">Map ${index + 1}</span>`;
+  const state = passed ? "is-passed" : status === "locked" ? "is-locked" : "";
+  if (status === "locked" || maps === 1) return `<span class="home-map ${state} ${status === "locked" ? "" : "is-shown"}">Map ${index + 1}</span>`;
+  return `<button type="button" class="home-map ${state} ${index === shown ? "is-shown" : ""}" data-map="${index}" aria-pressed="${index === shown}">Map ${index + 1}</button>`;
 }).join("")}</div>`;
 
 const homeCode = codeError => `<div class="home-code">
@@ -120,23 +143,24 @@ const homeCode = codeError => `<div class="home-code">
   ${codeError ? '<p class="home-code-error">No level has this code. Check its two words.</p>' : "<p>A code opens its level and every level before it.</p>"}
 </div>`;
 
+const homePlay = () => '<button type="button" class="goal-go home-play"><span>Play</span></button>';
 const HOME_BUTTONS = {
-  play: () => '<button type="button" class="goal-go home-play"><span>Play</span></button>',
-  done: () => '<button type="button" class="app-chip home-go">Play again</button>',
+  play: homePlay,
+  done: homePlay,
   locked: () => '<button type="button" class="home-go is-locked" disabled>Locked</button>',
 };
 
-function homePanel(chapters, stone, codeError) {
+function homePanel(chapters, stone, codeError, map = homeFirstMap(stone)) {
   const status = homeStatus(stone.number);
   const toPlay = homeLayout(chapters).stones[HOME_TO_PLAY - 1];
   const text = status === "locked" ? `Finish ${toPlay.number}. ${toPlay.title} to open this level.` : HOME_GOALS[status];
   return `<aside class="home-panel">
     <p class="home-chapter">${stone.chapter + 1}. ${chapters[stone.chapter].name}</p>
     <h3>${stone.number}. ${stone.title}</h3>
-    <div class="home-scene is-${status}">${HOME_SCENES[status]()}</div>
+    <div class="home-scene is-${status}">${HOME_SCENES[status](map)}</div>
     <p class="home-goal">${text}</p>
     ${status === "locked" ? homeCode(codeError) : ""}
-    <div class="home-bottom">${homeMapChips(stone)}${HOME_BUTTONS[status]()}</div>
+    <div class="home-bottom">${homeMapChips(stone, map)}${HOME_BUTTONS[status]()}</div>
   </aside>`;
 }
 
@@ -168,6 +192,16 @@ function homeWindow({ chosen: level = HOME_TO_PLAY, tip, long = false, codeError
     </div></div>
   </div>`;
 }
+
+// A click on a map tile shows that map in the panel; Play would open the level on it.
+document.addEventListener("click", event => {
+  const tile = event.target.closest?.(".home-map[data-map]");
+  const screen = tile?.closest(".home-window");
+  if (!screen) return;
+  const chapters = "long" in screen.dataset ? HOME_MORE : HOME_CHAPTERS;
+  const level = screen.querySelector('.home-stone[aria-pressed="true"]').dataset.level;
+  screen.querySelector(".home-panel").outerHTML = homePanel(chapters, homeLayout(chapters).stones[Number(level) - 1], false, Number(tile.dataset.map));
+});
 
 // A click on a stone chooses its level: the robot goes there and the panel shows it; only Play opens it.
 document.addEventListener("click", event => {
