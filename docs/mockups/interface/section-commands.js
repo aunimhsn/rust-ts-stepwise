@@ -5,7 +5,7 @@ const COMMAND_LINES = extra => {
   return lines;
 };
 
-const COMMAND_FORWARD = { name: "forward()", text: "Moves the robot one cell in front. In front of a wall, it bumps and the program stops.", example: ["repeat 3:", "    forward()", "turn_left()"] };
+const COMMAND_FORWARD = { name: "forward()", text: "Moves the robot one cell in front.", example: ["repeat 3:", "    forward()", "turn_left()"] };
 const COMMAND_PAINT = { name: "start_painting(color)", text: "Puts the brush down with the color: paints every cell the robot moves into.", example: ["start_painting(red)", "forward()"] };
 const COMMAND_IF = { name: "if", text: "Runs its block when the condition is true.", example: ["if front_is_clear():", "    forward()"] };
 const COMMAND_SIDES = { name: "sides", text: "A variable of your program.", example: ["sides = sides + 1"] };

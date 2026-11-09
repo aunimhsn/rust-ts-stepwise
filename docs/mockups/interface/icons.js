@@ -3,6 +3,7 @@ const appIcon = (size, body, fill = "none") => `<svg width="${size}" height="${s
 
 const ICONS = {
   play: size => appIcon(size, '<path d="M5 3.2 12.6 8 5 12.8Z"/>', "currentColor"),
+  stop: size => appIcon(size, '<rect x="3.5" y="3.5" width="9" height="9" rx="1"/>', "currentColor"),
   pause: size => appIcon(size, '<path d="M5.5 3.4v9.2M10.5 3.4v9.2" stroke-width="2.4"/>'),
   diamond: size => appIcon(size, '<path d="M8 2.2 13.8 8 8 13.8 2.2 8Z"/>'),
   // An arrow down onto a dot, as the "step into" of the developer tools.
@@ -15,6 +16,9 @@ const ICONS = {
   chevron: size => appIcon(size, '<path d="m6 3.5 4.5 4.5L6 12.5"/>'),
   close: size => appIcon(size, '<path d="m4 4 8 8M12 4l-8 8"/>'),
   next: size => appIcon(size, '<path d="M4.5 3.5 11 8l-6.5 4.5Z"/>', "currentColor"),
+  search: size => appIcon(size, '<circle cx="7" cy="7" r="4.6"/><path d="m10.4 10.4 3.6 3.6"/>'),
+  // A page opened elsewhere: an arrow out of its box.
+  external: size => appIcon(size, '<path d="M9.5 2.5h4v4M13.5 2.5 7.5 8.5"/><path d="M11.5 9.5v3a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h3"/>'),
   // The arrows of the keyboard, as printed on its keys.
   arrowUp: size => appIcon(size, '<path d="M8 13.2V2.8M3.8 7 8 2.8 12.2 7"/>'),
   arrowDown: size => appIcon(size, '<path d="M8 2.8v10.4M3.8 9 8 13.2 12.2 9"/>'),

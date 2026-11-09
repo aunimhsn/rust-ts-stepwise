@@ -1,0 +1,158 @@
+/* The manual: the sections on the left, the content in the middle, On this page on the right. */
+:root[data-theme="day-desk"] { --manual-field: #e4e8ee; --manual-mark: #ffe9ad; }
+:root[data-theme="night-desk"] { --manual-field: #14181e; --manual-mark: #4a3c17; }
+
+/* Back to the level: an amber button along the bottom of the column of the sections, as high as the
+   header of the other screens. On hover, the robot crosses it backward, from right to left,
+   leaving a lighter amber behind it, as on Play and Unlock. */
+.app-window .manual-back { position: relative; flex: none; width: 100%; height: 49px; padding: 0 20px; overflow: hidden; background: var(--accent); color: var(--on-accent); border: 0; border-radius: 0; font-weight: var(--strong-weight); }
+.manual-back span { position: relative; z-index: 1; }
+.manual-back::before, .manual-back::after { content: ""; position: absolute; pointer-events: none; }
+.manual-back::before { inset: 0 0 0 calc(100% + 15px); background: #ffd25e; opacity: 0; transition: opacity .2s, left 0s .2s; }
+.manual-back::after { z-index: 2; right: -36px; top: calc(50% - 15px); width: 30px; height: 30px; background: url(../world-elements/daylight/robot.svg) center / contain no-repeat; transform: rotate(270deg); }
+.manual-back:hover::before { left: -15px; opacity: 1; transition: left .85s cubic-bezier(.35, .05, .4, 1), opacity 0s; }
+.manual-back:hover::after { right: calc(100% + 4px); transition: right .85s cubic-bezier(.35, .05, .4, 1); }
+@media (prefers-reduced-motion: reduce) {
+  .manual-back::before, .manual-back::after { display: none; }
+  .app-window .manual-back:hover { background: #ffd25e; }
+}
+
+/* The three columns. On a large screen, the sections stay against the left edge and the column of text
+   under about 760 pixels; the room left on the right holds the robot and what it says. */
+.manual-body { flex: 1; min-height: 0; display: grid; grid-template-columns: 0 250px minmax(0, 1fr) 200px 0; background: var(--surface); }
+.manual-window.is-large .manual-body { grid-template-columns: 0 270px minmax(0, 840px) 230px 1fr; }
+.manual-body::before { content: ""; background: var(--band); }
+.manual-side { display: flex; flex-direction: column; min-height: 0; padding: 0; background: var(--band); color: var(--band-text); }
+/* Opened from the home screen, the name leads back to it. */
+a.manual-name { color: inherit; text-decoration: none; cursor: pointer; }
+a.manual-name:hover { background: var(--band-hover); }
+.manual-name { flex: none; display: flex; align-items: center; height: 49px; padding: 0 14px 3px; box-sizing: border-box; margin-bottom: 8px; }
+.manual-content { position: relative; overflow: hidden auto; }
+.manual-text { box-sizing: border-box; max-width: 840px; padding: 30px 40px 60px; font-size: 14.5px; line-height: 1.6; }
+
+/* The search field: flat, without border, darker than its column. */
+.manual-search { position: relative; display: flex; align-items: center; height: 34px; margin: 0 14px 10px; padding: 0 8px 0 0; overflow: hidden; background: var(--manual-field); color: var(--weak); border-radius: var(--radius-small); }
+/* The magnifier, dark grey on a small amber square at the start of the field. */
+.manual-search-icon { flex: none; display: grid; place-items: center; width: 34px; height: 34px; background: var(--accent); color: #3a4250; }
+.manual-search input { flex: 1; min-width: 0; height: 100%; margin-left: 10px; padding: 0; background: none; border: 0; color: var(--text); font: 500 var(--size-text) var(--font-text); }
+/* The lowercase letters sit low in the font: the text is raised by 1.5 px to center them, tuned by eye. */
+.manual-search input { position: relative; top: -1.5px; }
+.manual-search input:focus { outline: none; }
+.manual-search input::placeholder { color: var(--weak); }
+.app-window .manual-clear { display: flex; padding: 3px; background: none; border: 0; color: var(--weak); }
+.app-window .manual-clear[hidden] { display: none; }
+
+/* The ten sections, the open one with its categories under it. */
+.manual-list { flex: 1; min-height: 0; overflow: hidden auto; padding-bottom: 14px; }
+.manual-sections a { display: block; padding: 4px 18px; cursor: pointer; }
+.manual-section.is-open { background: var(--tab-chosen); color: var(--on-tab-chosen); font-weight: var(--strong-weight); }
+.manual-sections a:not(.is-open):hover { background: var(--band-hover); }
+.manual-category { margin-left: 18px; padding-left: 16px !important; color: var(--band-weak); border-left: 2px solid var(--band-hover); }
+.manual-category.is-here { color: var(--band-text); border-left-color: var(--accent); font-weight: 500; }
+
+/* The results of a search, grouped by their place. */
+.manual-count { padding: 0 18px 6px; color: var(--band-weak); font-size: 12px; }
+.manual-place { padding: 8px 18px 3px; color: var(--band-weak); font: 600 11px var(--font-text); letter-spacing: .05em; text-transform: uppercase; }
+.manual-place i { font-style: normal; opacity: .6; }
+.manual-result { display: block; padding: 3px 18px 3px 28px; cursor: pointer; }
+.manual-result.is-code { font: var(--code-weight) 13.5px/1.5 var(--font-code); font-variant-ligatures: none; }
+.manual-result:hover { background: var(--band-hover); }
+.manual-result.is-chosen { background: var(--chosen); color: var(--on-chosen); }
+/* The match in each name: an amber background behind dark letters, readable on every background. */
+.manual-result mark { background: var(--accent); color: var(--on-accent); font-weight: var(--code-strong-weight); border-radius: 2px; box-shadow: 0 0 0 1px var(--accent); }
+.manual-none { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 30px 22px; color: var(--band-weak); text-align: center; }
+.manual-none p { margin: 6px 0 0; color: var(--band-text); font-weight: var(--strong-weight); }
+.manual-none code { font: var(--code-weight) 13px var(--font-code); }
+
+/* On this page: the categories of the section, the one in view marked. */
+/* 20 px away from the scroll bar of the content, tuned by eye. */
+.manual-toc { padding: 34px 18px 0 20px; }
+.manual-toc b { display: block; margin-bottom: 8px; color: var(--weak); font: 600 11px var(--font-text); letter-spacing: .06em; text-transform: uppercase; }
+.manual-toc a { display: block; padding: 3px 0 3px 12px; color: var(--weak); border-left: 2px solid var(--hover); cursor: pointer; }
+.manual-toc a:hover { color: var(--text); }
+.manual-toc a.is-here { color: var(--text); border-left-color: var(--accent); font-weight: 500; }
+
+/* The text of a section. */
+/* The headings and the code of the window, never those of the page of the mock-up around it. */
+.app-window .manual-text :is(h1, h2, h3) { color: var(--text); text-transform: none; letter-spacing: normal; }
+.app-window .manual-text .manual-sign { margin: 0; }
+.app-window .manual-text code, .app-window .manual-none code { color: inherit; }
+.manual-text h1 { margin: 0 0 8px; font: var(--title-weight) 27px/1.25 var(--font-title); }
+.manual-text h2 { margin: 34px 0 6px; font: 700 19px/1.3 var(--font-title); }
+.manual-text p { margin: 0 0 10px; }
+.manual-text code { font: var(--code-weight) .92em var(--font-code); font-variant-ligatures: none; }
+.manual-lead { color: var(--weak); font-size: 15.5px; }
+
+/* An entry: its name in the margin, what it does and its example beside it, a line between two entries;
+   decided in place of a name on a band, a card, a comic strip of the steps and the level screen in small. */
+.manual-entry { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 0 18px; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--hover); }
+.manual-sign { display: flex; flex-direction: column; gap: 2px; margin: 0; }
+.manual-sign code { font: var(--code-strong-weight) 14.5px/1.4 var(--font-code); }
+.manual-entry.is-flash { animation: manual-flash 1.6s ease-out; }
+@keyframes manual-flash { from { background: var(--manual-mark); } }
+
+/* The example: its code, and the small map where it plays. No Copy: the learner types it again. */
+.manual-example { display: flex; margin-top: 12px; }
+.manual-code { display: flex; flex-direction: column; flex: 1; min-width: 0; padding: 10px 0 0; background: var(--band); border-radius: var(--radius-small) 0 0 var(--radius-small); }
+.manual-code pre { margin: 0 0 10px; font: var(--code-weight) 13.5px/21px var(--font-code); font-variant-ligatures: none; color: var(--code-text); }
+.manual-line { display: block; padding: 0 14px; }
+.manual-line.is-on { background: var(--current); }
+/* The map fills its side of the example, without a frame or a shadow. */
+.manual-map { flex: none; overflow: hidden; border-radius: 0 var(--radius-small) var(--radius-small) 0; }
+.manual-map .app-map { box-shadow: none; }
+/* The console of an example that prints, named as the one of the level screen, under the map: the level
+   screen in small. */
+.manual-example.has-console { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "code map" "code console"; }
+.has-console .manual-code { grid-area: code; }
+.has-console .manual-map { grid-area: map; border-radius: 0 var(--radius-small) 0 0; }
+.manual-console { grid-area: console; display: flex; flex-direction: column; gap: 4px; min-height: 66px; box-sizing: border-box; padding: 8px 14px 10px; background: var(--hover); border-radius: 0 0 var(--radius-small) 0; }
+/* The name stays grey, so that it is never read as a line printed by the program. */
+.manual-console b { color: var(--weak); font: 700 var(--size-text) var(--font-text); }
+.manual-out { color: var(--code-text); font: var(--code-weight) 13px/20px var(--font-code); font-variant-ligatures: none; }
+
+/* The drawer, over the map and the panels of the level screen, the code still in view. */
+.manual-drawer { top: 49px; right: 0; bottom: 0; width: 50%; display: flex; flex-direction: column; background: var(--surface); border: 0; border-radius: 0; box-shadow: -12px 0 34px #22293530; }
+.app-window.is-large .manual-drawer { width: calc(100% - var(--crossing)); }
+.manual-drawer-head { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 10px 0 18px; background: var(--band); color: var(--band-text); }
+.manual-drawer-head b { margin-right: auto; font: var(--title-weight) 15px var(--font-title); }
+.app-window .manual-full { display: flex; align-items: center; gap: 6px; }
+.app-window .manual-drawer-close { display: flex; padding: 5px; background: none; border: 0; color: var(--band-weak); }
+.manual-drawer-search { padding: 12px 4px 0; background: var(--band); }
+.manual-drawer-search .manual-search { margin: 0 14px 12px; }
+.manual-drawer-results { flex: 1; min-height: 0; overflow: auto; padding: 12px 0; background: var(--band); color: var(--band-text); }
+.manual-drawer-results[hidden], .manual-drawer-scroll[hidden] { display: none; }
+.manual-drawer-scroll { flex: 1; min-height: 0; overflow: hidden auto; }
+.manual-drawer-place { padding: 16px 28px 0; color: var(--weak); font-size: 12.5px; }
+.manual-drawer-place i { font-style: normal; opacity: .6; }
+.manual-drawer .manual-text { padding: 0 28px 40px; }
+.manual-drawer .manual-entry:first-child { margin-top: 10px; }
+/* The drawer is too narrow for the margin: the name goes above its entry. */
+.manual-drawer .manual-entry { grid-template-columns: minmax(0, 1fr); }
+.app-window .manual-drawer .manual-sign { flex-direction: row; gap: 4px 18px; margin-bottom: 6px; }
+.manual-hand { position: absolute; z-index: 3; pointer-events: none; }
+/* The hand on forward(), line 5 of the code: past the margin and eight spaces. */
+.manual-hand-place { position: absolute; z-index: 3; left: calc(52px + 14px + 12ch); top: 150px; font: var(--code-weight) var(--size-code) var(--font-code); pointer-events: none; }
+
+/* ▶ in the corner of the code, amber as Run on the level screen; ■ in its place while the example plays.
+   At the end, ▶ comes back fading in. */
+.manual-code { position: relative; }
+.app-window .manual-run, .app-window .manual-stop { position: absolute; right: 8px; bottom: 8px; display: grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: var(--control-radius); }
+.app-window .manual-run { background: var(--accent); color: var(--on-accent); }
+.app-window .manual-stop { display: none; background: var(--control); color: var(--on-control); box-shadow: var(--control-shadow); }
+.manual-example.is-playing .manual-run { display: none; }
+.manual-example.is-playing .manual-stop { display: grid; }
+.manual-example.is-done .manual-run { animation: manual-fade-in .8s ease-out; }
+@keyframes manual-fade-in { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .manual-example.is-done .manual-run { animation: none; } }
+
+/* The robot of the large screen, centered in the room left on the right, its speech bubble above it;
+   the size of the head (80 px) and of the words (25 px) tuned by eye; each sentence on one line. */
+.manual-buddy { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: calc(25px * .7); padding: 0 40px; }
+.manual-bubble { position: relative; white-space: nowrap; padding: .7em 1em; background: var(--band); color: var(--text); border-radius: .8em; font: 500 25px/1.35 var(--font-name); text-align: center; }
+.manual-bubble::after { content: ""; position: absolute; left: calc(50% - 12px); bottom: -11px; border: 12px solid transparent; border-bottom: 0; border-top-color: var(--band); }
+.manual-bubble p { margin: 0; }
+.manual-bubble.is-new { animation: manual-pop .25s cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes manual-pop { from { transform: scale(.9); } }
+.app-window .manual-buddy-head { padding: 0; background: none; border: 0; cursor: pointer; }
+.manual-buddy-head img { display: block; height: 80px; }
+@media (prefers-reduced-motion: reduce) { .manual-bubble.is-new { animation: none; } }

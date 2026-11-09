@@ -47,3 +47,7 @@ The four menus, the keyboard shortcuts of the controls decided (checked against 
 ### 3d. Panels (#14)
 
 The success panel, with the robot that paints its top and turns into the logo; the legend of the map; the two confirmations. The level codes became the teacher's alone: the interface never shows them.
+
+### 3e. Home screen (#15)
+
+The path of the levels with its chapters, the stones and the squares of their maps, the robot on the level chosen; the panel of a level to play, done and locked with its code; the large screen, and more levels than fit.
