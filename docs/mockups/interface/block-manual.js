@@ -48,25 +48,47 @@ function manualFrames({ map, trace }) {
 const MANUAL_ENTRIES = Object.fromEntries(MANUAL_COMMANDS.flatMap(({ entries }) => entries).map(entry => [entry.id, entry]));
 const MANUAL_FRAMES = Object.fromEntries(Object.values(MANUAL_ENTRIES).map(entry => [entry.id, manualFrames(entry)]));
 
-function manualMap(entry, frame) {
+function manualMap(entry, frame, cell = MANUAL_CELL) {
   const extras = appMapLife(frame.rows);
   const add = (cell, mark) => { extras[cell] = { ...extras[cell], ...mark }; };
   for (const cell of entry.map.slots ?? []) add(cell, { goalItem: true });
   for (const cell of frame.items) add(cell, { item: true });
   const [x, y, facing] = frame.robot;
   add(`${x},${y}`, { robot: facing, carrying: frame.carrying, pincer: frame.pincer });
-  return appMap(frame.rows, extras, MANUAL_CELL, frame.links);
+  return appMap(frame.rows, extras, cell, frame.links);
 }
 
 // An example: its code, to type again rather than copy, the small map where it plays, filling the rest
-// of the card, and the console, named as on the level screen, when it prints.
+// of the card, and the console, named as on the level screen, when it prints. The status bar counts the
+// steps, for the look of the level screen in small (14).
+const manualStepText = (step, frames) => step === 0 ? "Ready" : `Step ${step} of ${frames.length - 1}`;
+
 function manualExample(entry, step = 0) {
-  const frame = MANUAL_FRAMES[entry.id][step];
+  if (chosen.entry === "strip") return manualStrip(entry);
+  const frames = MANUAL_FRAMES[entry.id];
+  const frame = frames[step];
   const prints = entry.lines.some(line => line.startsWith("print"));
   return `<div class="manual-example ${prints ? "has-console" : ""}" data-example="${entry.id}" data-frame="${step}">
-    <div class="manual-code"><pre>${entry.lines.map((line, index) => `<span class="manual-line ${frame.line === index ? "is-on" : ""}">${highlightCode(line) || " "}</span>`).join("")}</pre></div>
+    <div class="manual-code"><pre>${entry.lines.map((line, index) => `<span class="manual-line ${frame.line === index ? "is-on" : ""}">${highlightCode(line) || " "}</span>`).join("")}</pre><div class="manual-status"><b>${manualStepText(step, frames)}</b></div></div>
     <div class="manual-map">${manualMap(entry, frame)}</div>
-    ${entry.lines.some(line => line.startsWith("print")) ? `<div class="manual-console"><b>Console</b><div class="manual-out">${frame.out.join("<br>")}</div></div>` : ""}
+    ${prints ? `<div class="manual-console"><b>Console</b><div class="manual-out">${frame.out.join("<br>")}</div></div>` : ""}
+  </div>`;
+}
+
+// 13: the example as a strip, still: the start, then one frame per step that acts, the map after it and
+// the line of code that did it, read from left to right as a comic.
+const MANUAL_STRIP_CELL = 26;
+function manualStrip(entry) {
+  const frames = MANUAL_FRAMES[entry.id];
+  const acting = frames.map((frame, index) => ({ frame, action: index ? entry.trace[index - 1][1] : "start" })).filter(({ action }) => action);
+  return `<div class="manual-example is-strip">
+    <div class="manual-code"><pre>${entry.lines.map(line => `<span class="manual-line">${highlightCode(line) || " "}</span>`).join("")}</pre></div>
+    <ol class="manual-strip">${acting.map(({ frame, action }, index) => `<li>
+      <span class="manual-strip-number">${index + 1}</span>
+      ${manualMap(entry, frame, MANUAL_STRIP_CELL)}
+      <code>${action === "start" ? '<span class="manual-strip-start">start</span>' : highlightCode(entry.lines[frame.line].trim()).replace("(", "<wbr>(")}</code>
+      ${action.startsWith("print") ? `<span class="manual-strip-out">${frame.out.at(-1)}</span>` : ""}
+    </li>`).join("")}</ol>
   </div>`;
 }
 
@@ -144,7 +166,7 @@ const MANUAL_HAND = '<svg class="manual-hand" width="17" height="21" viewBox="0 
 
 // The examples play one step every 0.7 s, wait on their end, then start again.
 setInterval(() => {
-  for (const example of document.querySelectorAll(".manual-example")) {
+  for (const example of document.querySelectorAll(".manual-example[data-example]")) {
     const wait = Number(example.dataset.wait ?? 0);
     if (wait > 0) { example.dataset.wait = wait - 1; continue; }
     const entry = MANUAL_ENTRIES[example.dataset.example];
@@ -158,6 +180,7 @@ setInterval(() => {
     example.querySelectorAll(".manual-line").forEach((line, index) => line.classList.toggle("is-on", index === frame.line));
     const out = example.querySelector(".manual-out");
     if (out) out.innerHTML = frame.out.join("<br>");
+    example.querySelector(".manual-status b").textContent = manualStepText(step, frames);
   }
 }, 700);
 

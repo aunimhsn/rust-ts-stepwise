@@ -83,19 +83,20 @@ a.manual-name:hover { background: var(--band-hover); }
 .manual-text code { font: var(--code-weight) .92em var(--font-code); font-variant-ligatures: none; }
 .manual-lead { color: var(--weak); font-size: 15.5px; }
 
-/* An entry: a card of its own, decided in place of a name on a band or in the margin. */
-.manual-entry { margin-top: 22px; padding: 16px 18px 18px; background: var(--band); border-radius: var(--radius-small); }
+/* An entry: its name, what it does, its example. Five layouts compared below the shared rules. */
+.manual-entry { margin-top: 22px; border-radius: var(--radius-small); }
 .manual-sign { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 0 0 8px; }
-.manual-sign code { font: var(--code-strong-weight) 17px/1.4 var(--font-code); }
+.manual-sign code { font: var(--code-strong-weight) 15.5px/1.4 var(--font-code); }
 .manual-entry.is-flash { animation: manual-flash 1.6s ease-out; }
 @keyframes manual-flash { from { background: var(--manual-mark); } }
 
 /* The example: its code, and the small map where it plays. No Copy: the learner types it again. */
 .manual-example { display: flex; margin-top: 12px; }
-.manual-code { display: flex; flex-direction: column; flex: 1; min-width: 0; padding: 10px 0 0; background: var(--surface); border-radius: var(--radius-small) 0 0 var(--radius-small); }
-.manual-code pre { margin: 0; font: var(--code-weight) 13.5px/21px var(--font-code); font-variant-ligatures: none; color: var(--code-text); }
+.manual-code { display: flex; flex-direction: column; flex: 1; min-width: 0; padding: 10px 0 0; background: var(--example-code, var(--band)); border-radius: var(--radius-small) 0 0 var(--radius-small); }
+.manual-code pre { margin: 0 0 10px; font: var(--code-weight) 13.5px/21px var(--font-code); font-variant-ligatures: none; color: var(--code-text); }
 .manual-line { display: block; padding: 0 14px; }
 .manual-line.is-on { background: var(--current); }
+.manual-status { display: none; }
 /* The map fills its side of the example, without a frame or a shadow. */
 .manual-map { flex: none; overflow: hidden; border-radius: 0 var(--radius-small) var(--radius-small) 0; }
 .manual-map .app-map { box-shadow: none; }
@@ -108,6 +109,44 @@ a.manual-name:hover { background: var(--band-hover); }
 /* The name stays grey, so that it is never read as a line printed by the program. */
 .manual-console b { color: var(--weak); font: 700 var(--size-text) var(--font-text); }
 .manual-out { color: var(--code-text); font: var(--code-weight) 13px/20px var(--font-code); font-variant-ligatures: none; }
+
+/* 1: the name on a band of the tone of the code, as in the reference of a language. */
+:root[data-entry="band"] .manual-sign { padding: 6px 12px; background: var(--band); border-left: 3px solid var(--accent); border-radius: var(--radius-small); }
+
+/* 2: each entry on a card of its own. */
+:root[data-entry="card"] .manual-entry, :root[data-entry="strip"] .manual-entry { padding: 16px 18px 18px; background: var(--band); }
+:root[data-entry="card"] .manual-entry, :root[data-entry="strip"] .manual-entry { --example-code: var(--surface); }
+:root[data-entry="card"] .manual-sign code, :root[data-entry="strip"] .manual-sign code { font-size: 17px; }
+
+/* 3: the name in the margin, what it does beside it, a line between two entries. */
+:root[data-entry="margin"] .manual-entry { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 0 18px; padding-top: 18px; border-top: 1px solid var(--hover); border-radius: 0; }
+:root[data-entry="margin"] .manual-sign { flex-direction: column; gap: 2px; }
+:root[data-entry="margin"] .manual-sign code { font-size: 14.5px; }
+
+/* 13: a comic strip, still: one frame per step, its number, the map after it, the line that did it. */
+.manual-example.is-strip { flex-direction: column; gap: 12px; }
+.is-strip .manual-code { flex: none; align-self: flex-start; border-radius: var(--radius-small); }
+.is-strip .manual-code pre { padding-right: 10px; }
+.manual-strip { display: flex; flex-wrap: wrap; gap: 14px 10px; margin: 0; padding: 0; list-style: none; counter-reset: none; }
+.manual-strip li { position: relative; display: flex; flex-direction: column; gap: 6px; width: 130px; }
+.manual-strip .app-map { border-radius: var(--radius-small); overflow: hidden; box-shadow: none; }
+.manual-strip code { font: var(--code-weight) 12px/1.3 var(--font-code); font-variant-ligatures: none; }
+.manual-strip-start { color: var(--weak); font-family: var(--font-text); font-weight: 500; }
+.manual-strip-out { padding: 1px 6px; background: var(--hover); border-radius: var(--radius-small); font: var(--code-weight) 12px var(--font-code); }
+.manual-strip-number { position: absolute; z-index: 1; top: -7px; left: -7px; display: grid; place-items: center; width: 20px; height: 20px; background: var(--accent); color: var(--on-accent); border-radius: 50%; font: 700 11px var(--font-text); }
+
+/* 14: the level screen in small: the margin with the numbers of the lines, the status bar that counts
+   the steps, the map on its block with its shadow, the whole as a window. */
+:root[data-entry="level"] .manual-sign code { font-size: 17px; }
+:root[data-entry="level"] .manual-example { --example-code: var(--editor); overflow: hidden; border-radius: var(--radius-small); box-shadow: 0 6px 22px #22293530; }
+:root[data-entry="level"] .manual-code { padding-top: 10px; counter-reset: line; border-radius: 0; }
+:root[data-entry="level"] .manual-line { padding-left: 0; }
+:root[data-entry="level"] .manual-line::before { counter-increment: line; content: counter(line); display: inline-block; width: 30px; margin-right: 14px; color: var(--gutter-text); font-size: .88em; text-align: right; }
+:root[data-entry="level"] .manual-status { display: flex; align-items: center; height: 28px; margin-top: auto; padding: 0 12px; background: var(--status); color: var(--on-status); font: 400 12.5px var(--font-text); }
+:root[data-entry="level"] .manual-status b { color: var(--status-strong); font-weight: var(--strong-weight); }
+:root[data-entry="level"] .manual-map { display: grid; place-items: center; padding: 18px 22px; background: var(--map-block); border-radius: 0; }
+:root[data-entry="level"] .manual-map .app-map { box-shadow: var(--map-shadow); }
+:root[data-entry="level"] .manual-console { border-radius: 0; }
 
 /* The drawer, over the map and the panels of the level screen, the code still in view. */
 .manual-drawer { top: 49px; right: 0; bottom: 0; width: 50%; display: flex; flex-direction: column; background: var(--surface); border: 0; border-radius: 0; box-shadow: -12px 0 34px #22293530; }

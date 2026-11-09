@@ -4,6 +4,7 @@
 // is a list and `range` a slider, both setting the CSS `variable` at once, without redrawing the page.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(INTERFACE_STYLES).map(([key, style]) => [key, style.title])), fallback: Object.keys(INTERFACE_STYLES)[0] },
+  entry: { label: "Manual: an entry", options: { band: "1 · Name on a band", card: "2 · Card", margin: "3 · Name in the margin", strip: "13 · Comic strip", level: "14 · Level screen in small" }, fallback: "card" },
   tocGap: { label: "On this page: gap to the scroll bar", range: { min: 6, max: 40, step: 2 }, unit: "px", variable: "--manual-toc-gap", fallback: "20" },
 };
 
