@@ -60,7 +60,7 @@ const homeSquares = ({ number, maps }) => `<span class="home-squares">${Array.fr
   return `<i class="${passed ? "is-passed" : status === "locked" ? "is-locked" : ""}"></i>`;
 }).join("")}</span>`;
 
-const homeStone = (stone, chosen, tip) => `<button type="button" class="home-stone is-${homeStatus(stone.number)} ${stone.number === tip ? "is-tip" : ""} ${stone.x > 640 ? "is-tip-left" : ""}" style="left:${stone.x}px;top:${stone.y}px" data-level="${stone.number}" aria-pressed="${stone.number === chosen}"><span class="home-disc"><span class="home-number">${stone.number}</span></span>${homeSquares(stone)}<span class="home-tip">${stone.number}. ${stone.title}</span></button>`;
+const homeStone = (stone, chosen, tip) => `<button type="button" class="home-stone is-${homeStatus(stone.number)} ${stone.direction < 0 ? "is-row-west" : ""} ${stone.number === tip ? "is-tip" : ""} ${stone.x > 640 ? "is-tip-left" : ""}" style="left:${stone.x}px;top:${stone.y}px" data-level="${stone.number}" aria-pressed="${stone.number === chosen}"><span class="home-disc"><span class="home-number">${stone.number}</span></span>${homeSquares(stone)}<span class="home-tip">${stone.number}. ${stone.title}</span></button>`;
 
 const homeRobotPlace = stone => `left:${stone.x}px;top:${stone.y - 22}px`;
 
@@ -147,7 +147,7 @@ function homeWindow({ chosen: level = HOME_TO_PLAY, tip, long = false, codeError
   const { stones, bands, height } = homeLayout(chapters);
   const shown = stones[level - 1];
   const done = HOME_TO_PLAY - 1;
-  return `<div class="app-window home-window done-h${chosen.homeHoverDone} play-h${chosen.homeHoverPlay}" ${long ? "data-long" : ""} style="width:${size[0]}px;height:${size[1]}px">
+  return `<div class="app-window home-window" ${long ? "data-long" : ""} style="width:${size[0]}px;height:${size[1]}px">
     <header class="app-header">
       ${appWordmark(21)}
       <span class="home-count">${done} of ${stones.length} levels done</span>

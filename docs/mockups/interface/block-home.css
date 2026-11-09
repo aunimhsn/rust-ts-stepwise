@@ -11,7 +11,6 @@
 }
 :root[data-theme="day-desk"] { --home-ground: #e1e5ea; --home-line: #cad1da; --home-five: #22293520; --home-band: #ffffff8c; --home-rim: #f1f3f6; }
 :root[data-theme="night-desk"] { --home-ground: #262c35; --home-line: #36404d; --home-five: #ffffff14; --home-band: #1e232bd9; --home-rim: #20252d; }
-:root[data-home-ground="rooms"] { --home-ground: #5d687a; --home-tiles: none; --home-band: #e1e5ea; --home-band-tiles: url("../world-elements/daylight/floor.svg"); --home-rim: #e1e5ea; --home-title: #222935; --home-idea: #5d687a; }
 
 /* The header: the name, the count in the middle of the window, the three links on the right. */
 .home-count { position: absolute; left: 50%; transform: translateX(-50%); color: var(--band-weak); }
@@ -40,10 +39,30 @@
 .app-window .home-stone.is-locked { background: var(--home-rim); color: var(--home-idea); border: 1.5px dashed var(--home-idea); }
 .app-window .home-stone:focus-visible { outline: 2px solid var(--home-title); outline-offset: 2px; }
 .app-window .home-stone:hover { z-index: 4; }
+/* The robot stays on top of the stone it stands on; the other stones keep their title over it. */
+.app-window .home-stone[aria-pressed="true"]:hover { z-index: 1; }
 
 /* The face of a stone, clipped to its circle, with its number. */
 .home-disc { position: absolute; inset: 0; display: grid; place-items: center; overflow: hidden; border-radius: 50%; }
 .home-number { position: relative; z-index: 1; }
+
+/* On hover, a level done is a step back: the robot crosses the stone against the direction of the path and
+   paints it, with the mechanics of Let's go. */
+.home-stone.is-done { --cross-start: calc(100% + 4px); --cross-end: -34px; --cross-turn: -90deg; --paint-start: 0 0 0 calc(100% + 15px); --paint-end: 0 0 0 -15px; }
+.home-stone.is-done.is-row-west { --cross-start: -34px; --cross-end: calc(100% + 4px); --cross-turn: 90deg; --paint-start: 0 calc(100% + 15px) 0 0; --paint-end: 0 -15px 0 0; }
+.home-stone.is-done .home-disc::before { content: ""; position: absolute; inset: var(--paint-start); background: #a6ecd8; opacity: 0; transition: opacity .2s, inset 0s .2s; }
+.home-stone.is-done .home-disc::after { content: ""; position: absolute; z-index: 2; left: var(--cross-start); top: calc(50% - 15px); width: 30px; height: 30px; background: url(../world-elements/daylight/robot.svg) center / contain no-repeat; transform: rotate(var(--cross-turn)); }
+.home-stone.is-done:hover .home-disc::before { inset: var(--paint-end); opacity: 1; transition: inset .6s cubic-bezier(.35, .05, .4, 1), opacity 0s; }
+.home-stone.is-done:hover .home-disc::after { left: var(--cross-end); transition: left .6s cubic-bezier(.35, .05, .4, 1); }
+
+/* On hover, the level to play takes the visor of the robot instead of its number: its eyes search around. */
+.home-stone.is-play .home-disc::before { content: ""; position: absolute; left: calc(50% - 16px); top: calc(50% - 8px); width: 32px; height: 16px; background: #222935; border-radius: 8px; transform: scale(0); transition: transform .22s cubic-bezier(.3, 1.6, .5, 1); }
+.home-stone.is-play .home-disc::after { content: ""; position: absolute; left: calc(50% - 16px); top: calc(50% - 8px); width: 32px; height: 16px; background: radial-gradient(circle at 10px 8px, #3fc3ff 3.4px, transparent 3.9px), radial-gradient(circle at 22px 8px, #3fc3ff 3.4px, transparent 3.9px); opacity: 0; }
+.home-stone.is-play .home-number { transition: opacity .1s; }
+.home-stone.is-play:hover .home-number { opacity: 0; }
+.home-stone.is-play:hover .home-disc::before { transform: none; }
+.home-stone.is-play:hover .home-disc::after { opacity: 1; animation: home-search 2.2s .2s ease-in-out infinite; }
+@keyframes home-search { 0%, 12%, 100% { transform: none; } 22%, 40% { transform: translateX(-3px); } 50%, 72% { transform: translateX(3px); } 84% { transform: none; } 90% { transform: scaleY(.12); } 96% { transform: none; } }
 
 /* One small square per map, astride the bottom of the stone: green once passed, grey until then. */
 .home-squares { position: absolute; left: 50%; top: 38px; display: flex; gap: 4px; transform: translateX(-50%); }
@@ -97,4 +116,5 @@
 @media (prefers-reduced-motion: reduce) {
   .home-robot { transition: none; }
   .home-scene.is-play .app-robot > * { animation: none; }
+  .home-number, .home-disc::before, .home-disc::after { animation: none !important; transition: none !important; }
 }
