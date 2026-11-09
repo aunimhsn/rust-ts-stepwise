@@ -1,10 +1,8 @@
-// Section: the choice of the shortcut of Step (tabs at the top), and a tester of the keys, because only the real browser on the real keyboard can say which key
+// Section: a tester of the keys, because only the real browser on the real keyboard can say which key
 // a page receives. It is a check of the shortcuts, not a part of the interface.
 const KEY_TESTS = [
   ["Ctrl+Enter", "Address bar only"],
   ["Ctrl+Shift+Enter", "Address bar only"],
-  ["Ctrl+Shift+Backspace", "Nothing listed"],
-  ["F8", "Nothing listed"],
   ["F9", "Nothing listed"],
   ["F10", "Focus on the toolbar"],
   ["F1", "Opens the Chrome help"],
@@ -31,7 +29,7 @@ function keyPressName(event) {
 document.addEventListener("keydown", event => {
   if (["Control", "Shift", "Alt", "Meta", "AltGraph"].includes(event.key)) return;
   const name = keyPressName(event);
-  document.querySelector(".keys-last").textContent = `Last key: ${name}`;
+  document.querySelector(".keys-last").innerHTML = `Last key: ${appKeyLabel(name)}`;
   if (!KEY_TESTS.some(([key]) => key === name)) return;
   event.preventDefault();
   keysReached.add(name);
@@ -41,7 +39,7 @@ document.addEventListener("keydown", event => {
 });
 
 SECTIONS.push(["Try the keys", () => {
-  const tests = KEY_TESTS.map(([key, chrome]) => `<tr><td>${key}</td><td>${chrome}</td><td data-key-test="${key}" class="${keysReached.has(key) ? "is-reached" : ""}">${keysReached.has(key) ? "Reached the page" : "Not tried"}</td></tr>`).join("");
+  const tests = KEY_TESTS.map(([key, chrome]) => `<tr><td>${appKeyLabel(key)}</td><td>${chrome}</td><td data-key-test="${key}" class="${keysReached.has(key) ? "is-reached" : ""}">${keysReached.has(key) ? "Reached the page" : "Not tried"}</td></tr>`).join("");
   return `
     <p class="keys-intro">In ${browserName()}: click once in the box, then press each key. The page asks the browser to keep out of it. <b>Reached the page</b> means that the page got the key, not that the browser kept out: note it if the browser still does something, such as opening a menu. A key that stays <b>Not tried</b> after pressing it was taken before the page. To be done in Firefox and in Chrome, on the AZERTY keyboard.</p>
     <div class="keys-tester" tabindex="0">Click here once, then press the keys</div><span class="keys-last"></span>

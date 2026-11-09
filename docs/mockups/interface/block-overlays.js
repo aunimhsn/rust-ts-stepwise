@@ -1,5 +1,5 @@
 // The right end of a row of a menu: nothing, a chevron, a check mark or a shortcut.
-const appMenuEnd = end => !end ? "" : end === "›" ? `<i>${ICONS.chevron(12)}</i>` : end === "✓" ? `<i>${ICONS.check(12)}</i>` : `<kbd>${end}</kbd>`;
+const appMenuEnd = end => !end ? "" : end === "›" ? `<i>${ICONS.chevron(12)}</i>` : end === "✓" ? `<i>${ICONS.check(12)}</i>` : `<kbd>${appKeyLabel(end)}</kbd>`;
 
 // A menu, at `left` and `top` pixels: rows of [label, end, greyed], null for a line.
 const appDropdown = (left, rows, hovered, top = 49) => `<div class="app-popup app-dropdown" style="left:${left}px;top:${top}px">${rows.map((row, index) => row

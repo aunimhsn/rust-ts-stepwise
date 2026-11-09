@@ -17,7 +17,8 @@
 .app-commands-example { margin: 0; padding: 7px 10px; background: var(--editor); color: var(--code-text); border-radius: var(--radius-small); font: var(--code-weight) 12.5px/1.5 var(--font-code); font-variant-ligatures: none; white-space: pre; }
 .app-window button.app-commands-more { margin-top: 10px; padding: 4px 12px; }
 .app-commands-hints { flex: none; display: flex; gap: 16px; align-items: center; height: 28px; padding: 0 12px; background: var(--status); color: var(--on-status); font-size: 12px; white-space: nowrap; }
-.app-commands-hints > span { position: relative; top: var(--hints-top); }
+/* The texts of the bar sit one pixel low, tuned by eye. */
+.app-commands-hints > span { position: relative; top: 1px; }
 .app-commands-hints kbd { font: inherit; font-weight: 600; }
 /* The boards of the panel alone, at its real size. */
 .commands-boards { display: flex; flex-wrap: wrap; gap: 22px 24px; }

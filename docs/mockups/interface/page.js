@@ -3,8 +3,6 @@
 // One group of tabs per open decision; `fallback` is the choice shown by default.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(INTERFACE_STYLES).map(([key, style]) => [key, style.title])), fallback: Object.keys(INTERFACE_STYLES)[0] },
-  step: { label: "Step", options: Object.fromEntries(Object.entries(STEP_PROPOSALS).map(([key, proposal]) => [key, proposal.title])), fallback: "f8" },
-  hints: { label: "Hints lower by", options: { "0.0": "0 px", "0.5": "0.5 px", "1.0": "1 px", "1.5": "1.5 px" }, fallback: "1.0" },
 };
 
 const params = new URLSearchParams(location.search);

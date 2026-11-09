@@ -15,4 +15,12 @@ const ICONS = {
   chevron: size => appIcon(size, '<path d="m6 3.5 4.5 4.5L6 12.5"/>'),
   close: size => appIcon(size, '<path d="m4 4 8 8M12 4l-8 8"/>'),
   next: size => appIcon(size, '<path d="M4.5 3.5 11 8l-6.5 4.5Z"/>', "currentColor"),
+  // The other three directions of the chevron, for the keys of the keyboard.
+  chevronLeft: size => appIcon(size, '<path d="M10 3.5 5.5 8l4.5 4.5"/>'),
+  chevronUp: size => appIcon(size, '<path d="m3.5 10.25 4.5-4.5 4.5 4.5"/>'),
+  chevronDown: size => appIcon(size, '<path d="m3.5 5.75 4.5 4.5 4.5-4.5"/>'),
 };
+
+// A shortcut as text, its arrow keys drawn as chevrons so that they keep the weight of the other icons.
+const KEY_ARROWS = { "↑": "chevronUp", "↓": "chevronDown", "←": "chevronLeft", "→": "chevron" };
+const appKeyLabel = key => key.replace(/[↑↓←→]/g, arrow => `<span class="app-key-arrow">${ICONS[KEY_ARROWS[arrow]](13)}</span>`);
