@@ -1,0 +1,78 @@
+/* The home screen: the path of the levels on the left, the level chosen on the right. */
+
+/* The ground under the path, an open decision: only these tokens differ. `rim` is the solid color
+   that detaches a stone and its squares from the path. */
+:root[data-home-ground="desk"] { --home-ground: var(--map-block); --home-tiles: none; --home-band: var(--surface); --home-band-tiles: none; --home-rim: var(--surface); --home-title: var(--text); --home-idea: var(--weak); }
+:root[data-home-ground="floor"] { --home-ground: #e1e5ea; --home-tiles: url("../world-elements/daylight/floor.svg"); --home-band: #ffffff8c; --home-band-tiles: none; --home-rim: #f1f3f6; --home-title: #222935; --home-idea: #5d687a; }
+:root[data-home-ground="rooms"] { --home-ground: #5d687a; --home-tiles: none; --home-band: #e1e5ea; --home-band-tiles: url("../world-elements/daylight/floor.svg"); --home-rim: #e1e5ea; --home-title: #222935; --home-idea: #5d687a; }
+
+/* The header: the name, the count in the middle of the window, the three links on the right. */
+.home-count { position: absolute; left: 50%; transform: translateX(-50%); color: var(--band-weak); }
+.home-links { display: flex; gap: 2px; margin-left: auto; }
+
+/* The path and the panel keep their size, centered in the window. */
+.home-stage { flex: 1; min-height: 0; display: flex; justify-content: center; background: var(--home-ground) var(--home-tiles) center / 28px; }
+.home-center { flex: none; display: flex; align-items: center; width: 1280px; height: 100%; }
+.home-scroll { flex: none; display: flex; flex-direction: column; width: 900px; height: 100%; overflow: hidden auto; }
+.home-path { position: relative; flex: none; width: 900px; margin: auto 0; }
+
+/* A chapter: a light band behind its stones, with its name and its idea. */
+.home-band { position: absolute; box-sizing: border-box; height: 112px; padding: 6px 10px; background: var(--home-band) var(--home-band-tiles) center / 28px; border-radius: var(--radius-small); }
+.home-band b { display: block; color: var(--home-title); font: 600 14px/1.3 var(--font-title); }
+.home-band span { display: block; color: var(--home-idea); font: 400 11.5px/1.3 var(--font-text); }
+
+/* The path: the paint up to the level to play, then its ghost, as a goal mark on the map. */
+.home-line { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.home-line path { fill: none; stroke: var(--home-paint); stroke-width: var(--home-path); stroke-linecap: round; }
+.home-line path.is-ghost { opacity: .35; }
+
+/* A stone: filled when done, bold when it is the level to play, dashed when locked. */
+.app-window .home-stone { position: absolute; display: block; box-sizing: border-box; width: 44px; height: 44px; margin: -22px 0 0 -22px; padding: 0; border-radius: 50%; font: 600 15px/1 var(--font-text); }
+.app-window .home-stone.is-done { background: var(--passed); color: var(--on-passed); border: 0; }
+.app-window .home-stone.is-play { background: #ffffff; color: #222935; border: 3.5px solid var(--accent); font-weight: 800; }
+.app-window .home-stone.is-locked { background: var(--home-rim); color: var(--home-idea); border: 1.5px dashed var(--home-idea); }
+.app-window .home-stone:focus-visible { outline: 2px solid var(--home-title); outline-offset: 2px; }
+.app-window .home-stone:hover { z-index: 4; }
+
+/* One small square per map, astride the bottom of the stone: green once passed, grey until then. */
+.home-squares { position: absolute; left: 50%; top: 38px; display: flex; gap: 4px; transform: translateX(-50%); }
+.app-window .is-play .home-squares { top: 34.5px; }
+.app-window .is-locked .home-squares { top: 36.5px; }
+.home-squares i { box-sizing: border-box; width: 12px; height: 12px; background: var(--idle); border-radius: 2px; box-shadow: 0 0 0 2px var(--home-rim); }
+.home-squares i.is-passed { background: var(--passed); }
+.home-squares i.is-locked { background: var(--home-rim); border: 1px dashed var(--home-idea); }
+
+/* Its title, on hover. */
+.home-tip { display: none; position: absolute; left: calc(100% + 8px); top: 50%; padding: 4px 10px; background: var(--pop); color: var(--text); border: var(--pop-border); border-radius: var(--radius-small); box-shadow: var(--pop-shadow); font: 500 13px/1.3 var(--font-text); white-space: nowrap; transform: translateY(-50%); }
+.home-stone.is-tip-left .home-tip { left: auto; right: calc(100% + 8px); }
+.home-stone:hover .home-tip, .home-stone.is-tip .home-tip { display: block; }
+
+/* The robot, astride the top of the stone of the level chosen: it walks to the stone clicked. */
+.home-robot { position: absolute; z-index: 2; width: 36px; height: 36px; margin: -18px 0 0 -18px; pointer-events: none; transition: left .45s ease-in-out, top .45s ease-in-out; }
+
+/* The level chosen. */
+.home-panel { flex: none; display: flex; flex-direction: column; box-sizing: border-box; width: 360px; height: 640px; padding: 14px 16px 20px; background: var(--surface); box-shadow: var(--map-shadow); }
+.home-chapter { margin: 0; color: var(--weak); font-size: 12.5px; }
+.home-panel h3 { margin: 2px 0 10px; color: var(--text); font: 600 21px/1.25 var(--font-title); letter-spacing: 0; text-transform: none; }
+.home-scene { flex: none; display: grid; height: 240px; }
+.home-goal { margin: 14px 0 0; line-height: 1.45; }
+
+/* The field of a code, on a locked level. */
+.home-code { margin-top: 12px; }
+.home-code label { font-weight: var(--strong-weight); }
+.home-code-row { display: flex; gap: 8px; margin-top: 4px; }
+.home-code input { flex: 1; min-width: 0; box-sizing: border-box; height: 32px; padding: 0 10px; background: var(--editor); color: var(--text); border: 1px solid var(--idle); border-radius: var(--radius-small); font: var(--code-weight) 14px var(--font-code); }
+.home-code input.is-wrong { border-color: var(--error); }
+.home-code p { margin: 5px 0 0; color: var(--weak); font-size: 12.5px; }
+.home-code p.home-code-error { color: var(--error); }
+
+/* The maps of the level, then its one button, at the bottom of the panel. */
+.home-bottom { margin-top: auto; }
+.home-maps { display: flex; gap: 8px; }
+.home-map { width: 74px; height: 26px; box-sizing: border-box; display: grid; place-items: center; background: var(--chip); color: var(--on-chip); border: var(--chip-border); border-radius: var(--radius-small); font-size: 13px; font-weight: 500; }
+.home-map.is-passed { background: var(--passed); color: var(--on-passed); border-color: transparent; }
+.home-map.is-locked { background: none; color: var(--weak); border: 1px dashed var(--idle); }
+.app-window button.home-go { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; height: 40px; margin-top: 12px; padding: 0; font-size: 15px; }
+.app-window button.home-go.is-locked { background: var(--hover); color: var(--weak); border: 1px dashed var(--idle); border-radius: var(--control-radius); cursor: default; }
+
+@media (prefers-reduced-motion: reduce) { .home-robot { transition: none; } }
