@@ -17,10 +17,10 @@
   .app-window .manual-back:hover { background: #ffd25e; }
 }
 
-/* The three columns. On a large screen, the column of text stays under about 760 pixels, the whole
-   centered, the tone of the sections running to the left edge. */
+/* The three columns. On a large screen, the sections stay against the left edge and the column of text
+   under about 760 pixels; the room left on the right holds the robot and what it says. */
 .manual-body { flex: 1; min-height: 0; display: grid; grid-template-columns: 0 250px minmax(0, 1fr) 200px 0; background: var(--surface); }
-.manual-window.is-large .manual-body { grid-template-columns: 1fr 270px minmax(0, 840px) 230px 1fr; }
+.manual-window.is-large .manual-body { grid-template-columns: 0 270px minmax(0, 840px) 230px 1fr; }
 .manual-body::before { content: ""; background: var(--band); }
 .manual-side { display: flex; flex-direction: column; min-height: 0; padding: 0; background: var(--band); color: var(--band-text); }
 /* Opened from the home screen, the name leads back to it. */
@@ -132,3 +132,21 @@ a.manual-name:hover { background: var(--band-hover); }
 .manual-hand { position: absolute; z-index: 3; pointer-events: none; }
 /* The hand on forward(), line 5 of the code: past the margin and eight spaces. */
 .manual-hand-place { position: absolute; z-index: 3; left: calc(52px + 14px + 12ch); top: 150px; font: var(--code-weight) var(--size-code) var(--font-code); pointer-events: none; }
+
+/* Replay: once the example has played, in the corner of its code. */
+.app-window .manual-replay { position: absolute; right: 8px; bottom: 8px; display: none; align-items: center; gap: 5px; background: var(--surface); color: var(--weak); }
+.app-window .manual-replay:hover { color: var(--text); }
+.manual-code { position: relative; }
+.manual-example.is-done .manual-replay { display: flex; }
+
+/* The robot of the large screen, in the room left on the right, and its speech bubble above it. */
+.manual-buddy { display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: 10px; padding: 0 40px 70px 30px; }
+.manual-bubble { position: relative; max-width: 280px; padding: 12px 16px; background: var(--band); color: var(--text); border-radius: 14px; font: 500 16px/1.35 var(--font-name); }
+.manual-bubble::after { content: ""; position: absolute; left: 26px; bottom: -9px; border: 10px solid transparent; border-bottom: 0; border-top-color: var(--band); }
+.manual-bubble p { margin: 0; }
+.manual-bubble small { display: block; margin-top: 4px; color: var(--weak); font: 400 12px var(--font-text); }
+.manual-bubble.is-new { animation: manual-pop .25s cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes manual-pop { from { transform: scale(.9); } }
+.app-window .manual-buddy-head { padding: 0; margin-left: 8px; background: none; border: 0; cursor: pointer; }
+.manual-buddy-head img { display: block; height: 64px; }
+@media (prefers-reduced-motion: reduce) { .manual-bubble.is-new { animation: none; } }

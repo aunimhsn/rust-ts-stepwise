@@ -64,7 +64,7 @@ function manualExample(entry, step = 0) {
   const frame = MANUAL_FRAMES[entry.id][step];
   const prints = entry.lines.some(line => line.startsWith("print"));
   return `<div class="manual-example ${prints ? "has-console" : ""}" data-example="${entry.id}" data-frame="${step}">
-    <div class="manual-code"><pre>${entry.lines.map((line, index) => `<span class="manual-line ${frame.line === index ? "is-on" : ""}">${highlightCode(line) || " "}</span>`).join("")}</pre></div>
+    <div class="manual-code"><pre>${entry.lines.map((line, index) => `<span class="manual-line ${frame.line === index ? "is-on" : ""}">${highlightCode(line) || " "}</span>`).join("")}</pre><button type="button" class="app-chip manual-replay">${ICONS.reset(13)}<span>Replay</span></button></div>
     <div class="manual-map">${manualMap(entry, frame)}</div>
     ${prints ? `<div class="manual-console"><b>Console</b><div class="manual-out">${frame.out.join("<br>")}</div></div>` : ""}
   </div>`;
@@ -121,9 +121,43 @@ function manualWindow({ size = [1280, 720], back = "18. Paint a square", query =
       <aside class="manual-side">${back ? `<div class="manual-name">${appWordmark(21)}</div>` : `<a class="manual-name is-home" title="All levels">${appWordmark(21)}</a>`}${manualSearch(query)}<div class="manual-list">${manualList(query, "Move", result)}</div><button type="button" class="manual-back"><span>${back ? `Back to ${back}` : "Back to all levels"}</span></button></aside>
       <div class="manual-content"><article class="manual-text"><h1>2. ${MANUAL_SECTIONS[1]}</h1><p class="manual-lead">${MANUAL_LEAD}</p>${MANUAL_COMMANDS.map(manualCategory).join("")}</article></div>
       ${manualToc("Move")}
+      ${size[0] >= LARGE_FROM ? manualBuddy() : ""}
     </div>
   </div>`;
 }
+
+// On a large screen, the room left on the right: the head of the robot says one sentence per visit,
+// drawn at random; a click on it makes it say another, an easter egg to find. Only to fill the room: it
+// never moves by itself. Kind words, readable by a whole class; the sayings of the Zen of Python signed.
+const MANUAL_SAYINGS = [
+  ["Explicit is better than implicit.", "The Zen of Python"],
+  ["You read the manual. Most people don't."],
+  ["Four spaces. Not three. Not five. Four."],
+  ["Three turn_left() make a turn_right(). Don't tell anyone."],
+  ["Readability counts.", "The Zen of Python"],
+  ["An error is just your program talking back."],
+  ["No shame in pressing Step. I do it all the time."],
+  ["Simple is better than complex.", "The Zen of Python"],
+  ["I never bump into walls. Well, almost never."],
+  ["Errors should never pass silently.", "The Zen of Python"],
+];
+let manualSaying = 0;
+const manualSays = index => {
+  const [text, source] = MANUAL_SAYINGS[index % MANUAL_SAYINGS.length];
+  return `<p>${text}</p>${source ? `<small>${source}</small>` : ""}`;
+};
+const manualBuddy = () => `<aside class="manual-buddy"><div class="manual-bubble">${manualSays(manualSaying)}</div><button type="button" class="manual-buddy-head" title=""><img src="world-elements/daylight/logo.svg" alt=""></button></aside>`;
+
+document.addEventListener("click", event => {
+  const head = event.target.closest?.(".manual-buddy-head");
+  if (!head) return;
+  manualSaying += 1;
+  const bubble = head.closest(".manual-buddy").querySelector(".manual-bubble");
+  bubble.innerHTML = manualSays(manualSaying);
+  bubble.classList.remove("is-new");
+  void bubble.offsetWidth;
+  bubble.classList.add("is-new");
+});
 
 // The drawer over the level screen, opened by Ctrl+click or F1 on `forward()`: the search, the place
 // in the manual, the entry and the rest of its category, and Full page.
@@ -142,24 +176,55 @@ const MANUAL_HAND = '<svg class="manual-hand" width="17" height="21" viewBox="0 
 
 // ——— The life of the windows ———
 
-// The examples play one step every 0.7 s, wait on their end, then start again.
+// An example plays once, one step every 0.7 s, when it comes into view; then it stays on its last step
+// and Replay plays it again. Seventeen maps moving at once would disturb the reading.
+function manualDraw(example, step) {
+  const entry = MANUAL_ENTRIES[example.dataset.example];
+  const frame = MANUAL_FRAMES[entry.id][step];
+  example.dataset.frame = step;
+  example.querySelector(".manual-map").innerHTML = manualMap(entry, frame);
+  example.querySelectorAll(".manual-line").forEach((line, index) => line.classList.toggle("is-on", index === frame.line));
+  const out = example.querySelector(".manual-out");
+  if (out) out.innerHTML = frame.out.join("<br>");
+}
+
+function manualPlay(example) {
+  example.classList.remove("is-done");
+  example.dataset.playing = "1";
+  example.dataset.wait = 1;
+  manualDraw(example, 0);
+}
+
+const manualWatch = new IntersectionObserver(seen => {
+  for (const { target, isIntersecting } of seen) {
+    if (isIntersecting && !target.dataset.played) { target.dataset.played = "1"; manualPlay(target); }
+  }
+}, { threshold: 0.7 });
+
 setInterval(() => {
-  for (const example of document.querySelectorAll(".manual-example")) {
+  // The page is drawn again at each change of a control: watch the new examples.
+  for (const example of document.querySelectorAll(".manual-example:not([data-watched])")) {
+    example.dataset.watched = "1";
+    manualWatch.observe(example);
+  }
+  for (const example of document.querySelectorAll('.manual-example[data-playing="1"]')) {
     const wait = Number(example.dataset.wait ?? 0);
     if (wait > 0) { example.dataset.wait = wait - 1; continue; }
-    const entry = MANUAL_ENTRIES[example.dataset.example];
-    const frames = MANUAL_FRAMES[entry.id];
-    const step = (Number(example.dataset.frame) + 1) % frames.length;
-    example.dataset.frame = step;
-    if (step === frames.length - 1) example.dataset.wait = 3;
-    if (step === 0) example.dataset.wait = 1;
-    const frame = frames[step];
-    example.querySelector(".manual-map").innerHTML = manualMap(entry, frame);
-    example.querySelectorAll(".manual-line").forEach((line, index) => line.classList.toggle("is-on", index === frame.line));
-    const out = example.querySelector(".manual-out");
-    if (out) out.innerHTML = frame.out.join("<br>");
+    const last = MANUAL_FRAMES[example.dataset.example].length - 1;
+    const step = Number(example.dataset.frame) + 1;
+    manualDraw(example, step);
+    if (step === last) {
+      example.dataset.playing = "0";
+      example.classList.add("is-done");
+      example.querySelectorAll(".manual-line").forEach(line => line.classList.remove("is-on"));
+    }
   }
 }, 700);
+
+document.addEventListener("click", event => {
+  const replay = event.target.closest?.(".manual-replay");
+  if (replay) manualPlay(replay.closest(".manual-example"));
+});
 
 // The scroll of a page or of the drawer, and the place of a heading or an entry in it.
 const manualScroller = node => node.closest(".manual-window")?.querySelector(".manual-content") ?? node.closest(".manual-drawer")?.querySelector(".manual-drawer-scroll");
