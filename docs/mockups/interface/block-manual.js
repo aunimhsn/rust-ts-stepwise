@@ -23,7 +23,8 @@ function manualFrames({ map, trace }) {
   const frame = (line, pincer = false) => ({ line, pincer, rows: rows.map(row => row.join("")), links: [...links], robot: [x, y, facing], items: [...items], carrying, out: [...out] });
   const frames = [frame(null)];
   for (const [line, action] of trace) {
-    const [verb, value] = (action ?? "").split(":");
+    // Only the first colon separates the action from its value: a printed text may hold others.
+    const [verb, value] = (action ?? "").split(/:(.*)/);
     if (verb === "forward") {
       const from = `${x},${y}`;
       x += MANUAL_STEPS[facing][0];
@@ -57,13 +58,15 @@ function manualMap(entry, frame) {
   return appMap(frame.rows, extras, MANUAL_CELL, frame.links);
 }
 
-// An example: its code, to type again rather than copy, with the console under it when it prints, and
-// the small map where it plays, filling the rest of the card.
+// An example: its code, to type again rather than copy, the small map where it plays, filling the rest
+// of the card, and the console, named as on the level screen, when it prints.
 function manualExample(entry, step = 0) {
   const frame = MANUAL_FRAMES[entry.id][step];
-  return `<div class="manual-example" data-example="${entry.id}" data-frame="${step}">
-    <div class="manual-code"><pre>${entry.lines.map((line, index) => `<span class="manual-line ${frame.line === index ? "is-on" : ""}">${highlightCode(line) || " "}</span>`).join("")}</pre>${entry.lines.some(line => line.startsWith("print")) ? `<div class="manual-out">${frame.out.join("<br>") || " "}</div>` : ""}</div>
+  const prints = entry.lines.some(line => line.startsWith("print"));
+  return `<div class="manual-example ${prints ? "has-console" : ""}" data-example="${entry.id}" data-frame="${step}">
+    <div class="manual-code"><pre>${entry.lines.map((line, index) => `<span class="manual-line ${frame.line === index ? "is-on" : ""}">${highlightCode(line) || " "}</span>`).join("")}</pre></div>
     <div class="manual-map">${manualMap(entry, frame)}</div>
+    ${entry.lines.some(line => line.startsWith("print")) ? `<div class="manual-console"><b>Console</b><div class="manual-out">${frame.out.join("<br>")}</div></div>` : ""}
   </div>`;
 }
 
@@ -154,7 +157,7 @@ setInterval(() => {
     example.querySelector(".manual-map").innerHTML = manualMap(entry, frame);
     example.querySelectorAll(".manual-line").forEach((line, index) => line.classList.toggle("is-on", index === frame.line));
     const out = example.querySelector(".manual-out");
-    if (out) out.innerHTML = frame.out.join("<br>") || " ";
+    if (out) out.innerHTML = frame.out.join("<br>");
   }
 }, 700);
 

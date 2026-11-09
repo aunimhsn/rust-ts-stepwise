@@ -99,7 +99,17 @@ a.manual-name:hover { background: var(--band-hover); }
 /* The map fills its side of the example, without a frame or a shadow. */
 .manual-map { flex: none; overflow: hidden; border-radius: 0 var(--radius-small) var(--radius-small) 0; }
 .manual-map .app-map { box-shadow: none; }
-.manual-out { margin-top: auto; padding: 4px 14px; background: var(--hover); color: var(--code-text); font: var(--code-weight) 12.5px/1.5 var(--font-code); min-height: 19px; }
+/* The console of an example that prints, named and drawn as the one of the level screen: 11, under the
+   map, the level screen in small; 12, across the card, under the code and the map. */
+.manual-example.has-console { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "code map" "code console"; }
+:root[data-console="wide"] .manual-example.has-console { grid-template-areas: "code map" "console console"; }
+.has-console .manual-code { grid-area: code; }
+.has-console .manual-map { grid-area: map; border-radius: 0 var(--radius-small) 0 0; }
+.manual-console { grid-area: console; display: flex; flex-direction: column; gap: 4px; min-height: 66px; box-sizing: border-box; padding: 8px 14px 10px; background: var(--hover); border-radius: 0 0 var(--radius-small) 0; }
+:root[data-console="wide"] .manual-console { border-radius: 0 0 var(--radius-small) var(--radius-small); }
+:root[data-console="wide"] .has-console .manual-code { border-radius: var(--radius-small) 0 0 0; }
+.manual-console b { color: var(--weak); font: 500 12px var(--font-text); }
+.manual-out { color: var(--code-text); font: var(--code-weight) 13px/20px var(--font-code); font-variant-ligatures: none; }
 
 /* The drawer, over the map and the panels of the level screen, the code still in view. */
 .manual-drawer { top: 49px; right: 0; bottom: 0; width: 50%; display: flex; flex-direction: column; background: var(--surface); border: 0; border-radius: 0; box-shadow: -12px 0 34px #22293530; }
