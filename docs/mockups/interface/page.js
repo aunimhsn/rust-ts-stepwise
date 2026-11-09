@@ -4,6 +4,7 @@
 // is a list and `range` a slider, both setting the CSS `variable` at once, without redrawing the page.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(INTERFACE_STYLES).map(([key, style]) => [key, style.title])), fallback: Object.keys(INTERFACE_STYLES)[0] },
+  scrollbar: { label: "Scroll bar", options: { thin: "4 · Thin", hover: "5 · Thin, on hover", wide: "6 · Usual width" }, fallback: "thin" },
   entry: { label: "Manual: an entry", options: { band: "1 · Name on a band", card: "2 · Card", margin: "3 · Name in the margin" }, fallback: "band" },
 };
 
