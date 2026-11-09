@@ -17,16 +17,15 @@ function highlightCode(line) {
 
 // The three controls. `main` is the first one (run, pause or resume), `stepOff` greys Step while the
 // program runs, `pale` is their look while the learner types, `tip` the index of the control hovered.
-// Their shortcuts follow the proposal chosen on the page (keys.js).
+// Their shortcuts are in keys.js.
 const CONTROL_MAIN = { run: ["play", "Run"], pause: ["pause", "Pause"], resume: ["play", "Resume"] };
 
 function appControls({ main = "run", stepOff = false, pale = false, tip } = {}) {
   const [icon, name] = CONTROL_MAIN[main];
-  const keys = appKeys();
   const controls = [
-    { icon, name, key: keys.run, kind: "is-main" },
-    { icon: "step", name: "Step", key: keys.step, kind: stepOff ? "is-off" : "" },
-    { icon: "reset", name: "Reset", key: keys.reset, kind: "", help: "Puts the map back. Your code stays." },
+    { icon, name, key: KEYS.run, kind: "is-main" },
+    { icon: "step", name: "Step", key: KEYS.step, kind: stepOff ? "is-off" : "" },
+    { icon: "reset", name: "Reset", key: KEYS.reset, kind: "", help: "Puts the map back. Your code stays." },
   ];
   return `<div class="app-controls ${pale ? "is-pale" : ""}">${controls.map((control, index) =>
     `<button type="button" class="app-control ${control.kind} ${index === tip ? "is-hovered" : ""}">${ICONS[control.icon](20)}<span class="app-tip"><b>${control.name}</b><kbd>${control.key}</kbd>${control.help ? `<small>${control.help}</small>` : ""}</span></button>`).join("")}</div>`;

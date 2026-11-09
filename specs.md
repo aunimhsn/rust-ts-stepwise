@@ -267,7 +267,7 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
 - At the end of a run, the robot shows the result: when every goal is met, its eyes light up in yellow and it hops; when a goal isn't met, its eyes dim, it shakes its head, and the cells of the goals not met get a red flag (see [Levels and progression](#levels-and-progression)).
 - **Sounds**, when the setting is on: a short, soft sound when a run succeeds, another when it fails (never scolding), and one when the robot bumps into a wall; none at each step. The browser plays them only after a click, such as **Run**.
 - There is no **Stop**: **Pause** freezes the program to look at the map and the variables, **Reset** ends it.
-- The keyboard shortcuts of the controls are decided with the mock-up.
+- The shortcuts of the controls work everywhere on the level screen, even when the focus isn't in the editor: **Ctrl+Enter** for **Run**, **Pause** and **Resume**, **F10** for **Step**, **Ctrl+Shift+Enter** for **Reset**, and **F9** sets or removes a breakpoint on the line of the cursor. F5 still reloads the page and F11 stays the full screen of the browser, for the projector of a classroom. **Ctrl+Y** redoes. The commands of the menu **Level**, **Manual**, **Legend of the map**, **Keyboard shortcuts** and **Remove all breakpoints** have no shortcut, so that there are few to learn and a level never changes by mistake.
 
 **States of a run** (wireframe: [`docs/wireframes/states.excalidraw`](docs/wireframes/states.excalidraw)), on the level screen, whose blocks never move:
 

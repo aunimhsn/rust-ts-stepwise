@@ -1,11 +1,8 @@
-/* The section of the shortcuts, on the page and not in a window: the proposals and the key tester. */
+/* The tester of the keys, on the page and not in a window. */
 .keys-intro { max-width: 880px; margin: 4px 0 12px; color: #dee2e6; }
 .keys-table { border-collapse: collapse; margin-bottom: 8px; font-size: 13.5px; }
 .keys-table th, .keys-table td { padding: 5px 12px; border-bottom: 1px solid #3a3f45; text-align: left; vertical-align: top; }
 .keys-table th { color: #adb5bd; font-weight: 600; }
-.keys-table .is-chosen { background: #3a3f45; color: #fff; }
-.keys-table td.is-yes { color: #79d5b1; }
-.keys-table td.is-no { color: #ff9b9b; }
 .keys-table td.is-reached { color: #79d5b1; font-weight: 600; }
 .keys-tester { display: inline-block; margin: 6px 0 10px; padding: 9px 14px; border: 1px dashed #868e96; border-radius: 4px; color: #e9ecef; cursor: pointer; outline: none; }
 .keys-tester:focus { border: 1px solid #ffb300; background: #33302a; }
