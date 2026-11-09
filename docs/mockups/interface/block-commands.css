@@ -1,0 +1,29 @@
+/* The command menu: one fixed panel of three columns, which never changes shape while moving in it. */
+.app-commands { display: flex; flex-direction: column; width: 630px; height: 306px; overflow: hidden; }
+.app-commands-columns { flex: 1; min-height: 0; display: grid; grid-template-columns: 142px 202px 1fr; }
+/* Nothing found: the message takes the place of the commands and of their details. */
+.app-commands-columns.is-merged { grid-template-columns: 142px 1fr; }
+.app-commands-categories { padding: 5px 0; background: var(--band); color: var(--band-text); }
+.app-commands-category { display: flex; justify-content: space-between; align-items: center; padding: 2.5px 12px; }
+.app-commands-category.is-chosen { background: var(--tab-chosen); color: var(--on-tab-chosen); font-weight: var(--strong-weight); }
+.app-commands-category.is-pale { opacity: .4; }
+.app-commands-category em { color: var(--weak); font: 400 12px var(--font-text); }
+.app-commands-list { padding: 5px 0; overflow: hidden; font: var(--code-weight) 13.5px/1.55 var(--font-code); font-variant-ligatures: none; }
+.app-commands-title { padding: 5px 12px 1px; color: var(--weak); font: 600 11px var(--font-text); letter-spacing: .06em; }
+.app-commands-row { padding: 2px 12px; white-space: nowrap; }
+.app-commands-row.is-chosen { background: var(--chosen); color: var(--on-chosen); }
+/* Nothing found: the robot and its message in the middle of the whole space. */
+.app-commands-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; height: 100%; color: var(--weak); font: 400 var(--size-text)/1.4 var(--font-text); }
+.app-commands-details { padding: 10px 14px 10px; overflow: hidden; background: var(--band); color: var(--band-text); }
+.app-commands-name { font: var(--code-strong-weight) 14px var(--font-code); font-variant-ligatures: none; }
+.app-commands-details p { margin: 7px 0 9px; line-height: 1.4; }
+.app-commands-example { margin: 0; padding: 7px 10px; background: var(--editor); color: var(--code-text); border-radius: var(--radius-small); font: var(--code-weight) 12.5px/1.5 var(--font-code); font-variant-ligatures: none; white-space: pre; }
+.app-window button.app-commands-more { margin-top: 10px; padding: 4px 12px; }
+.app-commands-hints { flex: none; display: flex; gap: 16px; align-items: center; height: 28px; padding: 0 12px; background: var(--status); color: var(--on-status); font-size: 12px; white-space: nowrap; }
+/* The texts of the bar sit one pixel low, tuned by eye. */
+.app-commands-hints > span { position: relative; top: 1px; }
+.app-commands-hints kbd { font: inherit; font-weight: 600; }
+/* The boards of the panel alone, at its real size. */
+.commands-boards { display: flex; flex-wrap: wrap; gap: 22px 24px; }
+.app-window.commands-board { width: 630px; height: 306px; box-shadow: none; }
+.commands-board .app-commands { position: static; }

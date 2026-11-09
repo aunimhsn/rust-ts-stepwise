@@ -17,15 +17,15 @@ function highlightCode(line) {
 
 // The three controls. `main` is the first one (run, pause or resume), `stepOff` greys Step while the
 // program runs, `pale` is their look while the learner types, `tip` the index of the control hovered.
-// The shortcuts come from the wireframe and are decided in step 3c.
+// Their shortcuts are in keys.js.
 const CONTROL_MAIN = { run: ["play", "Run"], pause: ["pause", "Pause"], resume: ["play", "Resume"] };
 
 function appControls({ main = "run", stepOff = false, pale = false, tip } = {}) {
   const [icon, name] = CONTROL_MAIN[main];
   const controls = [
-    { icon, name, key: "F5", kind: "is-main" },
-    { icon: "step", name: "Step", key: "F11", kind: stepOff ? "is-off" : "" },
-    { icon: "reset", name: "Reset", key: "Shift+F5", kind: "", help: "Puts the map back. Your code stays." },
+    { icon, name, key: KEYS.run, kind: "is-main" },
+    { icon: "step", name: "Step", key: KEYS.step, kind: stepOff ? "is-off" : "" },
+    { icon: "reset", name: "Reset", key: KEYS.reset, kind: "", help: "Puts the map back. Your code stays." },
   ];
   return `<div class="app-controls ${pale ? "is-pale" : ""}">${controls.map((control, index) =>
     `<button type="button" class="app-control ${control.kind} ${index === tip ? "is-hovered" : ""}">${ICONS[control.icon](20)}<span class="app-tip"><b>${control.name}</b><kbd>${control.key}</kbd>${control.help ? `<small>${control.help}</small>` : ""}</span></button>`).join("")}</div>`;
@@ -35,8 +35,9 @@ function appControls({ main = "run", stepOff = false, pale = false, tip } = {}) 
 // lines with a breakpoint. `underlines` lists { line, col, length, kind }: an error, or "long" for the
 // dots past the 80th column; `hint` is the message shown on hover, { line, col, title, help }.
 // `controls` gives appControls. `state` and `tone` give the status bar (paused, failed, flash, passed),
-// `errors` the number of errors, `steps` its counter, `cursor` its position.
-function appEditor({ lines, next, error, breakpoints = [], underlines = [], hint, controls, state, tone = "", errors, steps, cursor }) {
+// `errors` the number of errors, `steps` its counter, `cursor` its position. `selected` lists the lines
+// selected and `caret` the place of the text cursor, { line, col }.
+function appEditor({ lines, next, error, breakpoints = [], underlines = [], hint, controls, state, tone = "", errors, steps, cursor, selected = [], caret }) {
   const row = (text, index) => {
     const number = index + 1;
     const dot = breakpoints.includes(number) ? '<span class="app-breakpoint"></span>' : "";
@@ -45,7 +46,9 @@ function appEditor({ lines, next, error, breakpoints = [], underlines = [], hint
     const marks = underlines.filter(underline => underline.line === number).map(underline =>
       `<span class="app-underline is-${underline.kind ?? "error"}" style="left:calc(14px + ${underline.col - 1}ch);width:${underline.length}ch"></span>`).join("");
     const note = hint?.line === number ? `<div class="app-popup app-hover-note" style="left:calc(14px + ${hint.col - 1}ch)"><b>${hint.title}</b>${hint.help ? `<br>${hint.help}` : ""}</div>` : "";
-    return `<div class="app-line ${kind}"><div class="app-margin"><span class="app-mark ${dot && number === next ? "has-both" : ""}">${mark}</span><span class="app-number">${number}</span></div><div class="app-text">${highlightCode(text)}${marks}${note}</div></div>`;
+    const selection = selected.includes(number) ? `<span class="app-selection" style="width:${text.length + 1}ch"></span>` : "";
+    const textCursor = caret?.line === number ? `<span class="app-caret" style="left:calc(14px + ${caret.col - 1}ch)"></span>` : "";
+    return `<div class="app-line ${kind}"><div class="app-margin"><span class="app-mark ${dot && number === next ? "has-both" : ""}">${mark}</span><span class="app-number">${number}</span></div><div class="app-text">${selection}${highlightCode(text)}${marks}${note}${textCursor}</div></div>`;
   };
   return `<div class="app-editor">
     <div class="app-code">

@@ -15,4 +15,14 @@ const ICONS = {
   chevron: size => appIcon(size, '<path d="m6 3.5 4.5 4.5L6 12.5"/>'),
   close: size => appIcon(size, '<path d="m4 4 8 8M12 4l-8 8"/>'),
   next: size => appIcon(size, '<path d="M4.5 3.5 11 8l-6.5 4.5Z"/>', "currentColor"),
+  // The arrows of the keyboard, as printed on its keys.
+  arrowUp: size => appIcon(size, '<path d="M8 13.2V2.8M3.8 7 8 2.8 12.2 7"/>'),
+  arrowDown: size => appIcon(size, '<path d="M8 2.8v10.4M3.8 9 8 13.2 12.2 9"/>'),
+  arrowLeft: size => appIcon(size, '<path d="M13.2 8H2.8M7 3.8 2.8 8 7 12.2"/>'),
+  arrowRight: size => appIcon(size, '<path d="M2.8 8h10.4M9 3.8 13.2 8 9 12.2"/>'),
 };
+
+// A shortcut as text, its arrow keys drawn as the arrows printed on the keyboard: a chevron could be
+// read as a circumflex accent or the letter V.
+const KEY_ARROWS = { "↑": "arrowUp", "↓": "arrowDown", "←": "arrowLeft", "→": "arrowRight" };
+const appKeyLabel = keys => keys.replace(/[↑↓←→]/g, mark => `<span class="app-key-arrow">${ICONS[KEY_ARROWS[mark]](13)}</span>`);
