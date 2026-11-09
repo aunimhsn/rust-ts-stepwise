@@ -55,7 +55,10 @@
 .manual-result.is-code { font: var(--code-weight) 13.5px/1.5 var(--font-code); font-variant-ligatures: none; }
 .manual-result:hover { background: var(--band-hover); }
 .manual-result.is-chosen { background: var(--chosen); color: var(--on-chosen); }
-.manual-result mark { background: none; color: inherit; font-weight: var(--code-strong-weight); text-decoration: underline 2px var(--accent); text-underline-offset: 3px; }
+/* The match in each name, in amber: 7, an amber background behind dark letters; 8, letters in amber. */
+.manual-result mark { background: none; color: inherit; font-weight: var(--code-strong-weight); }
+:root[data-match="background"] .manual-result mark { background: var(--accent); color: var(--on-accent); border-radius: 2px; box-shadow: 0 0 0 1px var(--accent); }
+:root[data-match="text"] .manual-result mark { color: var(--accent); }
 .manual-none { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 30px 22px; color: var(--band-weak); text-align: center; }
 .manual-none p { margin: 6px 0 0; color: var(--band-text); font-weight: var(--strong-weight); }
 .manual-none code { font: var(--code-weight) 13px var(--font-code); }
