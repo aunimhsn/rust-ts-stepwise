@@ -65,7 +65,8 @@ a.manual-name:hover { background: var(--band-hover); }
 .manual-none code { font: var(--code-weight) 13px var(--font-code); }
 
 /* On this page: the categories of the section, the one in view marked. */
-.manual-toc { padding: 34px 18px 0 6px; }
+/* Away from the scroll bar of the content, tuned by eye. */
+.manual-toc { padding: 34px 18px 0 var(--manual-toc-gap, 20px); }
 .manual-toc b { display: block; margin-bottom: 8px; color: var(--weak); font: 600 11px var(--font-text); letter-spacing: .06em; text-transform: uppercase; }
 .manual-toc a { display: block; padding: 3px 0 3px 12px; color: var(--weak); border-left: 2px solid var(--hover); cursor: pointer; }
 .manual-toc a:hover { color: var(--text); }
