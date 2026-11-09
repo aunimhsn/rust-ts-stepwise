@@ -21,7 +21,7 @@ Design first (phases 3 to 5 of [process.md](process.md), with a sheet of the wor
 - [ ] **3. Mock-up**: the HTML mock-up of every screen and state, with real sample code and errors, in `docs/mockups/interface.html`. The world keeps the elements of step 1. Done when every scenario looks right at 1280 × 720 and on a large screen.
   - [x] **3a. Style of the interface** (#11)
   - [x] **3b. States and sizes of the window** (#12)
-  - [ ] **3c. Keyboard**: the four menus, the keyboard shortcuts of the controls decided (checked against those of the browsers, such as F5 and F11, on an AZERTY keyboard), the shortcuts of comfort of the editor (see [Code editor](specs.md#code-editor)), the command menu.
+  - [x] **3c. Keyboard**: the four menus, the keyboard shortcuts of the controls decided (checked against those of the browsers, such as F5 and F11, on an AZERTY keyboard), the shortcuts of comfort of the editor (see [Code editor](specs.md#code-editor)), the command menu.
   - [ ] **3d. Panels**: the legend, the success panel, the confirmations.
   - [ ] **3e. Other screens**: the home screen and its path, the manual, the settings with the theme, the messages (the storage refused, the window too small, the browser too old, offline).
   - [ ] **3f. Animations and sounds**: the animations of the map as mini-scenes to replay and tune, at every speed (each action of the robot, `pick_up()` with its pincer, the end of a run that succeeds or fails), with their sounds, synthesized and CC0 compared by ear.
