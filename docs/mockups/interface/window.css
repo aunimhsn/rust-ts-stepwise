@@ -20,13 +20,13 @@
 /* The tabs of the page take several rows: a section stops under them. */
 .page-section { scroll-margin-top: 130px; }
 
-/* The scroll bars of the application: very thin, an amber thumb on a grey track, as the line of On this
+/* The scroll bars of the application: very thin, a square amber thumb on a grey track, as the line of On this
    page. Chrome and Safari draw them 6 pixels wide, without arrows; Firefox, which only knows the
    standard properties, as thin as it can (about 8 pixels). Chrome ignores its own rules as soon as the
    standard ones are set: they only go to Firefox. */
 .app-window ::-webkit-scrollbar { width: 6px; height: 6px; }
 .app-window ::-webkit-scrollbar-track { background: var(--hover); }
-.app-window ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
+.app-window ::-webkit-scrollbar-thumb { background: var(--accent); }
 .app-window ::-webkit-scrollbar-button { display: none; }
 @supports not selector(::-webkit-scrollbar) {
   .app-window { scrollbar-color: var(--accent) var(--hover); scrollbar-width: thin; }
