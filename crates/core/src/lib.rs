@@ -20,6 +20,8 @@
     )
 )]
 
+pub mod probe;
+
 /// The version of the core, from its `Cargo.toml`.
 #[must_use]
 pub fn version() -> &'static str {

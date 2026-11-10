@@ -65,3 +65,7 @@ The settings with the theme, the storage refused, the window too small and the p
 ### 4a. Cargo workspace (#18)
 
 `crates/core` (a plain library with the lints that forbid panics), `crates/wasm` (its bridge, built for `wasm32-unknown-unknown`), `src/main.rs` and the release workflow removed, the Rust CI on the whole workspace (with the WebAssembly target and the minimum version), `CLAUDE.md` and the README updated (commands, `--workspace`). Reviewed twice, by `code-reviewer` on Opus 5.5 and on Fable 5.2, to compare the two models.
+
+### 4b. SvelteKit application (#19)
+
+`web/` with TypeScript strict, `adapter-static`, Fluent and `locales/en.ftl`, ESLint, Prettier, Vitest and `svelte-check`; `web/scripts/build-wasm.ts` (`cargo`, then `wasm-bindgen` at the exact version of the crate, checked before building); the front-end checks in the CI, skipped for documentation only behind the single required job `CI`; a page showing a Fluent message and the version of the core computed in Rust.
