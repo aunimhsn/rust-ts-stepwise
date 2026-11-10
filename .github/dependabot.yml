@@ -8,3 +8,11 @@ updates:
     directory: /
     schedule:
       interval: weekly
+  # The packages of the interface, their updates of the week in one pull request.
+  - package-ecosystem: npm
+    directory: /web
+    schedule:
+      interval: weekly
+    groups:
+      web:
+        patterns: ["*"]

@@ -99,7 +99,7 @@ Follow [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.
 
 ## Code review
 
-- Before opening any pull request that changes code or its build (`crates/`, tests, `Cargo.toml`, `clippy.toml`, `build.rs`, `rust-toolchain.toml`, `.github/workflows/`), run the `code-reviewer` subagent (`.claude/agents/code-reviewer.md`) on the branch.
+- Before opening any pull request that changes code or its build (`crates/`, `web/`, tests, `Cargo.toml`, `clippy.toml`, `build.rs`, `rust-toolchain.toml`, `.github/workflows/`), run the `code-reviewer` subagent (`.claude/agents/code-reviewer.md`) on the branch.
 - Run it once per pull request, on the whole branch, to save tokens; a step too large for one review is split into sub-steps in `roadmap.md`.
 - It writes its recommendations, in French, to `outputs/<YYYY-MM-DD>-<branch>-code-review.md`. These notes are ignored by Git.
 - Summarize the recommendations to the user and apply only the ones they approve, then open the pull request.
@@ -107,12 +107,14 @@ Follow [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.
 ## Development
 
 - The Rust code is a Cargo workspace: `crates/core` (`stepwise-core`), the language and the map, a plain library tested without a browser; `crates/wasm` (`stepwise-wasm`), the bridge that exposes the core to the interface in WebAssembly, which only converts the arguments and the results.
+- The interface is the SvelteKit application of `web/`, in TypeScript strict; its npm commands run from `web/`. `npm run wasm` builds the core and its JavaScript glue into `web/src/lib/wasm/` (ignored by Git); `dev`, `build`, `check` and `test` run it first.
 - Before committing, run and make sure all of these pass:
   - `cargo fmt --all --check`
   - `cargo clippy --workspace --all-targets --all-features -- -D warnings`
   - `cargo clippy --workspace --all-features --target wasm32-unknown-unknown -- -D warnings`
   - `cargo test --workspace --all-features`
-- The same checks run in CI (`.github/workflows/ci.yml`) on every pull request.
+  - in `web/`, when it or the Rust code changed: `npm run lint`, `npm run check`, `npm test` and `npm run build`
+- The same checks run in CI (`.github/workflows/ci.yml`) on every pull request; a pull request that changes only documentation skips them.
 - `unsafe` code is forbidden and Clippy pedantic lints are enabled (see `[workspace.lints]` in `Cargo.toml`); an exception to a lint is an `#[expect(..., reason = "...")]`, never an `#[allow]`.
 - The core never panics: the lints at the top of `crates/core/src/lib.rs` and the methods forbidden by `clippy.toml` rule out `unwrap`, `expect`, indexing, `panic!`, unchecked arithmetic and the like outside the tests, in `crates/core` and `crates/wasm`. A panic would abort the WebAssembly module and the page; return an error instead.
 - `rust-version` in `Cargo.toml` is the minimum Rust version: CI also builds with it. Raise it when a dependency or a language feature needs a newer Rust.

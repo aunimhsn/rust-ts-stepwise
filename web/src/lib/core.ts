@@ -1,0 +1,22 @@
+// The core of Stepwise, compiled to WebAssembly by `npm run wasm` (see scripts/build-wasm.ts).
+
+import init, { coreVersion } from '#lib/wasm/stepwise.js';
+
+/** What the interface reads from the core once it is loaded. */
+export interface Core {
+	version: string;
+}
+
+/**
+ * Loads the WebAssembly module, fetched once whatever the number of calls. A failure is written
+ * to the console with its cause, then passed on to the page, which says it.
+ */
+export async function loadCore(): Promise<Core> {
+	try {
+		await init();
+	} catch (error) {
+		console.error('core: the WebAssembly module could not load', error);
+		throw error;
+	}
+	return { version: coreVersion() };
+}

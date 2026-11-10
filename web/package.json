@@ -1,0 +1,45 @@
+{
+	"name": "stepwise-web",
+	"private": true,
+	"type": "module",
+	"engines": {
+		"node": ">=24"
+	},
+	"imports": {
+		"#lib/*": "./src/lib/*"
+	},
+	"scripts": {
+		"dev": "npm run wasm && vite dev",
+		"build": "npm run wasm -- --release && vite build",
+		"preview": "vite preview",
+		"wasm": "node scripts/build-wasm.ts",
+		"prepare": "svelte-kit sync || echo ''",
+		"check": "npm run wasm && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "npm run wasm && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"lint": "prettier --check . && eslint .",
+		"format": "prettier --write .",
+		"test:unit": "npm run wasm && vitest",
+		"test": "npm run wasm && vitest --run"
+	},
+	"devDependencies": {
+		"@eslint/js": "^10.0.1",
+		"@fluent/bundle": "^0.19.1",
+		"@fluent/syntax": "^0.19.0",
+		"@sveltejs/adapter-static": "^4.0.0",
+		"@sveltejs/kit": "^3.0.0",
+		"@sveltejs/vite-plugin-svelte": "^7.2.0",
+		"@types/node": "^24",
+		"eslint": "^10.4.1",
+		"eslint-config-prettier": "^10.1.8",
+		"eslint-plugin-svelte": "^3.19.0",
+		"globals": "^17.6.0",
+		"prettier": "^3.8.3",
+		"prettier-plugin-svelte": "^4.1.0",
+		"svelte": "^5.57.2",
+		"svelte-check": "^4.6.0",
+		"typescript": "^6.0.3",
+		"typescript-eslint": "^8.60.1",
+		"vite": "^8.3.0",
+		"vitest": "^4.1.8"
+	}
+}
