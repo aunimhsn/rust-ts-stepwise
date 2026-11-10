@@ -17,8 +17,40 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  # A pull request that changes only documentation runs no check. The jobs below are then
+  # skipped rather than left out, and a skipped job counts as passed for the checks a
+  # ruleset requires: the pull request can still be merged.
+  changes:
+    name: Changed files
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      rust: ${{ steps.filter.outputs.rust }}
+      web: ${{ steps.filter.outputs.web }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          filters: |
+            rust: &rust
+              - 'crates/**'
+              - 'Cargo.toml'
+              - 'Cargo.lock'
+              - 'clippy.toml'
+              - 'rust-toolchain.toml'
+              - '.github/workflows/**'
+            # The interface loads the core: a change of the Rust code checks it too.
+            web:
+              - *rust
+              - 'web/**'
+
   check:
-    name: Format, lint and test
+    name: Rust
+    needs: changes
+    if: needs.changes.outputs.rust == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -35,7 +67,9 @@ jobs:
       - run: cargo test --locked --workspace --all-features
 
   msrv:
-    name: Minimum Rust version
+    name: Rust minimum version
+    needs: changes
+    if: needs.changes.outputs.rust == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -50,3 +84,37 @@ jobs:
       # `+version` overrides the stable channel of rust-toolchain.toml.
       - run: cargo +${{ steps.msrv.outputs.version }} check --locked --workspace --all-targets --all-features
       - run: cargo +${{ steps.msrv.outputs.version }} check --locked --workspace --all-features --target wasm32-unknown-unknown
+
+  web:
+    name: Interface
+    needs: changes
+    if: needs.changes.outputs.web == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+      # The command-line tool at the exact version of the crate, read from Cargo.lock, as
+      # scripts/build-wasm.ts checks it.
+      - name: Read the version of wasm-bindgen from Cargo.lock
+        id: wasm-bindgen
+        working-directory: .
+        run: echo "version=$(sed -n '/^name = "wasm-bindgen"$/{n;s/^version = "\(.*\)"/\1/p;}' Cargo.lock)" >> "$GITHUB_OUTPUT"
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-bindgen@${{ steps.wasm-bindgen.outputs.version }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run check
+      - run: npm test
+      - run: npm run build
