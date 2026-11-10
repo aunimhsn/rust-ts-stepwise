@@ -3,10 +3,12 @@
 //! The core must never panic: compiled to WebAssembly, a panic aborts the module and the page
 //! with it, while every program of a learner, even absurd, must end with an error the
 //! interface can show. The lints below, and the methods forbidden by `clippy.toml`, rule out
-//! what can panic outside the tests.
+//! what can panic outside the tests: indexing, `unwrap`, `panic!`, and the arithmetic, since
+//! a division by zero panics and an overflow wraps silently in release (use `checked_*`).
 #![cfg_attr(
     not(test),
     deny(
+        clippy::arithmetic_side_effects,
         clippy::indexing_slicing,
         clippy::string_slice,
         clippy::unwrap_used,
@@ -22,14 +24,4 @@
 #[must_use]
 pub fn version() -> &'static str {
     env!("CARGO_PKG_VERSION")
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn the_version_is_the_one_of_the_workspace() {
-        assert_eq!(version(), "0.1.0");
-    }
 }

@@ -25,6 +25,10 @@ unsafe_code = "forbid"
 
 [workspace.lints.clippy]
 pedantic = { level = "warn", priority = -1 }
+# An exception to a lint is an `#[expect(..., reason = "...")]`: it says why, and it warns
+# once the code no longer needs it.
+allow_attributes = "warn"
+allow_attributes_without_reason = "warn"
 
 [profile.release]
 lto = true

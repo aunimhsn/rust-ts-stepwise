@@ -113,8 +113,8 @@ Follow [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.
   - `cargo clippy --workspace --all-features --target wasm32-unknown-unknown -- -D warnings`
   - `cargo test --workspace --all-features`
 - The same checks run in CI (`.github/workflows/ci.yml`) on every pull request.
-- `unsafe` code is forbidden and Clippy pedantic lints are enabled (see `[workspace.lints]` in `Cargo.toml`).
-- The core never panics: the lints at the top of `crates/core/src/lib.rs` and the methods forbidden by `clippy.toml` rule out `unwrap`, `expect`, indexing, `panic!` and the like outside the tests. A panic would abort the WebAssembly module and the page; return an error instead.
+- `unsafe` code is forbidden and Clippy pedantic lints are enabled (see `[workspace.lints]` in `Cargo.toml`); an exception to a lint is an `#[expect(..., reason = "...")]`, never an `#[allow]`.
+- The core never panics: the lints at the top of `crates/core/src/lib.rs` and the methods forbidden by `clippy.toml` rule out `unwrap`, `expect`, indexing, `panic!`, unchecked arithmetic and the like outside the tests, in `crates/core` and `crates/wasm`. A panic would abort the WebAssembly module and the page; return an error instead.
 - `rust-version` in `Cargo.toml` is the minimum Rust version: CI also builds with it. Raise it when a dependency or a language feature needs a newer Rust.
 - The `wasm-bindgen` crate is pinned to an exact version (`=x.y.z` in `Cargo.toml`): the command-line tool that generates the JavaScript glue must match it exactly. Update both together.
 
