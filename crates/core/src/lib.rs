@@ -20,7 +20,9 @@
     )
 )]
 
+pub mod lexer;
 pub mod probe;
+pub mod span;
 
 /// The version of the core, from its `Cargo.toml`.
 #[must_use]

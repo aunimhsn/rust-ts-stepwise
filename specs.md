@@ -16,7 +16,7 @@ Stepwise teaches the first steps of programming. The learner writes a small prog
 - **Identity**: our own robot, friendly and simple, whose smiling head is the logo of Stepwise. Its look comes from the sheet of the world elements (see [Look of the world](#look-of-the-world)).
 - **The robot shows what the program does**: every action is animated, the line being run is highlighted, and nothing happens without the learner seeing it.
 - **Three fonts, each with one role**: **Fredoka**, the personality, the familiarity with the robot, kept rare so that it keeps its effect: the name, what the robot says, **Let's go**, the great moments such as *"Level 18 done!"*. **Manrope**, the interface: everything read or clicked. **Source Code Pro** in semi-bold, the code: the editor, the console, the variables panel, the examples of the manual.
-- **Tone of the messages**: short, friendly, in the second person, never blaming. An error says what happened, where (line and column), and how to fix it, with the words of the language: *"Expected ':' at the end of the `if` line."*
+- **Tone of the messages**: short, friendly, in the second person, never blaming. An error says what happened, where (its line), and the rule to follow, with the words of the language: *"Expected ':' at the end of the `if` line."* It never rewrites the learner's code for them: finding the fix by reading the line again is part of learning.
 - **Strict where it builds a habit**: indentation of exactly four spaces, `snake_case` names, a function defined before it is called, a variable declared before it is used. Each rule has its own clear message.
 
 ## The language
@@ -49,13 +49,13 @@ else:
 
 - One statement per line. A line ending with `:` opens a block: the lines under it, indented by **exactly four more spaces**, until a line goes back to the level of the opening line.
 - Indentation uses spaces only. A tab, or an indentation that isn't four spaces more than the line that opens the block, is an error. The editor inserts four spaces when the Tab key is pressed.
-- A block has at least one line.
-- `#` starts a comment, up to the end of the line. Empty lines and comment lines are ignored, whatever their indentation.
+- A block has at least one line. A block that holds only comments is an error of its own: the comments don't count as lines.
+- `#` starts a comment, up to the end of the line. Empty lines and comment lines are ignored, whatever their indentation: a line of spaces, tabs or other blank characters (such as a non-breaking space pasted from a document) is empty.
 - A line can't be split in two, even inside parentheses.
 
 ### Names
 
-- Variables and functions are written in `snake_case`: lowercase letters, digits and underscores, starting with a letter (`sides`, `paint_side`, `count_2`). Any other name is an error that suggests the `snake_case` version (`paintSide` → `paint_side`).
+- Variables and functions are written in `snake_case`: lowercase letters from `a` to `z` without accents, digits and underscores, starting with a letter (`sides`, `paint_side`, `count_2`). Any other name (`paintSide`, `côté`) is an error that recalls the rule, without writing the name for the learner.
 - The keywords, the built-in functions and the colors are reserved: a variable, a function or a parameter can't take their names.
 - Keywords: `let`, `if`, `else`, `while`, `repeat`, `break`, `function`, `return`, `and`, `or`, `not`, `true`, `false`.
 - The words a learner may write from another language are reserved too, each with a message that shows the Stepwise way: `elif` (→ `else if`), `def` (→ `function`), `var` and `const` (→ `let`), `for`, `continue`, `pass`, `none`, `null`.
@@ -64,7 +64,7 @@ else:
 
 | Type | Written | Notes |
 |---|---|---|
-| Whole number | `0`, `42`, `-7` | 64-bit; a result beyond that range stops the program with an error. No decimal numbers in version 1. |
+| Whole number | `0`, `42`, `-7` | 64-bit; a result beyond that range stops the program with an error. A number is written up to 9223372036854775807, with or without `-`: the smallest value, -9223372036854775808, can only be computed. No decimal numbers in version 1. |
 | Boolean | `true`, `false` | The only values a condition accepts: `if 3:` is an error, there is no "truthy" value. |
 | Text | `"I am stuck"` | Double quotes, on one line; `\"`, `\\` and `\n` inside. Used by `print`. |
 | Color | `red`, `yellow`, `blue` | The three paints of the world: enough for the sensors to tell three cases apart (four with an unpainted cell), few enough to read at a glance and to stay distinct with a red-green color blindness. Their shades are in [Look of the world](#look-of-the-world). |
@@ -81,7 +81,7 @@ Lists and decimal numbers come later (see the [backlog](docs/backlog.md)).
 
 - Arithmetic on whole numbers: `+`, `-`, `*`, `/` (whole division, `7 / 2` is `3`), `%` (remainder). Dividing by zero stops the program with an error.
 - `+` also joins two texts. Adding a text and a number is an error: `print` takes several values instead (`print("Sides:", sides)`).
-- Comparisons: `==`, `!=` (two values of the same type), `<`, `<=`, `>`, `>=` (whole numbers). Comparisons don't chain: `1 < x < 5` is an error that suggests `1 < x and x < 5`.
+- Comparisons: `==`, `!=` (two values of the same type), `<`, `<=`, `>`, `>=` (whole numbers). Comparisons don't chain: `1 < x < 5` is an error that says to join two comparisons with `and`, without rewriting them.
 - Logic: `and`, `or`, `not`, on booleans, evaluated from left to right and stopping as soon as the result is known.
 - Parentheses group as usual and are never required: `if front_is_clear():` and `if (front_is_clear()):` both work.
 - Priority, from the strongest: parentheses and calls; `-` and `not` in front of a value; `*`, `/`, `%`; `+`, `-`; comparisons; `and`; `or`.
@@ -387,7 +387,7 @@ The messages are drawn in the wireframe [`docs/wireframes/states.excalidraw`](do
 
 | Situation | Behavior |
 |---|---|
-| A syntax or check error in the program | Underlined in the editor, listed in the console with its line and column; **Run** doesn't start. |
+| A syntax or check error in the program | Underlined in the editor, listed in the console with its line (the underline shows the place; a column would only be noise for a beginner); **Run** doesn't start. |
 | An error while the program runs | The program stops; the error is shown in the console with its line, the line is marked in the editor, by a mark of its own in the margin (✕ in the wireframe [`docs/wireframes/states.excalidraw`](docs/wireframes/states.excalidraw); its look is decided with the mock-up), distinct from the next line (▶), a breakpoint (●) and the errors underlined before running; the variables panel shows the state at that moment. The code can be changed at once, without **Reset**. |
 | An infinite loop | The program keeps running visibly until **Pause** or **Reset**; the page stays responsive. |
 | A recursion that never ends | Stopped at 200 nested calls with an error. |

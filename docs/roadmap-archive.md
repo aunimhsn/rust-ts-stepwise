@@ -73,3 +73,7 @@ The settings with the theme, the storage refused, the window too small and the p
 ### 4c. Probe (#21)
 
 A fake program of a few steps in Rust, advanced by `step()` at each animation frame from Svelte, moving the robot on a small map at each of the five speeds; the size of the WebAssembly module measured, with `opt-level` 3, `"s"` and `"z"` compared and the choice written in `docs/technical-choices.md`.
+
+### 4d. Deployment (#22)
+
+The website deployed to GitHub Pages by a workflow at `stepwise.sylent.tools` (the path never hard-coded; the owner adds the DNS records, see [GitHub Pages usage](github-pages-usage.md#address)); `main` protected by a ruleset requiring the check `CI` (the last job of `.github/workflows/ci.yml`).

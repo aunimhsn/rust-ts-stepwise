@@ -7,10 +7,12 @@ The ideas, polish and edge cases found along the way that the current step doesn
 - Lists, and a `for` loop over them.
 - Decimal numbers.
 - Two functions that call each other (needs a way to declare a function before its body, or hoisting).
+- Messages of their own, rather than *unexpected character*, for `1.5` (no decimal numbers in version 1), `;` (one statement per line) and the typographic quotes `“ ”` pasted from a document (seen at step 5); the error already carries the character, so this may be done in the messages alone.
 
 ## Interface
 
 - The French translation of the interface, the levels and the manual.
+- The code normalized to NFC in the editor (step 15): a name pasted with its accents decomposed (`côté` written `co` + U+0302 + …) is cut before the accent by the lexer, which reads the combining mark as an unexpected character (seen in the review of step 5).
 - The description of a built-in function on hover in the editor.
 - A phone or tablet layout.
 - The home screen in the mock-up (step 3): the path painted up to the level to play and drawn as a ghost after it, as the paint and the goal marks of the map.

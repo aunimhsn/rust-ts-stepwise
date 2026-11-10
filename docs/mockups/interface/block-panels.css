@@ -20,6 +20,6 @@
 .app-call { margin: 0 -6px; padding: 0 6px; border-radius: var(--radius-small); line-height: 22px; }
 .app-call.is-current { background: var(--call-current); font-weight: var(--code-strong-weight); }
 /* The places take one column, so that the messages of a list line up. */
-.app-message { display: grid; grid-template-columns: 14ch 1fr; gap: 12px; }
+.app-message { display: grid; grid-template-columns: 7ch 1fr; gap: 12px; }
 .app-place-link { color: var(--error); font-weight: var(--code-strong-weight); }
 .app-message b { font-weight: var(--code-strong-weight); }
