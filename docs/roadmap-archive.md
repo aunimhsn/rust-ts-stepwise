@@ -69,3 +69,7 @@ The settings with the theme, the storage refused, the window too small and the p
 ### 4b. SvelteKit application (#19)
 
 `web/` with TypeScript strict, `adapter-static`, Fluent and `locales/en.ftl`, ESLint, Prettier, Vitest and `svelte-check`; `web/scripts/build-wasm.ts` (`cargo`, then `wasm-bindgen` at the exact version of the crate, checked before building); the front-end checks in the CI, skipped for documentation only behind the single required job `CI`; a page showing a Fluent message and the version of the core computed in Rust.
+
+### 4c. Probe (#21)
+
+A fake program of a few steps in Rust, advanced by `step()` at each animation frame from Svelte, moving the robot on a small map at each of the five speeds; the size of the WebAssembly module measured, with `opt-level` 3, `"s"` and `"z"` compared and the choice written in `docs/technical-choices.md`.
