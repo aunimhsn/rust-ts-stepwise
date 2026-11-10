@@ -20,3 +20,6 @@ export async function loadCore(): Promise<Core> {
 	}
 	return { version: coreVersion() };
 }
+
+/** The probe of step 4c (see crates/core/src/probe.rs), to create once `loadCore` has resolved. */
+export { Probe, type Action, type Direction } from '#lib/wasm/stepwise.js';

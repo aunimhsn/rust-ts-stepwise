@@ -83,6 +83,9 @@ run('cargo', [
 	...(release ? ['--release'] : [])
 ]);
 run('wasm-bindgen', [
+	// The names of the functions, only read by a debugger, and the list of the tools that
+	// built the module: a third of its size, and of no use to the website.
+	...(release ? ['--remove-name-section', '--remove-producers-section'] : []),
 	'--target',
 	'web',
 	'--out-dir',
