@@ -1,21 +1,29 @@
 name: Deploy
 
 # Every merge into `main` publishes the website to GitHub Pages (see docs/github-pages-usage.md).
-# It builds again rather than wait for the workflow CI: the code merged already passed its checks
-# in the pull request, which the ruleset of `main` requires.
+# It builds again rather than wait for the workflow CI, which checks the same commit at the same
+# time: the pull request already passed CI, as the ruleset of `main` requires, but its branch
+# doesn't have to be up to date with `main`, so the merged commit itself is checked in parallel.
+# A pull request that changes this workflow or the shared setup runs the build alone, so that a
+# mistake shows before the merge.
 on:
   push:
     branches: [main]
+  pull_request:
+    paths:
+      - '.github/workflows/deploy.yml'
+      - '.github/actions/**'
   workflow_dispatch:
 
 permissions:
   contents: read
 
 # One deployment at a time; one in progress finishes rather than leave the website half published,
-# and only the latest waiting one runs after it.
+# and only the latest waiting one runs after it. A pull request has a group of its own, so that it
+# never waits for a deployment.
 concurrency:
-  group: pages
-  cancel-in-progress: false
+  group: ${{ github.event_name == 'pull_request' && format('pages-{0}', github.ref) || 'pages' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   CARGO_TERM_COLOR: always
@@ -24,6 +32,10 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # Read by actions/configure-pages: the API of Pages answers 404 without it.
+      pages: read
     steps:
       - uses: actions/checkout@v7
       # The address of the website, set in Settings › Pages: its path is empty at the root of a
@@ -43,6 +55,7 @@ jobs:
   deploy:
     name: Deploy
     needs: build
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions:
       pages: write
