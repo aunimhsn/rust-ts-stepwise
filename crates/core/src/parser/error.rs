@@ -61,8 +61,8 @@ pub enum ParseErrorKind {
     /// What follows can't be there: the statement or the value before it is complete
     /// (`forward() forward()`, `print("a" "b")`, `break 3`).
     UnexpectedToken,
-    /// A `(` whose `)` is missing on its line, the line ending where a value or the `)` is
-    /// expected. The span is the `(`.
+    /// A `(` whose `)` is missing on its line, the line or the `:` at its end coming where a
+    /// value or the `)` is expected (`forward(`, `if front_is_clear(:`). The span is the `(`.
     UnclosedParen,
     /// A `)` that closes no `(`.
     UnmatchedParen,
@@ -78,18 +78,39 @@ pub enum ParseErrorKind {
     },
     /// No name after `let`.
     ExpectedName,
-    /// A keyword where a name is expected (`let repeat = 3`, `repeat = 3`): keywords are
-    /// reserved.
+    /// A keyword where a name is expected (`let repeat = 3`, `repeat = 3`, `else = 3`):
+    /// keywords are reserved. The span is the keyword.
     KeywordAsName {
         /// The keyword.
         keyword: Keyword,
     },
     /// No `=` after the name of a `let`: a variable is declared with its first value.
     ExpectedEqual,
-    /// A line indented further than the line above, which opens no block.
+    /// A line indented further than the line above, which opens no block. The span is its
+    /// indentation.
     UnexpectedIndent,
-    /// Parentheses, operators and calls nested deeper than
-    /// [`MAX_DEPTH`](super::MAX_DEPTH).
+    /// No `:` at the end of a line that opens a block (`if front_is_clear()`). The span is
+    /// what stands there instead, or the end of the line.
+    ExpectedColon,
+    /// Something after the `:` of a line that opens a block (`if front_is_clear(): forward()`):
+    /// the block goes on the lines under it. The span is what follows the `:`, up to the end
+    /// of the line.
+    AfterColon,
+    /// No line under a line that opens a block. The span is that line.
+    EmptyBlock,
+    /// Only comments under a line that opens a block, at least one of them indented further
+    /// than that line: the comments don't count as lines. The span is the first of these
+    /// comments.
+    CommentOnlyBlock,
+    /// An `else` that follows no block of an `if` at its indentation. The span is the `else`.
+    ElseWithoutIf,
+    /// An `else` or an `else if` after the `else` of an `if`: the `else` comes last, once.
+    /// The span is the `else` too many.
+    ElseAfterElse,
+    /// Parentheses, operators, calls and blocks nested deeper than
+    /// [`MAX_DEPTH`](super::MAX_DEPTH), or blocks alone deeper than
+    /// [`MAX_BLOCK_DEPTH`](super::MAX_BLOCK_DEPTH). For a block, the span is the line that
+    /// opens it.
     TooDeep,
 }
 

@@ -26,6 +26,9 @@ pub mod parser;
 pub mod probe;
 pub mod span;
 
+#[cfg(test)]
+mod test_support;
+
 /// The version of the core, from its `Cargo.toml`.
 #[must_use]
 pub fn version() -> &'static str {

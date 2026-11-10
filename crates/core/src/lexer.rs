@@ -4,7 +4,8 @@
 //! indentation* in `specs.md`):
 //!
 //! - an empty line or a comment line is skipped, whatever its indentation, tabs and other
-//!   blank characters included;
+//!   blank characters included; the place of each comment line is kept aside, for the parser
+//!   to tell a block that holds only comments from an empty one;
 //! - the indentation of any other line, in spaces only, opens a block with
 //!   [`TokenKind::Indent`] when it is four spaces more than the line above, or closes blocks
 //!   with one [`TokenKind::Dedent`] each when it goes back to an enclosing line; any other
@@ -35,7 +36,17 @@ use crate::span::{Position, Span};
 /// The number of spaces that indent a block further than the line that opens it.
 pub const INDENT_WIDTH: u32 = 4;
 
-/// The tokens of `source`, ending with [`TokenKind::End`].
+/// What the lexer reads in a source.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Lexed {
+    /// The tokens, ending with [`TokenKind::End`].
+    pub tokens: Vec<Token>,
+    /// The comment of each line that holds only a comment, from its `#` to its last
+    /// character, in the order of the source. These lines give no token.
+    pub comments: Vec<Span>,
+}
+
+/// The tokens of `source`, with the places of its comment lines.
 ///
 /// A line break is `\n` or `\r\n`.
 ///
@@ -44,9 +55,10 @@ pub const INDENT_WIDTH: u32 = 4;
 /// The first error of the source: a tab, a wrong indentation, a text not closed or with an
 /// unknown escape, a number too large, a word that starts with a digit, or a character that
 /// has no meaning outside a text or a comment.
-pub fn tokenize(source: &str) -> Result<Vec<Token>, LexError> {
+pub fn tokenize(source: &str) -> Result<Lexed, LexError> {
     let mut lexer = Lexer {
         tokens: Vec::new(),
+        comments: Vec::new(),
         levels: Vec::new(),
     };
     let mut end = Position::new(1, 1);
@@ -58,12 +70,17 @@ pub fn tokenize(source: &str) -> Result<Vec<Token>, LexError> {
         lexer.push(TokenKind::Dedent, Span::at(end));
     }
     lexer.push(TokenKind::End, Span::at(end));
-    Ok(lexer.tokens)
+    Ok(Lexed {
+        tokens: lexer.tokens,
+        comments: lexer.comments,
+    })
 }
 
 /// The state kept from one line to the next.
 struct Lexer {
     tokens: Vec<Token>,
+    /// The comment of each comment line read, from its `#` to its last character.
+    comments: Vec<Span>,
     /// The indentation of each block still open, in spaces, the innermost last: empty at the
     /// top level.
     levels: Vec<u32>,
@@ -86,7 +103,19 @@ impl Lexer {
         // Blank characters of any kind, tabs and non-breaking spaces included: a line that
         // looks empty is empty.
         let content = line.trim_start();
-        if content.is_empty() || content.starts_with('#') {
+        if content.is_empty() {
+            return Ok(end);
+        }
+        if content.starts_with('#') {
+            // Without the blank characters before the `#` nor those after the comment.
+            let width = u32::try_from(content.trim_end().chars().count()).unwrap_or(u32::MAX);
+            let before =
+                length.saturating_sub(u32::try_from(content.chars().count()).unwrap_or(u32::MAX));
+            let start = before.saturating_add(1);
+            self.comments.push(Span::new(
+                Position::new(number, start),
+                Position::new(number, start.saturating_add(width)),
+            ));
             return Ok(end);
         }
         let mut cursor = Cursor::new(line, number);

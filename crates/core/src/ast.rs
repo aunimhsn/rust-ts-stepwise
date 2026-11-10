@@ -15,7 +15,8 @@ pub struct Program {
 }
 
 /// A statement, with the stretch of the source it comes from: its line, without the
-/// indentation nor a comment at its end.
+/// indentation nor a comment at its end. For a statement that opens a block, it is the line
+/// up to its `:`, without the block.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Statement {
     /// What the statement is.
@@ -48,9 +49,43 @@ pub enum StatementKind {
         /// The value given back, if any.
         value: Option<Expression>,
     },
+    /// `if`, with its `else if` and its `else`.
+    If {
+        /// The `if` and each `else if`, in order, never empty: the block of the first true
+        /// condition runs. A list rather than an `if` inside each `else`, so that a long chain of
+        /// `else if` doesn't deepen the tree.
+        branches: Vec<Branch>,
+        /// The block of the `else`, if any.
+        otherwise: Option<Vec<Statement>>,
+    },
+    /// `while condition:`, which runs its block as long as the condition is true.
+    While {
+        /// The condition, evaluated before each turn.
+        condition: Expression,
+        /// The block.
+        body: Vec<Statement>,
+    },
+    /// `repeat count:`, which runs its block `count` times.
+    Repeat {
+        /// The number of turns, evaluated once.
+        count: Expression,
+        /// The block.
+        body: Vec<Statement>,
+    },
     /// An expression alone on its line. Only a call does something: the checker refuses
     /// the others, since it alone knows whether a name is a function or a variable.
     Expression(Expression),
+}
+
+/// An `if` or an `else if` with its block.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Branch {
+    /// The condition.
+    pub condition: Expression,
+    /// The block that runs when the condition is true.
+    pub body: Vec<Statement>,
+    /// Where its line is in the source, from the `if` or the `else` up to the `:`.
+    pub span: Span,
 }
 
 /// A name where the language expects one (the variable of a `let`, the function of a call),

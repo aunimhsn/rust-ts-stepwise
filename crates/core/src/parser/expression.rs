@@ -182,31 +182,33 @@ impl Parser {
     }
 
     /// The error of the `(` at `open` when the line ends right where a value is expected
-    /// inside it: the `)` is missing, more surely than a value (`forward(`).
-    fn unclosed_at_end_of_line(&self, open: Span) -> Result<(), ParseError> {
-        match self.current.kind {
-            TokenKind::Newline | TokenKind::End => Err(ParseError {
+    /// inside it: the `)` is missing, more surely than a value (`forward(`). The `:` that
+    /// ends a line which opens a block ends it as well (`if front_is_clear(:`).
+    fn unclosed_at_end_of_line(&mut self, open: Span) -> Result<(), ParseError> {
+        if self.at_end_of_line() {
+            return Err(ParseError {
                 kind: ParseErrorKind::UnclosedParen,
                 span: open,
-            }),
-            _ => Ok(()),
+            });
         }
+        Ok(())
     }
 
     /// Takes the `)` that closes the `(` at `open`, and returns the position after it.
     fn close(&mut self, open: Span) -> Result<Position, ParseError> {
-        match self.current.kind {
-            TokenKind::RightParen => {
-                let end = self.current.span.end;
-                self.advance();
-                Ok(end)
-            }
-            TokenKind::Newline | TokenKind::End => Err(ParseError {
+        if self.current.kind == TokenKind::RightParen {
+            let end = self.current.span.end;
+            self.advance();
+            return Ok(end);
+        }
+        Err(if self.at_end_of_line() {
+            ParseError {
                 kind: ParseErrorKind::UnclosedParen,
                 span: open,
-            }),
-            _ => Err(self.error(ParseErrorKind::UnexpectedToken)),
-        }
+            }
+        } else {
+            self.error(ParseErrorKind::UnexpectedToken)
+        })
     }
 
     /// Parses one level deeper: the value of an operator, the inside of parentheses, a value
@@ -219,14 +221,10 @@ impl Parser {
         &mut self,
         parse: impl FnOnce(&mut Self) -> Result<Deep, ParseError>,
     ) -> Result<Deep, ParseError> {
-        let depth = self.depth.saturating_add(1);
-        if depth >= MAX_DEPTH {
+        if !self.fits_deeper() {
             return Err(self.error(ParseErrorKind::TooDeep));
         }
-        self.depth = depth;
-        let result = parse(self);
-        self.depth = self.depth.saturating_sub(1);
-        result
+        self.deeper(parse)
     }
 
     /// The node `kind` over `span`, above a tree of height `below` (0 for a value alone).

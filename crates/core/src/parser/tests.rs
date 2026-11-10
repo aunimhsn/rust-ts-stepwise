@@ -1,6 +1,8 @@
 //! The tests of the parser, grouped by the rules of the specifications.
 
-use super::{ForeignWord, MAX_DEPTH, ParseError, ParseErrorKind as E, SyntaxError, parse};
+use super::{
+    ForeignWord, MAX_BLOCK_DEPTH, MAX_DEPTH, ParseError, ParseErrorKind as E, SyntaxError, parse,
+};
 use crate::ast::{
     BinaryOperator, Expression, ExpressionKind, Statement, StatementKind, UnaryOperator,
 };
@@ -61,7 +63,36 @@ fn show_statement(statement: &Statement) -> String {
         StatementKind::Return { value: None } => "return".to_owned(),
         StatementKind::Return { value: Some(value) } => format!("return {}", show(value)),
         StatementKind::Expression(expression) => show(expression),
+        StatementKind::If {
+            branches,
+            otherwise,
+        } => {
+            let mut shown: Vec<String> = branches
+                .iter()
+                .map(|branch| {
+                    format!(
+                        "if {} {}",
+                        show(&branch.condition),
+                        show_block(&branch.body)
+                    )
+                })
+                .collect();
+            shown.extend(otherwise.as_deref().map(show_block));
+            shown.join(" else ")
+        }
+        StatementKind::While { condition, body } => {
+            format!("while {} {}", show(condition), show_block(body))
+        }
+        StatementKind::Repeat { count, body } => {
+            format!("repeat {} {}", show(count), show_block(body))
+        }
     }
+}
+
+/// A block between braces, its statements separated by `;`.
+fn show_block(body: &[Statement]) -> String {
+    let lines: Vec<String> = body.iter().map(show_statement).collect();
+    format!("{{ {} }}", lines.join("; "))
 }
 
 fn show(expression: &Expression) -> String {
@@ -184,18 +215,10 @@ mod programs {
         assert_eq!(error.span, span(1, 11, 18));
     }
 
-    /// Until step 6b, which parses the blocks.
+    /// Until step 6c, which parses the functions.
     #[test]
-    fn a_line_that_opens_a_block_is_an_error_for_now() {
-        for source in [
-            "if true:",
-            "else:",
-            "while true:",
-            "repeat 3:",
-            "function f():",
-        ] {
-            assert_eq!(error_kind(source), E::UnexpectedToken, "{source}");
-        }
+    fn a_function_is_an_error_for_now() {
+        assert_eq!(error_kind("function f():"), E::UnexpectedToken);
     }
 }
 
@@ -819,10 +842,488 @@ mod foreign_words {
     }
 }
 
+mod blocks {
+    use super::*;
+
+    #[test]
+    fn an_if() {
+        assert_eq!(line("if a:\n    b()\n"), "if a { b() }");
+    }
+
+    #[test]
+    fn an_if_with_its_else() {
+        let source = "if a:\n    b()\nelse:\n    c()\n";
+        assert_eq!(line(source), "if a { b() } else { c() }");
+    }
+
+    #[test]
+    fn an_if_with_several_else_if() {
+        let source = "if a:\n    b()\nelse if c:\n    d()\nelse if e:\n    f()\n";
+        assert_eq!(
+            line(source),
+            "if a { b() } else if c { d() } else if e { f() }"
+        );
+        let source = format!("{source}else:\n    g()\n");
+        assert_eq!(
+            line(&source),
+            "if a { b() } else if c { d() } else if e { f() } else { g() }"
+        );
+    }
+
+    #[test]
+    fn the_else_if_are_branches_of_one_statement() {
+        let source = "if a:\n    b()\nelse if c:\n    d()\nelse:\n    e()\n";
+        let mut statements = statements(source);
+        assert_eq!(statements.len(), 1);
+        let StatementKind::If {
+            branches,
+            otherwise,
+        } = statements.pop().unwrap().kind
+        else {
+            panic!("an if expected");
+        };
+        assert_eq!(branches.len(), 2);
+        assert_eq!(otherwise.map(|block| block.len()), Some(1));
+    }
+
+    #[test]
+    fn a_while() {
+        let source = "while sides < 4:\n    forward()\n";
+        assert_eq!(line(source), "while (sides < 4) { forward() }");
+    }
+
+    #[test]
+    fn a_repeat() {
+        let source = "repeat length + 1:\n    forward()\n";
+        assert_eq!(line(source), "repeat (length + 1) { forward() }");
+    }
+
+    #[test]
+    fn a_block_holds_every_line_under_it() {
+        assert_eq!(
+            program("if a:\n    b()\n    c()\nd()\n"),
+            ["if a { b(); c() }", "d()"]
+        );
+    }
+
+    #[test]
+    fn a_block_holds_any_statement() {
+        let source = "while true:\n    let a = 1\n    a = 2\n    break\n    return a\n";
+        assert_eq!(
+            line(source),
+            "while true { let a = 1; a = 2; break; return a }"
+        );
+    }
+
+    #[test]
+    fn blocks_nest() {
+        let source = "while a:\n    if b:\n        c()\n    d()\ne()\n";
+        assert_eq!(program(source), ["while a { if b { c() }; d() }", "e()"]);
+    }
+
+    #[test]
+    fn the_end_of_the_source_closes_every_block() {
+        let source = "while a:\n    repeat 3:\n        b()";
+        assert_eq!(line(source), "while a { repeat 3 { b() } }");
+    }
+
+    #[test]
+    fn a_line_closes_several_blocks() {
+        let source = "while a:\n    repeat 3:\n        b()\nc()\n";
+        assert_eq!(program(source), ["while a { repeat 3 { b() } }", "c()"]);
+    }
+
+    #[test]
+    fn an_else_belongs_to_the_if_at_its_indentation() {
+        let outer = "if a:\n    if b:\n        c()\nelse:\n    d()\n";
+        assert_eq!(line(outer), "if a { if b { c() } } else { d() }");
+        let inner = "if a:\n    if b:\n        c()\n    else:\n        d()\n";
+        assert_eq!(line(inner), "if a { if b { c() } else { d() } }");
+    }
+
+    #[test]
+    fn comments_and_empty_lines_change_nothing() {
+        let source =
+            "if a:  # one\n    # two\n\n    b()\n# three\n\nelse:\n        # four\n    c()\n";
+        assert_eq!(line(source), "if a { b() } else { c() }");
+    }
+
+    #[test]
+    fn spaces_around_the_words_of_a_line_change_nothing() {
+        let source = "if  a :\n    b()\nelse   if c  :\n    d()\nelse :\n    e()\n";
+        assert_eq!(line(source), "if a { b() } else if c { d() } else { e() }");
+    }
+
+    #[test]
+    fn parentheses_around_a_condition_are_never_required() {
+        assert_eq!(line("if (a):\n    b()\n"), "if a { b() }");
+        assert_eq!(
+            line("while (a) and (b):\n    c()\n"),
+            "while (a and b) { c() }"
+        );
+    }
+
+    #[test]
+    fn a_long_chain_of_else_if_is_one_statement() {
+        let source = format!("if a:\n    b()\n{}", "else if a:\n    b()\n".repeat(1_000));
+        assert_eq!(statements(&source).len(), 1);
+    }
+
+    #[test]
+    fn a_statement_that_opens_a_block_spans_its_line() {
+        let statements = statements("if a < 3:  # one\n    b()\nc()\n");
+        assert_eq!(statements.len(), 2);
+        let first = statements.into_iter().next().unwrap();
+        assert_eq!(first.span, span(1, 1, 10));
+        let StatementKind::If { branches, .. } = first.kind else {
+            panic!("an if expected");
+        };
+        assert_eq!(branches[0].span, span(1, 1, 10));
+        assert_eq!(branches[0].body[0].span, span(2, 5, 8));
+    }
+
+    #[test]
+    fn each_branch_spans_its_line() {
+        let source = "if a:\n    b()\nelse if c:\n    d()\nelse:\n    e()\n";
+        let StatementKind::If { branches, .. } = statements(source).pop().unwrap().kind else {
+            panic!("an if expected");
+        };
+        assert_eq!(branches[0].span, span(1, 1, 6));
+        assert_eq!(branches[1].span, span(3, 1, 11));
+    }
+
+    #[test]
+    fn a_nested_statement_spans_its_line_without_the_indentation() {
+        let source = "while a:\n    repeat 3:\n        b()\n";
+        let StatementKind::While { body, .. } = statements(source).pop().unwrap().kind else {
+            panic!("a while expected");
+        };
+        assert_eq!(body[0].span, span(2, 5, 14));
+    }
+}
+
+mod block_errors {
+    use super::*;
+
+    #[test]
+    fn a_missing_colon_is_an_error_at_the_end_of_the_line() {
+        for (source, line, column) in [
+            ("if a\n    b()\n", 1, 5),
+            ("if a", 1, 5),
+            ("if a  # one\n    b()\n", 1, 5),
+            ("while a\nb()\n", 1, 8),
+            ("repeat 3\n    b()\n", 1, 9),
+            ("if a:\n    b()\nelse\n    c()\n", 3, 5),
+            ("if a:\n    b()\nelse if c\n    d()\n", 3, 10),
+            ("while a:\n    if b\n        c()\n", 2, 9),
+        ] {
+            let error = error(source);
+            assert_eq!(error.kind, E::ExpectedColon, "{source}");
+            assert_eq!(error.span, span(line, column, column), "{source}");
+        }
+    }
+
+    #[test]
+    fn a_missing_colon_is_an_error_at_what_stands_there() {
+        let error = error("if a b():\n    c()\n");
+        assert_eq!(error.kind, E::ExpectedColon);
+        assert_eq!(error.span, span(1, 6, 7));
+        let error = error_of_else("else c:\n    d()\n");
+        assert_eq!(error.kind, E::ExpectedColon);
+        assert_eq!(error.span, span(3, 6, 7));
+    }
+
+    /// The error of an `if` with its block followed by `rest`, from line 3.
+    fn error_of_else(rest: &str) -> ParseError {
+        error(&format!("if a:\n    b()\n{rest}"))
+    }
+
+    #[test]
+    fn a_parenthesis_too_many_before_the_colon_is_its_own_error() {
+        assert_eq!(error_kind("if a):\n    b()\n"), E::UnmatchedParen);
+    }
+
+    #[test]
+    fn something_after_the_colon_is_an_error_up_to_the_end_of_the_line() {
+        for (source, line, start, end) in [
+            ("if a: b()\n", 1, 7, 10),
+            ("while a: b() # one\n", 1, 10, 13),
+            ("repeat 3: forward()", 1, 11, 20),
+            ("if a:\n    b()\nelse: c()\n", 3, 7, 10),
+            ("if a: if b: c()\n", 1, 7, 16),
+            ("if a::\n    b()\n", 1, 6, 7),
+            ("if a: let\n", 1, 7, 10),
+        ] {
+            let error = error(source);
+            assert_eq!(error.kind, E::AfterColon, "{source}");
+            assert_eq!(error.span, span(line, start, end), "{source}");
+        }
+    }
+
+    #[test]
+    fn a_word_of_another_language_after_the_colon_is_its_own_error() {
+        let error = error("if a: pass\n");
+        assert_eq!(
+            error.kind,
+            E::ForeignWord {
+                word: ForeignWord::Pass
+            }
+        );
+        assert_eq!(error.span, span(1, 7, 11));
+    }
+
+    #[test]
+    fn a_word_of_another_language_further_after_the_colon_is_part_of_what_follows() {
+        let error = error("if a: b() pass\n");
+        assert_eq!(error.kind, E::AfterColon);
+        assert_eq!(error.span, span(1, 7, 15));
+    }
+
+    #[test]
+    fn a_block_without_a_line_is_an_error_at_the_line_that_opens_it() {
+        for (source, line, start, end) in [
+            ("if a:\nb()\n", 1, 1, 6),
+            ("if a:", 1, 1, 6),
+            ("if a:\n", 1, 1, 6),
+            ("while a:\n\n\nb()\n", 1, 1, 9),
+            ("repeat 3:\nb()\n", 1, 1, 10),
+            ("while a:\n    if b:\n    c()\n", 2, 5, 10),
+            ("while a:\n    c()\n    if b:\nd()\n", 3, 5, 10),
+            ("while a:\n    if b:\n", 2, 5, 10),
+            ("if a:\n    b()\nelse:\nc()\n", 3, 1, 6),
+            ("if a:\n    b()\nelse if c:\nd()\n", 3, 1, 11),
+        ] {
+            let error = error(source);
+            assert_eq!(error.kind, E::EmptyBlock, "{source}");
+            assert_eq!(error.span, span(line, start, end), "{source}");
+        }
+    }
+
+    #[test]
+    fn a_block_of_comments_is_an_error_at_its_first_comment() {
+        for (source, line, start, end) in [
+            ("if a:\n    # todo\nb()\n", 2, 5, 11),
+            ("if a:\n    # todo", 2, 5, 11),
+            ("if a:\n    # todo\n", 2, 5, 11),
+            ("if a:\n\n    # one\n    # two\nb()\n", 3, 5, 10),
+            ("repeat 3:\n    # todo  \nb()\n", 2, 5, 11),
+            ("while a:\n    if b:\n        # todo\n    c()\n", 3, 9, 15),
+            ("while a:\n    if b:\n        # todo\nc()\n", 3, 9, 15),
+            ("if a:\n    b()\nelse:\n    # todo\nc()\n", 4, 5, 11),
+        ] {
+            let error = error(source);
+            assert_eq!(error.kind, E::CommentOnlyBlock, "{source}");
+            assert_eq!(error.span, span(line, start, end), "{source}");
+        }
+    }
+
+    #[test]
+    fn a_comment_indented_further_than_the_opening_line_is_in_the_block() {
+        // Whatever its indentation, as long as it is further.
+        for source in [
+            "if a:\n  # todo\nb()\n",
+            "if a:\n            # todo\nb()\n",
+            "if a:\n\t# todo\nb()\n",
+        ] {
+            assert_eq!(error_kind(source), E::CommentOnlyBlock, "{source}");
+        }
+    }
+
+    #[test]
+    fn a_comment_at_the_level_of_the_opening_line_is_not_in_the_block() {
+        for source in [
+            "if a:\n# next\nb()\n",
+            "if a:\n\n# next\nb()\n",
+            "if a:\n# next",
+            "while a:\n    if b:\n    # todo\n    c()\n",
+            "while a:\n    if b:\n# todo\n    c()\n",
+        ] {
+            assert_eq!(error_kind(source), E::EmptyBlock, "{source}");
+        }
+    }
+
+    #[test]
+    fn a_comment_in_the_block_wins_over_one_at_the_level_of_the_opening_line() {
+        let error = error("if a:\n# next\n    # todo\n\n# next\nb()\n");
+        assert_eq!(error.kind, E::CommentOnlyBlock);
+        assert_eq!(error.span, span(3, 5, 11));
+    }
+
+    #[test]
+    fn only_the_comments_under_the_colon_and_above_the_next_line_count() {
+        for source in [
+            "if a: # todo\nb()\n",
+            "    # above\nif a:\nb()\n",
+            "if a:\nb()\n    # below\n",
+            "if c:\n    # in another block\n    d()\nif a:\nb()\n",
+        ] {
+            assert_eq!(error_kind(source), E::EmptyBlock, "{source}");
+        }
+    }
+
+    #[test]
+    fn a_line_indented_under_a_statement_of_a_block_is_an_error() {
+        let error = error("if a:\n    b()\n        c()\n");
+        assert_eq!(error.kind, E::UnexpectedIndent);
+        assert_eq!(error.span, span(3, 1, 9));
+    }
+
+    #[test]
+    fn an_else_without_its_if_is_an_error() {
+        for (source, line, column) in [
+            ("else:\n    a()\n", 1, 1),
+            ("else if a:\n    b()\n", 1, 1),
+            ("else", 1, 1),
+            ("while a:\n    b()\nelse:\n    c()\n", 3, 1),
+            ("if a:\n    b()\nc()\nelse:\n    d()\n", 4, 1),
+            // Indented further than its `if`: it follows `b()`.
+            ("if a:\n    b()\n    else:\n        c()\n", 3, 5),
+            // Indented less than its `if`: it follows the block of the `while`.
+            ("while a:\n    if b:\n        c()\nelse:\n    d()\n", 4, 1),
+        ] {
+            let error = error(source);
+            assert_eq!(error.kind, E::ElseWithoutIf, "{source}");
+            assert_eq!(error.span, span(line, column, column + 4), "{source}");
+        }
+    }
+
+    #[test]
+    fn nothing_follows_the_else_of_an_if() {
+        for rest in ["else if d:\n    e()\n", "else:\n    e()\n", "else"] {
+            let error = error(&format!("if a:\n    b()\nelse:\n    c()\n{rest}"));
+            assert_eq!(error.kind, E::ElseAfterElse, "{rest}");
+            assert_eq!(error.span, span(5, 1, 5), "{rest}");
+        }
+    }
+
+    #[test]
+    fn a_missing_condition_is_a_missing_value() {
+        for (source, column) in [("if:", 3), ("while :", 7), ("repeat:", 7), ("if", 3)] {
+            let error = error(source);
+            assert_eq!(error.kind, E::ExpectedValue, "{source}");
+            assert_eq!(error.span.start, Position::new(1, column), "{source}");
+        }
+        let error = error_of_else("else if:\n    c()\n");
+        assert_eq!(error.kind, E::ExpectedValue);
+    }
+
+    #[test]
+    fn the_errors_of_an_expression_come_first() {
+        assert_eq!(error_kind("if x = 3:\n    a()\n"), E::AssignInExpression);
+        assert_eq!(
+            error_kind("while 1 < x < 5:\n    a()\n"),
+            E::ChainedComparison
+        );
+        let error = error_of_else("else if x = 3:\n    a()\n");
+        assert_eq!(error.kind, E::AssignInExpression);
+    }
+
+    #[test]
+    fn a_parenthesis_not_closed_before_the_colon_is_an_error_at_the_parenthesis() {
+        for (source, column) in [
+            ("if front_is_clear(:\n    a()\n", 18),
+            ("repeat (3:\n    a()\n", 8),
+            ("while (a:\n    b()\n", 7),
+            ("if a(b:\n    c()\n", 5),
+            ("if a(b, :\n    c()\n", 5),
+            ("if (a + (b):\n    c()\n", 4),
+            ("if a(b:  # one\n    c()\n", 5),
+            ("if a(b:", 5),
+        ] {
+            let error = error(source);
+            assert_eq!(error.kind, E::UnclosedParen, "{source}");
+            assert_eq!(error.span, span(1, column, column + 1), "{source}");
+        }
+    }
+
+    #[test]
+    fn a_colon_inside_parentheses_that_are_closed_is_an_error_at_the_colon() {
+        for (source, column) in [
+            ("print(a: b)", 8),
+            ("paint_side(3:)", 13),
+            ("let x = (1: 2)", 11),
+            ("if a(b: c):\n    d()\n", 7),
+        ] {
+            let error = error(source);
+            assert_eq!(error.kind, E::UnexpectedToken, "{source}");
+            assert_eq!(error.span, span(1, column, column + 1), "{source}");
+        }
+        let error = error("if front_is_clear(:)\n    a()\n");
+        assert_eq!(error.kind, E::ExpectedValue);
+        assert_eq!(error.span, span(1, 19, 20));
+    }
+
+    #[test]
+    fn a_colon_after_a_statement_that_opens_no_block_is_an_error() {
+        for (source, column) in [("forward():", 10), ("break:", 6), ("let a = 3:", 10)] {
+            let error = error(source);
+            assert_eq!(error.kind, E::UnexpectedToken, "{source}");
+            assert_eq!(error.span, span(1, column, column + 1), "{source}");
+        }
+    }
+
+    #[test]
+    fn a_keyword_that_opens_a_block_is_not_assigned() {
+        for (source, keyword) in [
+            ("if = 3", Keyword::If),
+            ("else = 3", Keyword::Else),
+            ("while = 3", Keyword::While),
+            ("repeat = 3", Keyword::Repeat),
+        ] {
+            assert_eq!(error_kind(source), E::KeywordAsName { keyword }, "{source}");
+        }
+    }
+
+    #[test]
+    fn a_keyword_after_the_block_of_an_if_is_not_assigned_either() {
+        let error = error_of_else("else = 3\n");
+        assert_eq!(
+            error.kind,
+            E::KeywordAsName {
+                keyword: Keyword::Else
+            }
+        );
+        assert_eq!(error.span, span(3, 1, 5));
+        let error = error_of_else("else if = 3\n");
+        assert_eq!(
+            error.kind,
+            E::KeywordAsName {
+                keyword: Keyword::If
+            }
+        );
+        assert_eq!(error.span, span(3, 6, 8));
+    }
+
+    #[test]
+    fn elif_is_a_word_of_another_language() {
+        let error = error_of_else("elif c:\n    d()\n");
+        assert_eq!(
+            error.kind,
+            E::ForeignWord {
+                word: ForeignWord::Elif
+            }
+        );
+        assert_eq!(error.span, span(3, 1, 5));
+    }
+
+    #[test]
+    fn an_error_inside_a_block_comes_through() {
+        let error = error("while a:\n    if b:\n        let = 3\n");
+        assert_eq!(error.kind, E::ExpectedName);
+        assert_eq!(error.span, span(3, 13, 14));
+    }
+
+    #[test]
+    fn an_error_above_a_block_comes_first() {
+        assert_eq!(error_kind("let = 3\nif a:\nb()\n"), E::ExpectedName);
+    }
+}
+
 mod depth {
     use super::*;
 
     const MAX: usize = MAX_DEPTH as usize;
+    const BLOCKS: usize = MAX_BLOCK_DEPTH as usize;
 
     /// The number of levels of the tree of `expression`, 1 for a value alone.
     fn height(expression: &Expression) -> usize {
@@ -928,6 +1429,150 @@ mod depth {
         assert_eq!(statements(&source).len(), 2);
     }
 
+    /// `count` blocks one inside the other, the innermost holding `body`. `opening` gives
+    /// the lines that open the block of a level, from this level and its indentation.
+    pub(super) fn blocks_with(
+        count: usize,
+        opening: impl Fn(usize, &str) -> String,
+        body: &str,
+    ) -> String {
+        let mut source = String::new();
+        for level in 0..count {
+            source.push_str(&opening(level, &" ".repeat(level * 4)));
+        }
+        source + &" ".repeat(count * 4) + body
+    }
+
+    /// `count` blocks of `if` one inside the other, the innermost holding `body`.
+    fn blocks(count: usize, body: &str) -> String {
+        blocks_with(count, |_, indent| format!("{indent}if a:\n"), body)
+    }
+
+    /// The number of levels of the tree of `statement`: its blocks, then its deepest
+    /// expression.
+    pub(super) fn statement_height(statement: &Statement) -> usize {
+        let block = |body: &[Statement]| 1 + body.iter().map(statement_height).max().unwrap_or(0);
+        match &statement.kind {
+            StatementKind::Let { value, .. }
+            | StatementKind::Assign { value, .. }
+            | StatementKind::Return { value: Some(value) }
+            | StatementKind::Expression(value) => height(value),
+            StatementKind::Break | StatementKind::Return { value: None } => 0,
+            StatementKind::If {
+                branches,
+                otherwise,
+            } => branches
+                .iter()
+                .map(|branch| height(&branch.condition).max(block(&branch.body)))
+                .chain(otherwise.as_deref().map(block))
+                .max()
+                .unwrap_or(0),
+            StatementKind::While { condition, body } => height(condition).max(block(body)),
+            StatementKind::Repeat { count, body } => height(count).max(block(body)),
+        }
+    }
+
+    #[test]
+    fn blocks_as_deep_as_their_limit() {
+        let mut statements = statements(&blocks(BLOCKS, "b()"));
+        assert_eq!(statement_height(&statements.pop().unwrap()), BLOCKS + 1);
+        let error = error(&blocks(BLOCKS + 1, "b()"));
+        assert_eq!(error.kind, E::TooDeep);
+        let column = u32::try_from(BLOCKS * 4 + 1).unwrap();
+        assert_eq!(
+            error.span,
+            span(MAX_BLOCK_DEPTH + 1, column, column + 5),
+            "the line that opens the block too many"
+        );
+    }
+
+    #[test]
+    fn a_block_too_deep_is_an_error_whatever_it_holds() {
+        assert_eq!(error_kind(&blocks(BLOCKS + 1, "break")), E::TooDeep);
+    }
+
+    #[test]
+    fn the_blocks_and_the_expressions_add_up() {
+        for count in [1, 2, BLOCKS] {
+            let fits = blocks(count, &chain(MAX - count));
+            let mut statements = statements(&fits);
+            assert_eq!(statement_height(&statements.pop().unwrap()), MAX, "{count}");
+            let too_deep = blocks(count, &chain(MAX - count + 1));
+            assert_eq!(error_kind(&too_deep), E::TooDeep, "{count}");
+        }
+    }
+
+    #[test]
+    fn a_condition_is_as_deep_as_the_line_of_its_block() {
+        let inside = " ".repeat(44);
+        let outside = " ".repeat(40);
+        for line in [
+            "if {}:\n",
+            "while {}:\n",
+            "repeat {}:\n",
+            "if a:\n{inside}b()\n{outside}else if {}:\n",
+        ] {
+            let nested = |condition: &str| {
+                let line = line
+                    .replace("{}", condition)
+                    .replace("{inside}", &inside)
+                    .replace("{outside}", &outside);
+                blocks(10, &format!("{line}{inside}b()"))
+            };
+            assert!(parse(&nested(&chain(MAX - 10))).is_ok(), "{line}");
+            assert_eq!(error_kind(&nested(&chain(MAX - 9))), E::TooDeep, "{line}");
+        }
+    }
+
+    #[test]
+    fn every_kind_of_block_counts() {
+        let nested = |count: usize| {
+            let opening = |level: usize, indent: &str| {
+                let line = ["if a:", "while a:", "repeat 3:"][level % 3];
+                format!("{indent}{line}\n")
+            };
+            blocks_with(count, opening, "b()")
+        };
+        assert!(parse(&nested(BLOCKS)).is_ok());
+        assert_eq!(error_kind(&nested(BLOCKS + 1)), E::TooDeep);
+    }
+
+    #[test]
+    fn the_blocks_of_an_else_count_as_those_of_an_if() {
+        // Each `else:` holds the next `if`: one level per `else`.
+        let nested = |count: usize| {
+            let opening =
+                |_, indent: &str| format!("{indent}if a:\n{indent}    b()\n{indent}else:\n");
+            blocks_with(count, opening, "b()")
+        };
+        assert!(parse(&nested(BLOCKS)).is_ok());
+        assert_eq!(error_kind(&nested(BLOCKS + 1)), E::TooDeep);
+    }
+
+    #[test]
+    fn a_long_chain_of_else_if_at_the_deepest_level_is_fine() {
+        let indent = " ".repeat((BLOCKS - 1) * 4);
+        let chain = format!("{indent}else if a:\n{indent}    b()\n").repeat(100);
+        let source = blocks(BLOCKS, "b()\n") + &chain;
+        assert!(parse(&source).is_ok());
+    }
+
+    #[test]
+    fn the_depth_starts_again_after_a_block() {
+        let source = format!(
+            "{}\n{}\n{}\n",
+            blocks(BLOCKS, "b()"),
+            blocks(BLOCKS, "b()"),
+            chain(MAX)
+        );
+        assert_eq!(statements(&source).len(), 3);
+    }
+
+    #[test]
+    fn a_huge_nesting_of_blocks_is_an_error_and_never_an_overflow() {
+        assert_eq!(error_kind(&blocks(1_000, "b()")), E::TooDeep);
+    }
+
     #[test]
     fn a_huge_nesting_is_an_error_and_never_an_overflow() {
         for source in [
@@ -941,5 +1586,138 @@ mod depth {
         ] {
             assert_eq!(error_kind(&source), E::TooDeep);
         }
+    }
+}
+
+mod robustness {
+    use super::depth::{blocks_with, statement_height};
+    use super::*;
+    use crate::test_support::Random;
+
+    const MAX: usize = MAX_DEPTH as usize;
+    const BLOCKS: usize = MAX_BLOCK_DEPTH as usize;
+
+    /// Checks that the tree of `source`, when it has one, is never deeper than the limit, and
+    /// returns whether it has one. A panic or a loop without end fails the test by itself.
+    fn bounded(source: &str) -> bool {
+        let Ok(program) = parse(source) else {
+            return false;
+        };
+        for statement in &program.statements {
+            assert!(statement_height(statement) <= MAX, "{source}");
+        }
+        true
+    }
+
+    #[test]
+    fn any_pieces_give_a_tree_or_an_error() {
+        const PIECES: [&str; 32] = [
+            "if a:\n",
+            "if ",
+            "else:\n",
+            "else if a:\n",
+            "else",
+            "while a:\n",
+            "repeat 3:\n",
+            "function",
+            "    ",
+            "        ",
+            " ",
+            "\n",
+            "# c\n",
+            "    # c\n",
+            ":",
+            "(",
+            ")",
+            ",",
+            "=",
+            "==",
+            "+",
+            "-",
+            "not ",
+            "and",
+            "a",
+            "3",
+            "b()\n",
+            "let a = 1\n",
+            "break\n",
+            "return",
+            "pass",
+            "elif",
+        ];
+        let mut random = Random(1);
+        let mut read = 0;
+        for _ in 0..30_000 {
+            let length = random.next() % 12;
+            let source: String = (0..length).map(|_| random.pick(&PIECES)).collect();
+            read += usize::from(bounded(&source));
+        }
+        assert!(read > 1_000, "only {read} sources read");
+    }
+
+    #[test]
+    fn any_lines_at_any_indentation_give_a_tree_or_an_error() {
+        const LINES: [&str; 12] = [
+            "if a:",
+            "else if b:",
+            "else:",
+            "while a and not b:",
+            "repeat 3:",
+            "b()",
+            "b()",
+            "let c = (1 + 2) * 3",
+            "break",
+            "# c",
+            "",
+            "if a: b()",
+        ];
+        let mut random = Random(2);
+        let mut read = 0;
+        for _ in 0..30_000 {
+            let mut source = String::new();
+            let mut level = 0;
+            for _ in 0..random.next() % 10 {
+                let line = random.pick(&LINES);
+                source.push_str(&" ".repeat(level * 4));
+                source.push_str(line);
+                source.push('\n');
+                // Most often the level a right program takes, sometimes any other.
+                level = match random.next() % 8 {
+                    0 => random.next() % 4,
+                    1 | 2 => level.saturating_sub(1),
+                    _ if line.ends_with(':') => level + 1,
+                    _ => level,
+                };
+            }
+            read += usize::from(bounded(&source));
+        }
+        assert!(read > 1_000, "only {read} sources read");
+    }
+
+    #[test]
+    fn deep_blocks_and_expressions_give_a_tree_or_an_error() {
+        let mut random = Random(3);
+        let mut read = 0;
+        let mut refused = 0;
+        for _ in 0..300 {
+            let kinds: Vec<&str> = (0..random.next() % (BLOCKS + 20))
+                .map(|_| random.pick(&["if a:", "while a:", "repeat 3:"]))
+                .collect();
+            let count = random.next() % (MAX + 20);
+            let expression = match random.next() % 3 {
+                0 => vec!["1"; count + 1].join(" + "),
+                1 => format!("{}1{}", "(".repeat(count), ")".repeat(count)),
+                _ => format!("{}true", "not ".repeat(count)),
+            };
+            let opening = |level: usize, indent: &str| format!("{indent}{}\n", kinds[level]);
+            let source = blocks_with(kinds.len(), opening, &expression);
+            if bounded(&source) {
+                read += 1;
+            } else {
+                assert_eq!(error_kind(&source), E::TooDeep);
+                refused += 1;
+            }
+        }
+        assert!(read > 20 && refused > 20, "{read} read, {refused} refused");
     }
 }
