@@ -14,7 +14,7 @@ function appMessage(kind, [width, height]) {
     offline: ["Stepwise couldn't load", '<p>The connection seems to be lost. Check it, then try again.</p><button type="button" class="app-primary">Try again</button>'],
   };
   const [title, body] = texts[kind];
-  return `<div class="app-message ${kind === "phone" ? "is-phone" : ""}"><img class="message-head" src="world-elements/daylight/logo-disappointed.svg" height="${kind === "phone" ? 64 : 72}" alt=""><div class="message-title">${title}</div>${body}</div>`;
+  return `<div class="app-screen-message ${kind === "phone" ? "is-phone" : ""}"><img class="message-head" src="world-elements/daylight/logo-disappointed.svg" height="${kind === "phone" ? 64 : 72}" alt=""><div class="message-title">${title}</div>${body}</div>`;
 }
 
 const messageWindow = (kind, size) => `<div class="app-window" style="width:${size[0]}px;height:${size[1]}px">${appMessage(kind, size)}</div>`;
