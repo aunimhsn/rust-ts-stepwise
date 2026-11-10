@@ -25,7 +25,7 @@ use std::iter::Peekable;
 use std::vec::IntoIter;
 
 use crate::ast::{Name, Program, Statement, StatementKind};
-use crate::lexer::{Keyword, Token, TokenKind, Tokens, tokenize};
+use crate::lexer::{Keyword, Lexed, Token, TokenKind, tokenize};
 use crate::span::{Position, Span};
 
 /// The deepest a syntax tree goes: the blocks, the parentheses, the operators and the calls
@@ -42,8 +42,8 @@ pub const MAX_DEPTH: u32 = 200;
 ///
 /// The first syntax error of the source, from the lexer or from the parser.
 pub fn parse(source: &str) -> Result<Program, SyntaxError> {
-    let tokens = tokenize(source)?;
-    Ok(Parser::new(tokens).program()?)
+    let lexed = tokenize(source)?;
+    Ok(Parser::new(lexed).program()?)
 }
 
 /// The place of the parser in the tokens.
@@ -61,9 +61,9 @@ struct Parser {
 }
 
 impl Parser {
-    fn new(tokens: Tokens) -> Self {
+    fn new(lexed: Lexed) -> Self {
         let start = Position::new(1, 1);
-        let mut rest = tokens.tokens.into_iter().peekable();
+        let mut rest = lexed.tokens.into_iter().peekable();
         let current = rest.next().unwrap_or(Token {
             kind: TokenKind::End,
             span: Span::at(start),
@@ -73,7 +73,7 @@ impl Parser {
             rest,
             previous_end: start,
             depth: 0,
-            comments: tokens.comments,
+            comments: lexed.comments,
         }
     }
 
@@ -128,6 +128,19 @@ impl Parser {
     /// Whether a value fits one level deeper: the levels around it leave room for its own.
     fn fits_deeper(&self) -> bool {
         self.depth.saturating_add(1) < MAX_DEPTH
+    }
+
+    /// Runs `parse` one level deeper, and comes back whatever its result. The caller checks
+    /// first that a value [fits there](Self::fits_deeper), since the place of the error is
+    /// its own.
+    fn deeper<T>(
+        &mut self,
+        parse: impl FnOnce(&mut Self) -> Result<T, ParseError>,
+    ) -> Result<T, ParseError> {
+        self.depth = self.depth.saturating_add(1);
+        let result = parse(self);
+        self.depth = self.depth.saturating_sub(1);
+        result
     }
 
     /// The statement of one line, with the end of the line, and with its block when the line

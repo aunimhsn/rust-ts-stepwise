@@ -14,26 +14,16 @@ use crate::span::{Position, Span};
 impl Parser {
     /// An `if` with its `else if` and its `else`, from the `if`.
     pub(super) fn conditional(&mut self) -> Result<Statement, ParseError> {
-        let mut start = self.current.span.start;
-        let mut branches = Vec::new();
+        let first = self.branch(self.current.span.start)?;
+        // The line of the first `if`.
+        let span = first.span;
+        let mut branches = vec![first];
         let mut otherwise = None;
-        // Each turn reads one `if condition:` with its block, the `if` being the current token.
-        loop {
-            self.advance();
-            let condition = self.expression()?;
-            let span = self.colon(start)?;
-            let body = self.block(span)?;
-            branches.push(Branch {
-                condition,
-                body,
-                span,
-            });
-            if self.current.kind != TokenKind::Keyword(Keyword::Else) {
-                break;
-            }
-            start = self.current.span.start;
+        while self.current.kind == TokenKind::Keyword(Keyword::Else) {
+            let start = self.current.span.start;
             self.advance();
             if self.current.kind == TokenKind::Keyword(Keyword::If) {
+                branches.push(self.branch(start)?);
                 continue;
             }
             let line = self.colon(start)?;
@@ -43,15 +33,25 @@ impl Parser {
             }
             break;
         }
-        // The line of the first `if`.
-        let span = branches
-            .first()
-            .map_or(Span::at(start), |branch| branch.span);
         let kind = StatementKind::If {
             branches,
             otherwise,
         };
         Ok(Statement { kind, span })
+    }
+
+    /// `if condition:` with its block, the `if` being the current token and its line
+    /// starting at `start`: at the `if`, or at the `else` before it.
+    fn branch(&mut self, start: Position) -> Result<Branch, ParseError> {
+        self.advance();
+        let condition = self.expression()?;
+        let span = self.colon(start)?;
+        let body = self.block(span)?;
+        Ok(Branch {
+            condition,
+            body,
+            span,
+        })
     }
 
     /// `while condition:` with its block, from the `while`.
@@ -120,14 +120,16 @@ impl Parser {
             });
         }
         self.advance();
-        self.depth = self.depth.saturating_add(1);
-        let mut statements = Vec::new();
-        // The lexer closes every block it opens: the end of the source is never met first.
-        while !matches!(self.current.kind, TokenKind::Dedent | TokenKind::End) {
-            statements.push(self.statement()?);
-        }
+        let statements = self.deeper(|parser| {
+            let mut statements = Vec::new();
+            // The lexer closes every block it opens: the end of the source is never met
+            // first.
+            while !matches!(parser.current.kind, TokenKind::Dedent | TokenKind::End) {
+                statements.push(parser.statement()?);
+            }
+            Ok(statements)
+        })?;
         self.advance();
-        self.depth = self.depth.saturating_sub(1);
         Ok(statements)
     }
 

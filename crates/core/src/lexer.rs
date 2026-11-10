@@ -38,7 +38,7 @@ pub const INDENT_WIDTH: u32 = 4;
 
 /// What the lexer reads in a source.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Tokens {
+pub struct Lexed {
     /// The tokens, ending with [`TokenKind::End`].
     pub tokens: Vec<Token>,
     /// The comment of each line that holds only a comment, from its `#` to the end of the
@@ -55,7 +55,7 @@ pub struct Tokens {
 /// The first error of the source: a tab, a wrong indentation, a text not closed or with an
 /// unknown escape, a number too large, a word that starts with a digit, or a character that
 /// has no meaning outside a text or a comment.
-pub fn tokenize(source: &str) -> Result<Tokens, LexError> {
+pub fn tokenize(source: &str) -> Result<Lexed, LexError> {
     let mut lexer = Lexer {
         tokens: Vec::new(),
         comments: Vec::new(),
@@ -70,7 +70,7 @@ pub fn tokenize(source: &str) -> Result<Tokens, LexError> {
         lexer.push(TokenKind::Dedent, Span::at(end));
     }
     lexer.push(TokenKind::End, Span::at(end));
-    Ok(Tokens {
+    Ok(Lexed {
         tokens: lexer.tokens,
         comments: lexer.comments,
     })

@@ -61,8 +61,8 @@ pub enum ParseErrorKind {
     /// What follows can't be there: the statement or the value before it is complete
     /// (`forward() forward()`, `print("a" "b")`, `break 3`).
     UnexpectedToken,
-    /// A `(` whose `)` is missing on its line, the line ending where a value or the `)` is
-    /// expected. The span is the `(`.
+    /// A `(` whose `)` is missing on its line, the line or its `:` ending where a value or
+    /// the `)` is expected (`forward(`, `if front_is_clear(:`). The span is the `(`.
     UnclosedParen,
     /// A `)` that closes no `(`.
     UnmatchedParen,

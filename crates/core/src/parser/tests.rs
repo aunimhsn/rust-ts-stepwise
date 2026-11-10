@@ -1071,6 +1071,13 @@ mod block_errors {
     }
 
     #[test]
+    fn a_word_of_another_language_further_after_the_colon_is_part_of_what_follows() {
+        let error = error("if a: b() pass\n");
+        assert_eq!(error.kind, E::AfterColon);
+        assert_eq!(error.span, span(1, 7, 15));
+    }
+
+    #[test]
     fn a_block_without_a_line_is_an_error_at_the_line_that_opens_it() {
         for (source, line, start, end) in [
             ("if a:\nb()\n", 1, 1, 6),
@@ -1204,7 +1211,33 @@ mod block_errors {
             error_kind("while 1 < x < 5:\n    a()\n"),
             E::ChainedComparison
         );
-        assert_eq!(error_kind("repeat (3:\n    a()\n"), E::UnexpectedToken);
+        let error = error_of_else("else if x = 3:\n    a()\n");
+        assert_eq!(error.kind, E::AssignInExpression);
+    }
+
+    #[test]
+    fn a_parenthesis_not_closed_before_the_colon_is_an_error_at_the_parenthesis() {
+        for (source, column) in [
+            ("if front_is_clear(:\n    a()\n", 18),
+            ("repeat (3:\n    a()\n", 8),
+            ("while (a:\n    b()\n", 7),
+            ("if a(b:\n    c()\n", 5),
+            ("if a(b, :\n    c()\n", 5),
+            ("if (a + (b):\n    c()\n", 4),
+        ] {
+            let error = error(source);
+            assert_eq!(error.kind, E::UnclosedParen, "{source}");
+            assert_eq!(error.span, span(1, column, column + 1), "{source}");
+        }
+    }
+
+    #[test]
+    fn a_colon_after_a_statement_that_opens_no_block_is_an_error() {
+        for (source, column) in [("forward():", 10), ("break:", 6), ("let a = 3:", 10)] {
+            let error = error(source);
+            assert_eq!(error.kind, E::UnexpectedToken, "{source}");
+            assert_eq!(error.span, span(1, column, column + 1), "{source}");
+        }
     }
 
     #[test]
@@ -1367,7 +1400,7 @@ mod depth {
 
     /// The number of levels of the tree of `statement`: its blocks, then its deepest
     /// expression.
-    fn statement_height(statement: &Statement) -> usize {
+    pub(super) fn statement_height(statement: &Statement) -> usize {
         let block = |body: &[Statement]| 1 + body.iter().map(statement_height).max().unwrap_or(0);
         match &statement.kind {
             StatementKind::Let { value, .. }
@@ -1421,10 +1454,24 @@ mod depth {
 
     #[test]
     fn a_condition_is_as_deep_as_the_line_of_its_block() {
-        let nested =
-            |condition: &str| blocks(10, &format!("while {condition}:\n{}b()", " ".repeat(44)));
-        assert!(parse(&nested(&chain(MAX - 10))).is_ok());
-        assert_eq!(error_kind(&nested(&chain(MAX - 9))), E::TooDeep);
+        let inside = " ".repeat(44);
+        let outside = " ".repeat(40);
+        for line in [
+            "if {}:\n",
+            "while {}:\n",
+            "repeat {}:\n",
+            "if a:\n{inside}b()\n{outside}else if {}:\n",
+        ] {
+            let nested = |condition: &str| {
+                let line = line
+                    .replace("{}", condition)
+                    .replace("{inside}", &inside)
+                    .replace("{outside}", &outside);
+                blocks(10, &format!("{line}{inside}b()"))
+            };
+            assert!(parse(&nested(&chain(MAX - 10))).is_ok(), "{line}");
+            assert_eq!(error_kind(&nested(&chain(MAX - 9))), E::TooDeep, "{line}");
+        }
     }
 
     #[test]
@@ -1489,5 +1536,156 @@ mod depth {
         ] {
             assert_eq!(error_kind(&source), E::TooDeep);
         }
+    }
+}
+
+mod robustness {
+    use super::depth::statement_height;
+    use super::*;
+
+    const MAX: usize = MAX_DEPTH as usize;
+
+    /// A small generator of numbers, the same at every run, without a dependency.
+    struct Random(u64);
+
+    impl Random {
+        fn next(&mut self) -> usize {
+            self.0 = self
+                .0
+                .wrapping_mul(6_364_136_223_846_793_005)
+                .wrapping_add(1_442_695_040_888_963_407);
+            usize::try_from(self.0 >> 33).unwrap()
+        }
+
+        fn pick<'a>(&mut self, pieces: &[&'a str]) -> &'a str {
+            pieces[self.next() % pieces.len()]
+        }
+    }
+
+    /// Checks that the tree of `source`, when it has one, is never deeper than the limit, and
+    /// returns whether it has one. A panic or a loop without end fails the test by itself.
+    fn bounded(source: &str) -> bool {
+        let Ok(program) = parse(source) else {
+            return false;
+        };
+        for statement in &program.statements {
+            assert!(statement_height(statement) <= MAX, "{source}");
+        }
+        true
+    }
+
+    #[test]
+    fn any_pieces_give_a_tree_or_an_error() {
+        const PIECES: [&str; 32] = [
+            "if a:\n",
+            "if ",
+            "else:\n",
+            "else if a:\n",
+            "else",
+            "while a:\n",
+            "repeat 3:\n",
+            "function",
+            "    ",
+            "        ",
+            " ",
+            "\n",
+            "# c\n",
+            "    # c\n",
+            ":",
+            "(",
+            ")",
+            ",",
+            "=",
+            "==",
+            "+",
+            "-",
+            "not ",
+            "and",
+            "a",
+            "3",
+            "b()\n",
+            "let a = 1\n",
+            "break\n",
+            "return",
+            "pass",
+            "elif",
+        ];
+        let mut random = Random(1);
+        let mut read = 0;
+        for _ in 0..30_000 {
+            let length = random.next() % 12;
+            let source: String = (0..length).map(|_| random.pick(&PIECES)).collect();
+            read += usize::from(bounded(&source));
+        }
+        assert!(read > 1_000, "only {read} sources read");
+    }
+
+    #[test]
+    fn any_lines_at_any_indentation_give_a_tree_or_an_error() {
+        const LINES: [&str; 12] = [
+            "if a:",
+            "else if b:",
+            "else:",
+            "while a and not b:",
+            "repeat 3:",
+            "b()",
+            "b()",
+            "let c = (1 + 2) * 3",
+            "break",
+            "# c",
+            "",
+            "if a: b()",
+        ];
+        let mut random = Random(2);
+        let mut read = 0;
+        for _ in 0..30_000 {
+            let mut source = String::new();
+            let mut level = 0;
+            for _ in 0..random.next() % 10 {
+                let line = random.pick(&LINES);
+                source.push_str(&" ".repeat(level * 4));
+                source.push_str(line);
+                source.push('\n');
+                // Most often the level a right program takes, sometimes any other.
+                level = match random.next() % 8 {
+                    0 => random.next() % 4,
+                    1 | 2 => level.saturating_sub(1),
+                    _ if line.ends_with(':') => level + 1,
+                    _ => level,
+                };
+            }
+            read += usize::from(bounded(&source));
+        }
+        assert!(read > 1_000, "only {read} sources read");
+    }
+
+    #[test]
+    fn deep_blocks_and_expressions_give_a_tree_or_an_error() {
+        let mut random = Random(3);
+        let mut read = 0;
+        let mut refused = 0;
+        for _ in 0..300 {
+            let mut source = String::new();
+            let blocks = random.next() % (MAX + 20);
+            for level in 0..blocks {
+                source.push_str(&" ".repeat(level * 4));
+                source.push_str(random.pick(&["if a:\n", "while a:\n", "repeat 3:\n"]));
+            }
+            source.push_str(&" ".repeat(blocks * 4));
+            let count = random.next() % (MAX + 20);
+            let expression = match random.next() % 3 {
+                0 => vec!["1"; count + 1].join(" + "),
+                1 => format!("{}1{}", "(".repeat(count), ")".repeat(count)),
+                _ => format!("{}true", "not ".repeat(count)),
+            };
+            source.push_str(&expression);
+            if bounded(&source) {
+                read += 1;
+            } else {
+                assert_eq!(error_kind(&source), E::TooDeep);
+                refused += 1;
+            }
+        }
+        assert!(read > 20 && refused > 20, "{read} read, {refused} refused");
     }
 }

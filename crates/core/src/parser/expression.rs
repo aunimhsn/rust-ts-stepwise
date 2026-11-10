@@ -182,10 +182,11 @@ impl Parser {
     }
 
     /// The error of the `(` at `open` when the line ends right where a value is expected
-    /// inside it: the `)` is missing, more surely than a value (`forward(`).
+    /// inside it: the `)` is missing, more surely than a value (`forward(`). The `:` of a
+    /// line that opens a block ends it as well (`if front_is_clear(:`).
     fn unclosed_at_end_of_line(&self, open: Span) -> Result<(), ParseError> {
         match self.current.kind {
-            TokenKind::Newline | TokenKind::End => Err(ParseError {
+            TokenKind::Newline | TokenKind::End | TokenKind::Colon => Err(ParseError {
                 kind: ParseErrorKind::UnclosedParen,
                 span: open,
             }),
@@ -201,7 +202,7 @@ impl Parser {
                 self.advance();
                 Ok(end)
             }
-            TokenKind::Newline | TokenKind::End => Err(ParseError {
+            TokenKind::Newline | TokenKind::End | TokenKind::Colon => Err(ParseError {
                 kind: ParseErrorKind::UnclosedParen,
                 span: open,
             }),
@@ -222,10 +223,7 @@ impl Parser {
         if !self.fits_deeper() {
             return Err(self.error(ParseErrorKind::TooDeep));
         }
-        self.depth = self.depth.saturating_add(1);
-        let result = parse(self);
-        self.depth = self.depth.saturating_sub(1);
-        result
+        self.deeper(parse)
     }
 
     /// The node `kind` over `span`, above a tree of height `below` (0 for a value alone).

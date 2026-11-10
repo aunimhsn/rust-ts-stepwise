@@ -1994,7 +1994,7 @@ mod robustness {
             let source: String = (0..length)
                 .map(|_| PIECES[random.next() % PIECES.len()])
                 .collect();
-            let Ok(tokens) = tokenize(&source).map(|read| read.tokens) else {
+            let Ok(tokens) = tokenize(&source).map(|lexed| lexed.tokens) else {
                 continue;
             };
             read += 1;
@@ -2025,7 +2025,7 @@ mod robustness {
                 source.push_str(&" ".repeat(depth * 4));
                 source.push_str("a:\n");
             }
-            let Ok(tokens) = tokenize(&source).map(|read| read.tokens) else {
+            let Ok(tokens) = tokenize(&source).map(|lexed| lexed.tokens) else {
                 // Only a line indented by more than one level at once is refused.
                 assert!(matches!(error_kind(&source), E::WrongIndent { .. }));
                 continue;
