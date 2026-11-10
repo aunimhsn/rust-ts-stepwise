@@ -55,3 +55,7 @@ The path of the levels with its chapters, the stones and the squares of their ma
 ### 3f. Manual (#16)
 
 A section with its commands and examples, the search and its results, **On this page**, the drawer over the level screen, the large screen.
+
+### 3g. Settings and messages (#17)
+
+The settings with the theme, the storage refused, the window too small and the phone, the browser too old, offline.
