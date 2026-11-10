@@ -38,6 +38,11 @@ const settingsSounds = (control, on) => {
   return `<button type="button" class="settings-switch" data-settings-sounds aria-pressed="${on}" title="Sounds"><i></i></button>`;
 };
 
+// Clear all progress: red, alone, since it says what it does. It fills as a loading bar while the mouse
+// rests on it (or while it has the focus of the keyboard), and a click only counts once it is full: a
+// danger that a passing click can't set off. The confirmation follows.
+const SETTINGS_CLEAR = '<button type="button" class="settings-clear"><span>Clear all progress…</span><span class="settings-clear-fill" aria-hidden="true">Clear all progress…</span></button>';
+
 // `sounds` is the state of the setting Sounds, off by default.
 function appSettings({ sounds = false } = {}) {
   const control = chosen.settingsControls;
@@ -46,7 +51,7 @@ function appSettings({ sounds = false } = {}) {
     <div class="app-shortcuts-head"><b>Settings</b><button type="button" title="Close">${ICONS.close(16)}</button></div>
     ${row("Theme", "Only the interface changes: the map keeps its look.", settingsTheme(control), control === "cards")}
     ${row("Sounds", "A soft sound at the end of a run and when the robot bumps. Off in class.", settingsSounds(control, sounds))}
-    ${row("Progress", "Clears the levels done and the code of every level.", '<button type="button" class="app-chip">Clear all progress…</button>')}
+    <div class="settings-row is-end">${SETTINGS_CLEAR}</div>
   </div></div>`;
 }
 
@@ -66,4 +71,21 @@ document.addEventListener("click", event => {
     const clicked = event.target.closest("button");
     if (clicked) control.querySelectorAll("button").forEach(button => button.setAttribute("aria-pressed", button === clicked));
   } else control.setAttribute("aria-pressed", control.getAttribute("aria-pressed") !== "true");
+});
+
+// The button of Clear all progress is ready once its bar is full; it empties at once when the mouse leaves.
+document.addEventListener("transitionend", event => {
+  if (event.target.classList?.contains("settings-clear-fill") && event.target.matches(".settings-clear:hover > *, .settings-clear:focus-visible > *")) event.target.parentElement.classList.add("is-ready");
+});
+const settingsClearReset = event => event.target.closest?.(".settings-clear")?.classList.remove("is-ready");
+document.addEventListener("mouseout", event => { if (!event.relatedTarget?.closest?.(".settings-clear")) settingsClearReset(event); });
+document.addEventListener("focusout", settingsClearReset);
+// A click before it is full does nothing; once full, the confirmation takes the place of the settings.
+document.addEventListener("click", event => {
+  const button = event.target.closest?.(".settings-clear.is-ready");
+  if (button) button.closest(".app-veil").outerHTML = appConfirm({ question: "Clear all your progress?", lost: "The levels done and the code of every level will be cleared for good. Your settings stay.", action: "Clear progress" });
+});
+// In the mock-up, the two buttons of a confirmation close it.
+document.addEventListener("click", event => {
+  if (event.target.closest?.(".app-confirm .confirm-buttons button")) event.target.closest(".app-veil").remove();
 });

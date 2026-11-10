@@ -12,8 +12,8 @@ const MESSAGE_SCENES = {
 function appMessage(kind, [width, height]) {
   const address = '<p class="message-address">stepwise.sylent.art</p>';
   const texts = {
-    small: ["Stepwise needs a larger window", `<p>At least 1280 × 720 pixels. This one is <b class="message-size">${width} × ${height}</b>.</p><p>Widen the window, or zoom out with Ctrl and −.</p><p class="message-note">Nothing is lost: the screen comes back as it was once the window is large enough.</p>`],
-    phone: ["Stepwise needs a computer", `<p>It is made for a large window and a keyboard to write code.</p><p class="message-note">Open it on a computer:</p>${address}`],
+    small: ["Stepwise needs a larger window", `<p>At least 1280 × 720 pixels. This one is <b class="message-size">${width} × ${height}</b>.</p><p>Widen the window, or zoom out with Ctrl and −.</p>`],
+    phone: ["Stepwise needs a computer", "<p>It is made for a large window and a keyboard to write code.</p>"],
     old: ["Stepwise needs a recent browser", `<p>This browser can't run it. Update it, or open Stepwise in a recent Firefox, Chrome, Edge or Safari.</p>${address}`],
     offline: ["Stepwise couldn't load", '<p>The connection seems to be lost. Check it, then try again.</p><button type="button" class="app-primary">Try again</button>'],
   };

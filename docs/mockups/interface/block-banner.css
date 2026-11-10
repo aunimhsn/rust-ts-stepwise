@@ -1,16 +1,5 @@
 /* The banner under the header: its height from its line of text, its cross at the right end. */
-.app-banner { flex: none; display: flex; align-items: center; gap: 10px; padding: 8px 8px 8px 16px; background: var(--banner); color: var(--on-banner); box-shadow: var(--banner-edge); }
-.app-banner > i { display: flex; color: var(--banner-icon); }
+.app-banner { flex: none; display: flex; align-items: center; gap: 10px; padding: 8px 8px 8px 16px; background: var(--accent-soft); color: var(--text); }
 .app-banner span { flex: 1; }
 .app-window .app-banner button { display: grid; place-items: center; width: 24px; height: 24px; padding: 0; background: none; border: 0; border-radius: var(--radius-small); color: inherit; opacity: .7; }
 .app-window .app-banner button:hover { opacity: 1; background: #0001; }
-
-/* 4 · The pale amber of the accent: a warning, not an error, since Stepwise works. */
-:root[data-banner="amber-soft"] { --banner: var(--accent-soft); --on-banner: var(--text); --banner-icon: var(--status-strong); --banner-edge: none; }
-:root[data-theme="night-desk"][data-banner="amber-soft"] { --banner-icon: var(--accent); }
-/* 5 · The pale red of the errors. */
-:root[data-banner="red-soft"] { --banner: var(--error-soft); --on-banner: var(--text); --banner-icon: var(--error); --banner-edge: none; }
-/* 6 · The full amber, as the paused status bar. */
-:root[data-banner="amber"] { --banner: var(--accent); --on-banner: var(--on-accent); --banner-icon: var(--on-accent); --banner-edge: none; }
-/* 7 · The tone of the header, an amber edge on its left. */
-:root[data-banner="band-edge"] { --banner: var(--band); --on-banner: var(--band-text); --banner-icon: var(--accent); --banner-edge: inset 4px 0 0 var(--accent), inset 0 1px 0 var(--hover); }
