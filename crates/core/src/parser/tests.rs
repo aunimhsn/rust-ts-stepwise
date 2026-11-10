@@ -291,8 +291,9 @@ mod calls {
     #[test]
     fn a_comma_after_the_last_value_is_an_error() {
         let error = error("paint_side(3,)");
-        assert_eq!(error.kind, E::ExpectedValue);
-        assert_eq!(error.span, span(1, 14, 15));
+        assert_eq!(error.kind, E::TrailingComma);
+        assert_eq!(error.span, span(1, 13, 14), "the comma");
+        assert_eq!(error_kind("print(1, 2, )"), E::TrailingComma);
     }
 
     #[test]
@@ -313,7 +314,15 @@ mod calls {
         let error = error("print(1, 2\nforward()");
         assert_eq!(error.kind, E::UnclosedParen);
         assert_eq!(error.span, span(1, 6, 7));
-        assert_eq!(error_kind("forward("), E::ExpectedValue);
+        assert_eq!(error_kind("print(1,"), E::UnclosedParen);
+        assert_eq!(error_kind("print(1 +"), E::ExpectedValue);
+    }
+
+    #[test]
+    fn a_call_cut_at_its_parenthesis_is_not_closed() {
+        let error = error("forward(");
+        assert_eq!(error.kind, E::UnclosedParen, "rather than a value missing");
+        assert_eq!(error.span, span(1, 8, 9));
     }
 
     #[test]
@@ -401,9 +410,29 @@ mod priorities {
     }
 
     #[test]
-    fn not_is_a_value_wherever_one_is_expected() {
-        assert_eq!(line("a == not b"), "(a == (not b))");
+    fn not_starts_an_expression_or_follows_and_or_or() {
         assert_eq!(line("print(not a, -b)"), "print((not a), (-b))");
+        assert_eq!(line("let a = not b"), "let a = (not b)");
+        assert_eq!(line("a or not b and not c"), "(a or ((not b) and (not c)))");
+        assert_eq!(line("a == (not b)"), "(a == (not b))");
+        assert_eq!(line("2 * (not a)"), "(2 * (not a))");
+    }
+
+    #[test]
+    fn not_after_a_stronger_operator_is_an_error() {
+        let error = error("let same = a == not b");
+        assert_eq!(error.kind, E::NotAfterOperator);
+        assert_eq!(error.span, span(1, 17, 20));
+        for source in [
+            "2 * not a + 1",
+            "a < not b < c",
+            "1 + not a",
+            "-not a",
+            "not -not a",
+            "a and b != not c",
+        ] {
+            assert_eq!(error_kind(source), E::NotAfterOperator, "{source}");
+        }
     }
 
     #[test]
@@ -513,7 +542,8 @@ mod expression_errors {
 
     #[test]
     fn a_line_never_goes_on_inside_parentheses() {
-        assert_eq!(error_kind("print(1,\n2)"), E::ExpectedValue);
+        assert_eq!(error_kind("print(1,\n2)"), E::UnclosedParen);
+        assert_eq!(error_kind("let a = (\n1 + 2)"), E::UnclosedParen);
         assert_eq!(error_kind("let a = (1 +\n2)"), E::ExpectedValue);
     }
 
@@ -578,7 +608,6 @@ mod expression_errors {
             line("a < b or c < d and e < f"),
             "((a < b) or ((c < d) and (e < f)))"
         );
-        assert_eq!(line("a == not b == c"), "(a == (not (b == c)))");
     }
 }
 
@@ -656,6 +685,26 @@ mod statement_rules {
     fn only_a_name_is_assigned() {
         assert_eq!(error_kind("3 = sides"), E::AssignInExpression);
         assert_eq!(error_kind("= 3"), E::ExpectedValue);
+    }
+
+    #[test]
+    fn a_keyword_is_not_assigned() {
+        let error = error("repeat = 3");
+        assert_eq!(
+            error.kind,
+            E::KeywordAsName {
+                keyword: Keyword::Repeat
+            }
+        );
+        assert_eq!(error.span, span(1, 1, 7));
+        for keyword in Keyword::ALL {
+            if keyword != Keyword::Let {
+                assert_eq!(
+                    error_kind(&format!("{} = 3", keyword.as_str())),
+                    E::KeywordAsName { keyword }
+                );
+            }
+        }
     }
 
     #[test]
@@ -767,6 +816,18 @@ mod depth {
 
     const MAX: usize = MAX_DEPTH as usize;
 
+    /// The number of levels of the tree of `expression`, 1 for a value alone.
+    fn height(expression: &Expression) -> usize {
+        1 + match &expression.kind {
+            ExpressionKind::Call { arguments, .. } => {
+                arguments.iter().map(height).max().unwrap_or(0)
+            }
+            ExpressionKind::Unary { operand, .. } => height(operand),
+            ExpressionKind::Binary { left, right, .. } => height(left).max(height(right)),
+            _ => 0,
+        }
+    }
+
     /// `count` values joined by `+`: a tree of `count` levels.
     fn chain(count: usize) -> String {
         vec!["1"; count].join(" + ")
@@ -779,7 +840,7 @@ mod depth {
 
     #[test]
     fn a_chain_of_operators_as_deep_as_the_limit() {
-        assert!(parse(&chain(MAX)).is_ok());
+        assert_eq!(height(&expression(&chain(MAX))), MAX);
         assert_eq!(error_kind(&chain(MAX + 1)), E::TooDeep);
     }
 
@@ -793,7 +854,31 @@ mod depth {
     #[test]
     fn parentheses_as_deep_as_the_limit() {
         assert!(parse(&parentheses(MAX - 1)).is_ok());
-        assert_eq!(error_kind(&parentheses(MAX)), E::TooDeep);
+        let error = error(&parentheses(MAX));
+        assert_eq!(error.kind, E::TooDeep);
+        let column = u32::try_from(MAX).unwrap() + 1;
+        assert_eq!(
+            error.span,
+            span(1, column, column + 1),
+            "what the parenthesis too many holds"
+        );
+    }
+
+    #[test]
+    fn the_tree_is_never_deeper_than_the_limit() {
+        // Parentheses leave no node: the tree is less deep than the levels counted.
+        assert_eq!(height(&expression(&parentheses(MAX - 1))), 1);
+        let source = format!("{}true", "not ".repeat(MAX - 1));
+        assert_eq!(height(&expression(&source)), MAX);
+        let source = format!("{}1{}", "f(".repeat(MAX - 1), ")".repeat(MAX - 1));
+        assert_eq!(height(&expression(&source)), MAX);
+    }
+
+    #[test]
+    fn a_call_is_as_deep_as_its_deepest_value() {
+        let call = |count: usize| format!("f(1, {}, 1) + 1", chain(count));
+        assert_eq!(height(&expression(&call(MAX - 2))), MAX);
+        assert_eq!(error_kind(&call(MAX - 1)), E::TooDeep);
     }
 
     #[test]

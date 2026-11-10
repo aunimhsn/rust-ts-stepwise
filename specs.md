@@ -85,7 +85,7 @@ Lists and decimal numbers come later (see the [backlog](docs/backlog.md)).
 - Comparisons: `==`, `!=` (two values of the same type), `<`, `<=`, `>`, `>=` (whole numbers). Comparisons don't chain, whichever they are (`1 < x < 5`, `a == b == c`): an error that says to join two comparisons with `and`, without rewriting them.
 - Logic: `and`, `or`, `not`, on booleans, evaluated from left to right and stopping as soon as the result is known. `not` and `-` can be repeated (`not not done`, `- -3`).
 - Parentheses group as usual and are never required: `if front_is_clear():` and `if (front_is_clear()):` both work.
-- Priority, from the strongest: parentheses and calls; `-` in front of a value; `*`, `/`, `%`; `+`, `-`; comparisons; `not`; `and`; `or`. As in Python, `not` comes after the comparisons: `not sides == 4` is `not (sides == 4)`.
+- Priority, from the strongest: parentheses and calls; `-` in front of a value; `*`, `/`, `%`; `+`, `-`; comparisons; `not`; `and`; `or`. As in Python, `not` comes after the comparisons: `not sides == 4` is `not (sides == 4)`. So `not` is written at the start of an expression or after `and` or `or`; right after another operator (`a == not b`), it is an error that asks for parentheses (`a == (not b)`).
 - `=` where `==` is expected is an error that suggests `==`, anywhere in an expression (`if x = 3:`, `let a = b = 3`, `print(x = 3)`).
 - Expressions nest up to 200 deep, with the blocks around them and the long chains of operators (`1 + 1 + 1 + …`); beyond, an error. Nobody reaches it by hand.
 
@@ -107,7 +107,7 @@ Lists and decimal numbers come later (see the [backlog](docs/backlog.md)).
 
 - **A function is defined before it is called**, in the reading order of the program: calling it on a line above its definition is an error found before the program runs (*"`paint_side` is called on line 3 but defined on line 12. Move its definition above."*). There is no hoisting.
 - A function can call itself (recursion), since it is defined when its body runs. Two functions can't call each other.
-- A call gives exactly as many values as the function has parameters; another number is an error found before the program runs. No comma after the last value or the last parameter (`paint_side(3,)` is an error).
+- A call gives exactly as many values as the function has parameters; another number is an error found before the program runs. No comma after the last value or the last parameter (`paint_side(3,)` is an error of its own).
 - A function that ends without `return expression` gives back no value: using its result in an expression stops the program with an error.
 - Calls nest up to 200 deep; beyond, the program stops with an error (a recursion that never ends).
 - A function named without parentheses (`forward`), or a variable called like a function (`sides()`), is an error that shows the right way.

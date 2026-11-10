@@ -127,6 +127,9 @@ impl Parser {
         let kind = match self.current.kind {
             TokenKind::Indent => return Err(self.error(ParseErrorKind::UnexpectedIndent)),
             TokenKind::Keyword(Keyword::Let) => self.declaration()?,
+            TokenKind::Keyword(keyword) if assigns => {
+                return Err(self.error(ParseErrorKind::KeywordAsName { keyword }));
+            }
             TokenKind::Keyword(Keyword::Break) => {
                 self.advance();
                 StatementKind::Break

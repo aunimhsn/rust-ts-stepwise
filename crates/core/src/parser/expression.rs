@@ -15,17 +15,18 @@ use crate::span::{Position, Span};
 
 /// The priorities of the operators, from the weakest. A value in front of which `-` is
 /// written is read before any of them.
-mod priority {
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+enum Priority {
     /// Below every operator: a whole expression.
-    pub(super) const LOWEST: u8 = 0;
-    pub(super) const OR: u8 = 1;
-    pub(super) const AND: u8 = 2;
+    Lowest,
+    Or,
+    And,
     /// `not`, written in front of a value: it takes the comparisons that follow, as in
     /// Python.
-    pub(super) const NOT: u8 = 3;
-    pub(super) const COMPARISON: u8 = 4;
-    pub(super) const SUM: u8 = 5;
-    pub(super) const PRODUCT: u8 = 6;
+    Not,
+    Comparison,
+    Sum,
+    Product,
 }
 
 /// An expression with the height of its tree: 1 for a value alone.
@@ -37,12 +38,15 @@ struct Deep {
 impl Parser {
     /// A whole expression.
     pub(super) fn expression(&mut self) -> Result<Expression, ParseError> {
-        Ok(self.operators(priority::LOWEST)?.expression)
+        Ok(self.operators(Priority::Lowest)?.expression)
     }
 
     /// A value, then the operators stronger than `floor` with their values.
-    fn operators(&mut self, floor: u8) -> Result<Deep, ParseError> {
-        let mut left = self.operand()?;
+    fn operators(&mut self, floor: Priority) -> Result<Deep, ParseError> {
+        // Where a weaker operator could follow, a `not` would take it with the stronger one
+        // on its left: `2 * not a + 1` would be `2 * (not (a + 1))`. As in Python, `not`
+        // is written only where its whole expression fits.
+        let mut left = self.operand(floor <= Priority::Not)?;
         // Whether `left` is a comparison written without parentheses.
         let mut compared = false;
         loop {
@@ -75,7 +79,11 @@ impl Parser {
     }
 
     /// A value, with the `-` or the `not` in front of it, its parentheses or its call.
-    fn operand(&mut self) -> Result<Deep, ParseError> {
+    ///
+    /// # Errors
+    ///
+    /// Among others, a `not` where `not_fits` says it can't be written.
+    fn operand(&mut self, not_fits: bool) -> Result<Deep, ParseError> {
         let span = self.current.span;
         if let Some(name) = self.name()? {
             return self.name_or_call(name);
@@ -86,7 +94,12 @@ impl Parser {
             TokenKind::Keyword(Keyword::True) => ExpressionKind::Boolean(true),
             TokenKind::Keyword(Keyword::False) => ExpressionKind::Boolean(false),
             TokenKind::Minus => return self.unary(UnaryOperator::Negate),
-            TokenKind::Keyword(Keyword::Not) => return self.unary(UnaryOperator::Not),
+            TokenKind::Keyword(Keyword::Not) if not_fits => {
+                return self.unary(UnaryOperator::Not);
+            }
+            TokenKind::Keyword(Keyword::Not) => {
+                return Err(self.error(ParseErrorKind::NotAfterOperator));
+            }
             TokenKind::LeftParen => return self.parenthesized(),
             _ => return Err(self.error(ParseErrorKind::ExpectedValue)),
         };
@@ -100,8 +113,8 @@ impl Parser {
         self.advance();
         let operand = match operator {
             // `-` takes the value alone: `-a * b` is `(-a) * b`.
-            UnaryOperator::Negate => self.nested(Self::operand)?,
-            UnaryOperator::Not => self.nested(|parser| parser.operators(priority::NOT))?,
+            UnaryOperator::Negate => self.nested(|parser| parser.operand(false))?,
+            UnaryOperator::Not => self.nested(|parser| parser.operators(Priority::Not))?,
         };
         let span = Span::new(start, operand.expression.span.end);
         let kind = ExpressionKind::Unary {
@@ -116,8 +129,11 @@ impl Parser {
     fn parenthesized(&mut self) -> Result<Deep, ParseError> {
         let open = self.current.span;
         self.advance();
-        let inner = self.nested(|parser| parser.operators(priority::LOWEST))?;
+        self.unclosed_at_end_of_line(open)?;
+        let inner = self.nested(|parser| parser.operators(Priority::Lowest))?;
         let end = self.close(open)?;
+        // No node is made, so `node` checks nothing here, and nothing needs it: `nested`
+        // let the inside be parsed one level deeper, where its height was checked.
         Ok(Deep {
             expression: Expression {
                 kind: inner.expression.kind,
@@ -138,13 +154,19 @@ impl Parser {
         let mut below = 0;
         if self.current.kind != TokenKind::RightParen {
             loop {
-                let argument = self.nested(|parser| parser.operators(priority::LOWEST))?;
+                self.unclosed_at_end_of_line(open)?;
+                let argument = self.nested(|parser| parser.operators(Priority::Lowest))?;
                 below = below.max(argument.height);
                 arguments.push(argument.expression);
                 if self.current.kind != TokenKind::Comma {
                     break;
                 }
+                let comma = self.current.span;
                 self.advance();
+                if self.current.kind == TokenKind::RightParen {
+                    let kind = ParseErrorKind::TrailingComma;
+                    return Err(ParseError { kind, span: comma });
+                }
             }
         }
         let end = self.close(open)?;
@@ -154,6 +176,18 @@ impl Parser {
             arguments,
         };
         self.node(kind, span, below)
+    }
+
+    /// The error of the `(` at `open` when the line ends right where a value is expected
+    /// inside it: the `)` is missing, more surely than a value (`forward(`).
+    fn unclosed_at_end_of_line(&self, open: Span) -> Result<(), ParseError> {
+        match self.current.kind {
+            TokenKind::Newline | TokenKind::End => Err(ParseError {
+                kind: ParseErrorKind::UnclosedParen,
+                span: open,
+            }),
+            _ => Ok(()),
+        }
     }
 
     /// Takes the `)` that closes the `(` at `open`, and returns the position after it.
@@ -232,19 +266,19 @@ fn binary_operator(kind: &TokenKind) -> Option<BinaryOperator> {
     })
 }
 
-const fn priority_of(operator: BinaryOperator) -> u8 {
+const fn priority_of(operator: BinaryOperator) -> Priority {
     match operator {
-        BinaryOperator::Or => priority::OR,
-        BinaryOperator::And => priority::AND,
+        BinaryOperator::Or => Priority::Or,
+        BinaryOperator::And => Priority::And,
         BinaryOperator::Equal
         | BinaryOperator::NotEqual
         | BinaryOperator::Less
         | BinaryOperator::LessEqual
         | BinaryOperator::Greater
-        | BinaryOperator::GreaterEqual => priority::COMPARISON,
-        BinaryOperator::Add | BinaryOperator::Subtract => priority::SUM,
+        | BinaryOperator::GreaterEqual => Priority::Comparison,
+        BinaryOperator::Add | BinaryOperator::Subtract => Priority::Sum,
         BinaryOperator::Multiply | BinaryOperator::Divide | BinaryOperator::Remainder => {
-            priority::PRODUCT
+            Priority::Product
         }
     }
 }

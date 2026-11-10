@@ -50,13 +50,19 @@ pub struct ParseError {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ParseErrorKind {
     /// A value is missing where one is expected: after an operator, a `(`, a `,` or a `=`
-    /// (`sides +`, `print()` is fine but `print(1,)` isn't, `let sides =`). The span is
-    /// what stands there instead, or the end of the line.
+    /// (`sides +`, `print(, 1)`, `let sides =`). The span is what stands there instead, or
+    /// the end of the line.
     ExpectedValue,
+    /// A `,` after the last value of a call (`paint_side(3,)`). The span is the `,`.
+    TrailingComma,
+    /// A `not` right after an operator stronger than it (`a == not b`, `-not a`): it is
+    /// written at the start of an expression, after `and` or `or`, or between parentheses.
+    NotAfterOperator,
     /// What follows can't be there: the statement or the value before it is complete
     /// (`forward() forward()`, `print("a" "b")`, `break 3`).
     UnexpectedToken,
-    /// A `(` whose `)` is missing on its line. The span is the `(`.
+    /// A `(` whose `)` is missing on its line, the line ending where a value or the `)` is
+    /// expected. The span is the `(`.
     UnclosedParen,
     /// A `)` that closes no `(`.
     UnmatchedParen,
@@ -72,7 +78,8 @@ pub enum ParseErrorKind {
     },
     /// No name after `let`.
     ExpectedName,
-    /// A keyword where a name is expected (`let repeat = 3`): keywords are reserved.
+    /// A keyword where a name is expected (`let repeat = 3`, `repeat = 3`): keywords are
+    /// reserved.
     KeywordAsName {
         /// The keyword.
         keyword: Keyword,
@@ -105,7 +112,7 @@ pub enum ForeignWord {
     /// `pass`
     Pass,
     /// `none`
-    None,
+    NoneWord,
     /// `null`
     Null,
 }
@@ -120,7 +127,7 @@ impl ForeignWord {
         Self::For,
         Self::Continue,
         Self::Pass,
-        Self::None,
+        Self::NoneWord,
         Self::Null,
     ];
 
@@ -143,7 +150,7 @@ impl ForeignWord {
             Self::For => "for",
             Self::Continue => "continue",
             Self::Pass => "pass",
-            Self::None => "none",
+            Self::NoneWord => "none",
             Self::Null => "null",
         }
     }
