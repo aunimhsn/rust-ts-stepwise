@@ -1059,7 +1059,7 @@ mod numbers {
 
     #[test]
     fn the_smallest_number_is_too_large_written_as_a_literal() {
-        // Its value without the sign doesn't fit: see docs/backlog.md.
+        // Its value without the sign doesn't fit: only computed, see Values in specs.md.
         assert_eq!(error_kind("-9223372036854775808"), E::NumberTooLarge);
     }
 

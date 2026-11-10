@@ -11,8 +11,8 @@ SECTIONS.push(["Errors before running", () => `<div class="page-row"><div class=
   },
   map: appWorld({ robot: "2,1", facing: "east" }),
   panels: { tab: "Console", content: [
-    appConsoleError("Ln 5, Col 9", "The name foward doesn't exist.", "Did you mean forward?"),
-    appConsoleError("Ln 10, Col 5", "paint_side takes 1 value, not 2.", "Remove a value from the call."),
+    appConsoleError("Ln 5", "The name foward doesn't exist.", "Did you mean forward?"),
+    appConsoleError("Ln 10", "paint_side takes 1 value, not 2.", "Remove a value from the call."),
     consoleFix(2),
   ].join("") },
 })}</div></div>`]);
