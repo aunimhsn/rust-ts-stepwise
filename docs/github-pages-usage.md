@@ -18,15 +18,21 @@ Rules:
 
 ## Address
 
-Stepwise is served at **`https://stepwise.sylent.art/`** (decided by the owner on 2026-10-31), a subdomain of the owner's website, without buying a domain:
+Stepwise is served at **`https://stepwise.sylent.tools/`** (decided by the owner on 2026-11-10, replacing `stepwise.sylent.art` chosen on 2026-10-31), a subdomain of a domain the owner already has, without buying one for Stepwise:
 
-- `sylent.art` is itself a project site (the repository `aunimhsn/sylent.art`, with its own `CNAME`), not the user site `aunimhsn.github.io`: GitHub allows one user site per account but one project site per repository, so the two websites don't conflict. Each site has its own bandwidth limit.
-- The owner adds a DNS `CNAME` record at the registrar of `sylent.art`: `stepwise` → `aunimhsn.github.io`; the custom domain is set in **Settings › Pages** of the repository, with **Enforce HTTPS**.
-- The owner verifies `sylent.art` in the GitHub account (**Settings › Pages › Add a domain**, a DNS `TXT` record), so that no one else can claim a subdomain pointing to GitHub without a repository behind it. No domain was verified on 2026-10-31.
-- The website never hard-codes its path: it works at the root of a domain as well as under `/rust-ts-stepwise/` (the default address `https://aunimhsn.github.io/rust-ts-stepwise/`), with the `paths.base` setting of SvelteKit. The domain can change later without changing the code.
+- The DNS of `sylent.tools` is held by Cloudflare. The owner added a `CNAME` record there on 2026-11-10: `stepwise` → `aunimhsn.github.io`, **DNS only** (the grey cloud): proxied by Cloudflare, it would hide the domain from GitHub, which could then not issue its HTTPS certificate.
+- Once the record answers, the custom domain is set in **Settings › Pages** of the repository (done on 2026-11-10), then **Enforce HTTPS** once GitHub has issued the certificate. Set before the record exists, the default address would redirect to a domain that doesn't answer.
+- The owner verifies `sylent.tools` in the GitHub account (**Settings › Pages › Add a domain**, a DNS `TXT` record), so that no one else can claim a subdomain pointing to GitHub without a repository behind it.
+- Without a custom domain, the website is served at its default address, `https://aunimhsn.github.io/rust-ts-stepwise/`; with one, that address redirects to the domain.
+- The website never hard-codes its path: the workflow `.github/workflows/deploy.yml` reads it from the settings of Pages (`actions/configure-pages`) and gives it to SvelteKit as `paths.base` (the variable `BASE_PATH` of `web/vite.config.ts`); it is empty at the root of a domain and `/rust-ts-stepwise` at the default address. The domain can change later without changing the code, but not without deploying again: the path is fixed when the website is built, so a website built for `/rust-ts-stepwise` doesn't find its pages at the root of a domain. After any change of the domain in **Settings › Pages**, run **Actions › Deploy › Run workflow**.
+
+## Publishing
+
+- Every push to `main` (each merged pull request) runs `.github/workflows/deploy.yml`: it builds `web/` with the address above and publishes `web/build` to Pages. It can also be run by hand (**Actions › Deploy › Run workflow**). A pull request that changes this workflow or `.github/actions/` runs its build alone, without publishing.
+- Only `main` can deploy: the environment `github-pages`, created when Pages was set to **GitHub Actions** on 2026-11-10, allows that branch alone.
+- `main` is protected by the ruleset `main` (created on 2026-11-10): a pull request is required (no approval, the owner works alone; squash merging only), with the check `CI`, the last job of `.github/workflows/ci.yml`; no force push, no deletion; no one bypasses it, not even an administrator. The branch doesn't have to be up to date with `main` before merging, to avoid needless rebases.
 
 ## Risks accepted by the owner
 
-On 2026-10-31:
-
-- A class or a school visiting at once could, in theory, reach the soft bandwidth limit: unlikely at the sizes above. If it happens, the same static files can move to another host (Cloudflare Pages, Netlify) without changing the code.
+- On 2026-10-31: a class or a school visiting at once could, in theory, reach the soft bandwidth limit: unlikely at the sizes above. If it happens, the same static files can move to another host (Cloudflare Pages, Netlify) without changing the code.
+- On 2026-11-10: if Stepwise grows and gets a domain of its own, the old address will redirect to it; the links follow, but not the progress, which the browser keeps per address: the learners would start again, unless the export of the progress of the [backlog](backlog.md) exists by then.

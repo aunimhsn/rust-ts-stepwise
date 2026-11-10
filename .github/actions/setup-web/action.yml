@@ -1,0 +1,30 @@
+name: Set up the interface
+description: >-
+  The Rust toolchain with the WebAssembly target, the wasm-bindgen command-line tool and Node.js,
+  with the packages of web/ installed: what `npm run wasm` and the npm commands of web/ need.
+
+runs:
+  using: composite
+  steps:
+    - uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: wasm32-unknown-unknown
+    - uses: Swatinem/rust-cache@v2
+    # The command-line tool at the exact version of the crate in Cargo.lock, as
+    # scripts/build-wasm.ts checks it.
+    - name: Read the version of the wasm-bindgen crate
+      id: wasm-bindgen
+      shell: bash
+      run: echo "version=$(cargo pkgid wasm-bindgen | sed 's/.*@//')" >> "$GITHUB_OUTPUT"
+    - uses: taiki-e/install-action@v2
+      with:
+        tool: wasm-bindgen@${{ steps.wasm-bindgen.outputs.version }}
+    - uses: actions/setup-node@v7
+      with:
+        node-version-file: web/package.json
+        cache: npm
+        cache-dependency-path: web/package-lock.json
+    - name: Install the packages
+      shell: bash
+      working-directory: web
+      run: npm ci

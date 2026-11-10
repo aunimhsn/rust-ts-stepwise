@@ -41,6 +41,7 @@ jobs:
               - 'clippy.toml'
               - 'rust-toolchain.toml'
               - '.github/workflows/**'
+              - '.github/actions/**'
             # The interface loads the core: a change of the Rust code checks it too.
             web:
               - *rust
@@ -94,24 +95,7 @@ jobs:
         working-directory: web
     steps:
       - uses: actions/checkout@v7
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: wasm32-unknown-unknown
-      - uses: Swatinem/rust-cache@v2
-      # The command-line tool at the exact version of the crate in Cargo.lock, as
-      # scripts/build-wasm.ts checks it.
-      - name: Read the version of the wasm-bindgen crate
-        id: wasm-bindgen
-        run: echo "version=$(cargo pkgid wasm-bindgen | sed 's/.*@//')" >> "$GITHUB_OUTPUT"
-      - uses: taiki-e/install-action@v2
-        with:
-          tool: wasm-bindgen@${{ steps.wasm-bindgen.outputs.version }}
-      - uses: actions/setup-node@v7
-        with:
-          node-version-file: web/package.json
-          cache: npm
-          cache-dependency-path: web/package-lock.json
-      - run: npm ci
+      - uses: ./.github/actions/setup-web
       - run: npm run lint
       - run: npm run check
       - run: npm test
