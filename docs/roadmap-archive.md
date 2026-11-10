@@ -81,3 +81,9 @@ The website deployed to GitHub Pages by a workflow at `stepwise.sylent.tools` (t
 ## 5. Lexer (#23)
 
 The tokens of the language with their positions, the indentation turned into block starts and ends (four spaces, no tab), the texts and their escapes, the comments; every error as a code with its values and its position. Tests of every rule of [Lines and indentation](../specs.md#lines-and-indentation) and [Names](../specs.md#names).
+
+## 6. Parser
+
+### 6a. Expressions and simple statements (#25)
+
+The syntax tree and `parse(source)`; the expressions with their priorities and the calls; `let`, the assignment, `break`, `return`, an expression alone on its line; the errors of the expressions (`=` for `==`, chained comparisons, a parenthesis not closed, a value missing, a comma at the end) and the words of other languages (`elif`, `def`, `for`…), wherever they are; a maximum depth of 200 for the tree, long chains of operators included, an error rather than an overflow of the stack of the browser, in the parser or later in the checker and the interpreter. A line that opens a block is still an error.
