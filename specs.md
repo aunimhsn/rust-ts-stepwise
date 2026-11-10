@@ -333,7 +333,7 @@ A panel in the middle of the screen, over a veil, opened from the header of the 
 
 - **Theme**: **Day Desk** (light, by default, so that a whole class sees the same screen) or **Night Desk** (dark). Only the interface changes: the map keeps the same look in both.
 - **Sounds**: on or off (off by default, so that a classroom stays quiet).
-- **Clear all progress…**: a red button, alone at the end of the panel, without a sentence: its name says what it does. While the mouse rests on it (or the keyboard focus), it fills from the left like a loading bar for about 2 seconds, and a click counts only once it is full, so that a passing click can't set off a danger used so rarely. It then puts every level back in its first state (as **Restore starting code**, its breakpoints with its code) and clears the levels done and the levels opened by a code, after a confirmation; the settings stay. The messages only say *"the levels done and the code of every level"*: the breakpoints go with the code, without being named.
+- **Clear all progress…**: a gray button, alone at the end of the panel, without a sentence: its name says what it does. While the mouse rests on it (or the keyboard focus), it turns red from the left like a loading bar for about 2 seconds, and a click counts only once it is full, so that a passing click can't set off a danger used so rarely. It then puts every level back in its first state (as **Restore starting code**, its breakpoints with its code) and clears the levels done and the levels opened by a code, after a confirmation; the settings stay. The messages only say *"the levels done and the code of every level"*: the breakpoints go with the code, without being named.
 
 ### Interface language
 
