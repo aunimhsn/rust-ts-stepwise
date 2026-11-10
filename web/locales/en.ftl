@@ -32,5 +32,10 @@ probe-steps =
         [one] { $count } step
        *[other] { $count } steps
     }
+# $count (Number): the steps run since the start.
 # $rate (Number): the steps run each second at Instant, measured over the last second.
-probe-measured = { $rate } steps per second measured
+probe-steps-measured =
+    { $count ->
+        [one] { $count } step
+       *[other] { $count } steps
+    } · { $rate } steps per second measured

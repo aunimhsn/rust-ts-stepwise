@@ -16,26 +16,30 @@ export const START_CARRY = 1;
 
 /**
  * At an animated speed, whether a step runs at this frame, `elapsed` milliseconds after the one
- * before, and the share of a step still owed after it. At most one step runs per frame, so that
- * each one is drawn, and the share owed never passes a whole step: after a frame that came late
- * (a tab hidden, a busy browser), the program goes on at its pace rather than catching up.
+ * before, and the share of a step still owed after it, kept so that the speed is exact whatever
+ * the rate of the screen. At most one step runs per frame, so that each one is drawn, and a frame
+ * adds at most a whole step: after a frame that came late (a tab hidden, a busy browser), the
+ * program goes on at its pace rather than catching up.
  */
 export function paceFrame(
 	rate: number,
 	elapsed: number,
 	carry: number
 ): { step: boolean; carry: number } {
-	const owed = Math.min(carry + (Math.max(elapsed, 0) * rate) / 1000, 1);
+	const owed = carry + Math.min((Math.max(elapsed, 0) * rate) / 1000, 1);
 	return owed >= 1 ? { step: true, carry: owed - 1 } : { step: false, carry: owed };
 }
 
-/** The steps an **Instant** frame runs between two looks at the clock, which costs a little. */
+/**
+ * The steps an **Instant** frame runs between two looks at the clock, which costs a little. A
+ * batch can run past the budget when the steps are slow: to tune with the real interpreter.
+ */
 const BATCH = 1000;
 
 /**
  * At **Instant**, runs steps until `budget` milliseconds have passed since `start`, so that the
  * page keeps drawing and answering between two frames, or until `step` returns `false` (the
- * program ended). Returns the number of steps run.
+ * program ended at that step). Returns the number of steps run, the last one included.
  */
 export function runInstant(
 	step: () => boolean,

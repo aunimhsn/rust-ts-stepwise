@@ -30,10 +30,12 @@ pedantic = { level = "warn", priority = -1 }
 allow_attributes = "warn"
 allow_attributes_without_reason = "warn"
 
-# The WebAssembly module of the website (see docs/technical-choices.md, WebAssembly size): the
-# default `opt-level` 3, measured smaller and faster than "s" and "z". Not stripped here:
-# `wasm-bindgen` needs the section that lists the WebAssembly features, and removes the names
-# itself (web/scripts/build-wasm.ts).
+# The WebAssembly module of the website (see docs/technical-choices.md, WebAssembly size):
+# `opt-level` 3, measured smaller and faster than "s" and "z". No `strip`: the release profile
+# already leaves the debug information out, and removing the symbols would also remove the
+# section that tells `wasm-bindgen` which WebAssembly features the module uses; `wasm-bindgen`
+# removes the names itself (web/scripts/build-wasm.ts).
 [profile.release]
+opt-level = 3
 lto = true
 codegen-units = 1

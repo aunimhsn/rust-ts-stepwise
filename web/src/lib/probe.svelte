@@ -159,11 +159,10 @@
 	</svg>
 
 	<p>
-		{#if running}
-			<button type="button" onclick={pause}>{t('probe-pause')}</button>
-		{:else}
-			<button type="button" onclick={run}>{t('probe-run')}</button>
-		{/if}
+		<!-- One button whose label changes, so that it keeps the focus of the keyboard. -->
+		<button type="button" onclick={running ? pause : run}>
+			{running ? t('probe-pause') : t('probe-run')}
+		</button>
 		<button type="button" onclick={reset}>{t('probe-reset')}</button>
 	</p>
 
@@ -179,10 +178,9 @@
 	</fieldset>
 
 	<p aria-live="off">
-		{t('probe-steps', { count: steps })}
-		{#if running && measured !== undefined && !Number.isFinite(rate)}
-			· {t('probe-measured', { rate: measured })}
-		{/if}
+		{running && measured !== undefined && !Number.isFinite(rate)
+			? t('probe-steps-measured', { count: steps, rate: measured })
+			: t('probe-steps', { count: steps })}
 	</p>
 </section>
 

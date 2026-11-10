@@ -54,6 +54,27 @@ pub enum Direction {
     West = "west",
 }
 
+impl From<probe::Action> for Action {
+    fn from(action: probe::Action) -> Self {
+        match action {
+            probe::Action::Moved => Self::Moved,
+            probe::Action::Turned => Self::Turned,
+            probe::Action::Bumped => Self::Bumped,
+        }
+    }
+}
+
+impl From<probe::Direction> for Direction {
+    fn from(direction: probe::Direction) -> Self {
+        match direction {
+            probe::Direction::North => Self::North,
+            probe::Direction::East => Self::East,
+            probe::Direction::South => Self::South,
+            probe::Direction::West => Self::West,
+        }
+    }
+}
+
 #[wasm_bindgen]
 impl Probe {
     /// The program at its start.
@@ -76,11 +97,7 @@ impl Probe {
 
     /// Runs the next instruction.
     pub fn step(&mut self) -> Action {
-        match self.0.step() {
-            probe::Action::Moved => Action::Moved,
-            probe::Action::Turned => Action::Turned,
-            probe::Action::Bumped => Action::Bumped,
-        }
+        self.0.step().into()
     }
 
     /// The column of the robot, from the left.
@@ -97,15 +114,11 @@ impl Probe {
         self.0.robot().y
     }
 
+    /// Where the robot looks.
     #[wasm_bindgen(getter)]
     #[must_use]
     pub fn direction(&self) -> Direction {
-        match self.0.robot().direction {
-            probe::Direction::North => Direction::North,
-            probe::Direction::East => Direction::East,
-            probe::Direction::South => Direction::South,
-            probe::Direction::West => Direction::West,
-        }
+        self.0.robot().direction.into()
     }
 
     /// The steps run since the start: a `bigint` in JavaScript.
