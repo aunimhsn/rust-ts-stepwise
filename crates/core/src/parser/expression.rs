@@ -15,6 +15,9 @@ use crate::span::{Position, Span};
 
 /// The priorities of the operators, from the weakest. A value in front of which `-` is
 /// written is read before any of them.
+///
+/// The order of the variants is the order of the priorities: the comparisons derived below
+/// (`priority <= floor`, `floor <= Priority::Not`) rely on it.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 enum Priority {
     /// Below every operator: a whole expression.

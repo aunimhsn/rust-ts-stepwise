@@ -413,6 +413,10 @@ mod priorities {
     fn not_starts_an_expression_or_follows_and_or_or() {
         assert_eq!(line("print(not a, -b)"), "print((not a), (-b))");
         assert_eq!(line("let a = not b"), "let a = (not b)");
+        assert_eq!(
+            program("return not done\ndone = not done"),
+            ["return (not done)", "done = (not done)"]
+        );
         assert_eq!(line("a or not b and not c"), "(a or ((not b) and (not c)))");
         assert_eq!(line("a == (not b)"), "(a == (not b))");
         assert_eq!(line("2 * (not a)"), "(2 * (not a))");
@@ -427,6 +431,10 @@ mod priorities {
             "2 * not a + 1",
             "a < not b < c",
             "1 + not a",
+            "a - not b",
+            "a % not b",
+            // Even with no value after it: the place of the `not` is the first thing wrong.
+            "a == not",
             "-not a",
             "not -not a",
             "a and b != not c",
