@@ -20,7 +20,9 @@
     )
 )]
 
+pub mod ast;
 pub mod lexer;
+pub mod parser;
 pub mod probe;
 pub mod span;
 

@@ -9,6 +9,8 @@ The ideas, polish and edge cases found along the way that the current step doesn
 - Two functions that call each other (needs a way to declare a function before its body, or hoisting).
 - Messages of their own, rather than *unexpected character*, for `1.5` (no decimal numbers in version 1), `;` (one statement per line) and the typographic quotes `“ ”` pasted from a document (seen at step 5); the error already carries the character, so this may be done in the messages alone.
 
+- The words of Python written with a capital, `True`, `False` and `None`: today names that aren't in `snake_case`, so the checker recalls the rule of the names instead of showing `true`, `false` or that there is no empty value (seen at step 6a).
+
 ## Interface
 
 - The French translation of the interface, the levels and the manual.
