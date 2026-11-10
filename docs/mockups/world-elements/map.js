@@ -57,7 +57,7 @@ function appCell({ wall = false, wallEdge = true, wallRim = true, lines = "", sh
   const carried = carrying ? `<img class="is-carried" src="${element("item")}" alt="">` : "";
   if (robot) images.push(`<div class="app-robot is-${robot}"><img src="${element("robot")}" alt="">${pincer ? `<img src="${element("pincer")}" alt="">` : ""}${carried}${lit ? `<img src="${element(lit === "success" ? "eyes-lit" : "eyes-dim")}" alt="">` : ""}</div>`);
   // A goal not met: a small red flag planted in the corner of its cell, over the robot. Its red,
-  // distinct from the red paint, may follow the error color of the design system (step 4).
+  // distinct from the red paint, may follow the error color of the design system (step 12).
   if (missed) images.push(`<img src="${element("goal-missed")}" alt="">`);
   return `<div class="app-cell" style="--cell:${size}px">${images.join("")}</div>`;
 }

@@ -11,16 +11,16 @@ function appWordmark(fontSize) {
 }
 
 // The header: the name, the menus, the place of the level (block-place.js), the gear of the settings at
-// its right end, the thin bar of the progress. `menu` is the menu open and `goalOpen` the bubble of the goal;
+// its right end, the thin bar of the progress. `menu` is the menu open and `goalOpen` the bubble of the goal, `settings` the panel of the settings;
 // `place` is the level, when it isn't the sample one.
 // The sandbox has no goal and no progress.
-function appHeader({ menu, goalOpen = false, sandbox = false, place } = {}) {
+function appHeader({ menu, goalOpen = false, sandbox = false, place, settings = false } = {}) {
   return `<header class="app-header">
     ${appWordmark(21)}
     <nav class="app-menus">${["Level", "Edit", "Run", "Help"].map(item =>
       `<button type="button" class="app-menu ${item === menu ? "is-open" : ""}">${item}</button>`).join("")}</nav>
     ${sandbox ? appPlaceSandbox() : appPlace(goalOpen, place)}
-    <button type="button" class="app-gear" title="Settings">${ICONS.gear(18)}</button>
+    <button type="button" class="app-gear ${settings ? "is-open" : ""}" title="Settings">${ICONS.gear(18)}</button>
     ${sandbox ? "" : '<div class="app-progress" title="17 of 20 levels done"><i style="width:85%"></i></div>'}
   </header>`;
 }

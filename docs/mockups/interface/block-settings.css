@@ -1,0 +1,23 @@
+/* The panel of the settings: a row per setting, its title and its sentence on the left, its control on the right. */
+.app-settings { position: relative; width: 500px; box-sizing: border-box; padding: 18px 22px 8px; }
+.settings-row { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 14px 0; border-top: 1px solid var(--hover); }
+.app-shortcuts-head + .settings-row { margin-top: 10px; }
+.settings-row b { font-weight: var(--strong-weight); }
+.settings-row p { margin: 2px 0 0; color: var(--weak); line-height: 1.4; }
+/* Clear all progress, alone at the end of the panel. */
+.settings-row.is-end { justify-content: flex-end; }
+/* Gray at rest, as a small button that doesn't call for a click; then the red that fills it from the
+   left, the text turning white with it. */
+.app-window .settings-clear { position: relative; padding: 7px 16px; background: var(--chip); color: var(--on-chip); border: 0; border-radius: var(--radius-small); font-weight: 500; cursor: default; }
+.settings-clear-fill { position: absolute; inset: 0; display: grid; place-items: center; background: var(--danger); color: var(--on-danger); border-radius: inherit; clip-path: inset(0 100% 0 0); transition: clip-path .2s ease-out; }
+.settings-clear:hover .settings-clear-fill, .settings-clear:focus-visible .settings-clear-fill { clip-path: inset(0 0 0 0); transition: clip-path 2s linear; }
+.app-window .settings-clear.is-ready { cursor: pointer; }
+
+/* Two segments side by side, the one chosen dark (or light at night). */
+.settings-segments { display: flex; flex: none; padding: 2px; background: var(--chip); border-radius: var(--radius-small); }
+.app-window .settings-segments button { padding: 5px 12px; background: none; border: 0; border-radius: var(--radius-small); color: var(--weak); font-weight: 500; white-space: nowrap; }
+.app-window .settings-segments button[aria-pressed="true"] { background: var(--chosen); color: var(--on-chosen); }
+
+/* Once cleared: gray again, a check before its words, and nothing more to click. */
+.app-window .settings-clear.is-done { cursor: default; }
+.settings-clear.is-done span { display: flex; align-items: center; gap: 6px; }

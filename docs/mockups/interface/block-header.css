@@ -11,3 +11,4 @@
 
 /* The gear of the settings, at the right end of the header. */
 .app-window .app-gear { display: grid; place-items: center; width: 30px; height: 30px; margin-left: auto; padding: 0; background: none; border: 0; border-radius: var(--radius-small); color: var(--band-weak); }
+.app-window .app-gear.is-open { background: var(--band-hover); color: var(--band-text); }

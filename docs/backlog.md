@@ -34,7 +34,8 @@ The ideas, polish and edge cases found along the way that the current step doesn
 
 ## Tooling
 
-- An `animation-reviewer` subagent, to decide at step 3h: like `code-reviewer`, it recommends without changing anything, once per pull request that touches the animations. It checks what can be measured, the taste staying with the owner: the time an element is really visible for its size, a hover that never restarts by itself, the stacking order, the state at rest in both themes, a fallback for each animation when the learner asked for less motion, and the match with `specs.md`.
+- An `animation-reviewer` subagent, to decide at step 11 (animations and sounds): like `code-reviewer`, it recommends without changing anything, once per pull request that touches the animations. It checks what can be measured, the taste staying with the owner: the time an element is really visible for its size, a hover that never restarts by itself, the stacking order, the state at rest in both themes, a fallback for each animation when the learner asked for less motion, and the match with `specs.md`.
+- A recommendation of the model and effort for each kind of step, to discuss at the retrospective (and to write in `process.md` and the template if it holds). Every step so far ran on Opus 5.5 at high effort; the steps of architecture (the workspace, the interpreter, the bridge), the audits of quality and the refactorings could run on Fable 5.2, if it brings much in good practices and in quality for its cost. To judge on real cases, e.g. a second review of the same pull request by Fable 5.2, compared with the one of `code-reviewer`.
 
 ## Distribution
 

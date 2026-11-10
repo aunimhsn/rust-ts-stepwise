@@ -5,13 +5,15 @@
 const LARGE_FROM = 1600;
 const EDITOR_LARGEST = 768;
 
-const appWindow = ({ header, maps = {}, editor, map, panels, overlay = "", size = [1280, 720], sandbox = false }) => {
+const appWindow = ({ header, maps = {}, editor, map, panels, overlay = "", size = [1280, 720], sandbox = false, banner = "" }) => {
   const [width, height] = size;
   const large = width >= LARGE_FROM;
-  const style = large ? `width:${width}px;height:${height}px;--crossing:${EDITOR_LARGEST}px` : "";
+  const mapRow = height - 49 - (large ? 250 : 216);
+  const style = (large ? `width:${width}px;height:${height}px;--crossing:${EDITOR_LARGEST}px;` : "") + (banner ? `--map-row:${mapRow}px` : "");
   return `
-  <div class="app-window ${large ? "is-large" : ""}" style="${style}">
+  <div class="app-window ${large ? "is-large" : ""} ${banner ? "has-banner" : ""}" style="${style}">
     ${appHeader({ ...header, sandbox })}
+    ${banner}
     <div class="app-body">
       <div class="app-block is-editor">${appEditor(editor)}</div>
       <div class="app-block is-map">${appMapRow(maps.shown ?? 1, maps.passed ?? [], sandbox, maps.legend)}${map}</div>

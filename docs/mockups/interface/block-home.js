@@ -181,8 +181,9 @@ function homePanel(chapters, stone, code, map = homeFirstMap(stone)) {
 
 // `chosen` is the level shown on the right, `tip` a stone hovered, `long` the path with more levels
 // than fit, `code` the state of the field of a code, `size` the window in pixels, `done` the last level
-// done and `open` the last level open.
-function homeWindow({ chosen: level = HOME_TO_PLAY, tip, long = false, code = "empty", size = [1280, 720], done = HOME_TO_PLAY - 1, open = HOME_TO_PLAY } = {}) {
+// done and `open` the last level open. `banner` goes under the header, `overlay` over the screen, and
+// `settings` marks the link of the settings as open.
+function homeWindow({ chosen: level = HOME_TO_PLAY, tip, long = false, code = "empty", size = [1280, 720], done = HOME_TO_PLAY - 1, open = HOME_TO_PLAY, banner = "", overlay = "", settings = false } = {}) {
   homeDone = done;
   homeOpen = open;
   const chapters = long ? HOME_MORE : HOME_CHAPTERS;
@@ -192,9 +193,10 @@ function homeWindow({ chosen: level = HOME_TO_PLAY, tip, long = false, code = "e
     <header class="app-header">
       ${appWordmark(21)}
       <span class="home-count">${done} of ${stones.length} levels done</span>
-      <nav class="home-links">${["Sandbox", "Manual", "Settings"].map(item => `<button type="button" class="app-menu">${item}</button>`).join("")}</nav>
+      <nav class="home-links">${["Sandbox", "Manual", "Settings"].map(item => `<button type="button" class="app-menu ${settings && item === "Settings" ? "is-open" : ""}">${item}</button>`).join("")}</nav>
       <div class="app-progress"><i style="width:${(100 * done / stones.length).toFixed(1)}%"></i></div>
     </header>
+    ${banner}
     <div class="home-stage"><div class="home-center">
       <div class="home-scroll"><div class="home-path" style="height:${height}px">
         ${bands.map(({ left, right, top, chapter, number }) => `<div class="home-band" style="left:${left}px;top:${top}px;width:${right - left}px"><b>${number}. ${chapter.name}</b><span>${chapter.idea}</span></div>`).join("")}
@@ -207,6 +209,7 @@ function homeWindow({ chosen: level = HOME_TO_PLAY, tip, long = false, code = "e
       </div></div>
       ${homePanel(chapters, shown, code)}
     </div></div>
+    ${overlay}
   </div>`;
 }
 
