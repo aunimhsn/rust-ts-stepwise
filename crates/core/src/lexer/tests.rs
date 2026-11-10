@@ -805,11 +805,11 @@ mod comments {
     }
 
     #[test]
-    fn a_comment_line_is_kept_aside_from_its_hash_to_the_end_of_the_line() {
+    fn a_comment_line_is_kept_aside_from_its_hash_to_its_last_character() {
         let source = "# one\nif a:\n    # two\n        # three \r\n    b\n#\n";
         assert_eq!(
             comments(source),
-            [(1, 1, 6), (3, 5, 10), (4, 9, 17), (6, 1, 2)]
+            [(1, 1, 6), (3, 5, 10), (4, 9, 16), (6, 1, 2)]
         );
     }
 
@@ -1928,6 +1928,7 @@ else:
 /// and that what it gives always holds together.
 mod robustness {
     use super::*;
+    use crate::test_support::Random;
 
     const PIECES: [&str; 40] = [
         " ",
@@ -1971,19 +1972,6 @@ mod robustness {
         "\u{a0}",
         ".",
     ];
-
-    /// A small generator of numbers, the same at every run, without a dependency.
-    struct Random(u64);
-
-    impl Random {
-        fn next(&mut self) -> usize {
-            self.0 = self
-                .0
-                .wrapping_mul(6_364_136_223_846_793_005)
-                .wrapping_add(1_442_695_040_888_963_407);
-            usize::try_from(self.0 >> 33).unwrap()
-        }
-    }
 
     #[test]
     fn random_sources_never_panic_and_hold_together() {

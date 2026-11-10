@@ -4,9 +4,10 @@
 //! The line of such a statement ends with a `:` ([`Parser::colon`]), and its block is the
 //! lines under it, between the [`TokenKind::Indent`] and the [`TokenKind::Dedent`] of the
 //! lexer ([`Parser::block`]). A block counts for one level of the depth of the tree, as the
-//! parentheses do: its statements are parsed by a recursion of the parser.
+//! parentheses do: its statements are parsed by a recursion of the parser. The blocks
+//! themselves nest up to [`MAX_BLOCK_DEPTH`].
 
-use super::{ParseError, ParseErrorKind, Parser};
+use super::{MAX_BLOCK_DEPTH, ParseError, ParseErrorKind, Parser};
 use crate::ast::{Branch, Statement, StatementKind};
 use crate::lexer::{Keyword, TokenKind};
 use crate::span::{Position, Span};
@@ -14,24 +15,25 @@ use crate::span::{Position, Span};
 impl Parser {
     /// An `if` with its `else if` and its `else`, from the `if`.
     pub(super) fn conditional(&mut self) -> Result<Statement, ParseError> {
-        let first = self.branch(self.current.span.start)?;
+        let first = self.opening(self.current.span.start)?;
         // The line of the first `if`.
         let span = first.span;
         let mut branches = vec![first];
         let mut otherwise = None;
         while self.current.kind == TokenKind::Keyword(Keyword::Else) {
             let start = self.current.span.start;
+            self.not_assigned(Keyword::Else)?;
             self.advance();
-            if self.current.kind == TokenKind::Keyword(Keyword::If) {
-                branches.push(self.branch(start)?);
-                continue;
+            if self.current.kind != TokenKind::Keyword(Keyword::If) {
+                let line = self.colon(start)?;
+                otherwise = Some(self.block(line)?);
+                if self.current.kind == TokenKind::Keyword(Keyword::Else) {
+                    return Err(self.error(ParseErrorKind::ElseAfterElse));
+                }
+                break;
             }
-            let line = self.colon(start)?;
-            otherwise = Some(self.block(line)?);
-            if self.current.kind == TokenKind::Keyword(Keyword::Else) {
-                return Err(self.error(ParseErrorKind::ElseAfterElse));
-            }
-            break;
+            self.not_assigned(Keyword::If)?;
+            branches.push(self.opening(start)?);
         }
         let kind = StatementKind::If {
             branches,
@@ -40,9 +42,32 @@ impl Parser {
         Ok(Statement { kind, span })
     }
 
-    /// `if condition:` with its block, the `if` being the current token and its line
-    /// starting at `start`: at the `if`, or at the `else` before it.
-    fn branch(&mut self, start: Position) -> Result<Branch, ParseError> {
+    /// `while condition:` with its block, from the `while`.
+    pub(super) fn while_loop(&mut self) -> Result<Statement, ParseError> {
+        let Branch {
+            condition,
+            body,
+            span,
+        } = self.opening(self.current.span.start)?;
+        let kind = StatementKind::While { condition, body };
+        Ok(Statement { kind, span })
+    }
+
+    /// `repeat count:` with its block, from the `repeat`.
+    pub(super) fn repeat_loop(&mut self) -> Result<Statement, ParseError> {
+        let Branch {
+            condition: count,
+            body,
+            span,
+        } = self.opening(self.current.span.start)?;
+        let kind = StatementKind::Repeat { count, body };
+        Ok(Statement { kind, span })
+    }
+
+    /// A keyword, the current token, then an expression, a `:` and a block: what `if`,
+    /// `while` and `repeat` share. The line starts at `start`: at the keyword, or at the
+    /// `else` before an `if`.
+    fn opening(&mut self, start: Position) -> Result<Branch, ParseError> {
         self.advance();
         let condition = self.expression()?;
         let span = self.colon(start)?;
@@ -54,26 +79,13 @@ impl Parser {
         })
     }
 
-    /// `while condition:` with its block, from the `while`.
-    pub(super) fn while_loop(&mut self) -> Result<Statement, ParseError> {
-        let start = self.current.span.start;
-        self.advance();
-        let condition = self.expression()?;
-        let span = self.colon(start)?;
-        let body = self.block(span)?;
-        let kind = StatementKind::While { condition, body };
-        Ok(Statement { kind, span })
-    }
-
-    /// `repeat count:` with its block, from the `repeat`.
-    pub(super) fn repeat_loop(&mut self) -> Result<Statement, ParseError> {
-        let start = self.current.span.start;
-        self.advance();
-        let count = self.expression()?;
-        let span = self.colon(start)?;
-        let body = self.block(span)?;
-        let kind = StatementKind::Repeat { count, body };
-        Ok(Statement { kind, span })
+    /// The error of `keyword`, the current token, when a `=` follows it: the same as at the
+    /// start of a statement, for the `else` and the `if` that come after a block.
+    fn not_assigned(&mut self, keyword: Keyword) -> Result<(), ParseError> {
+        if self.next_is_equal() {
+            return Err(self.error(ParseErrorKind::KeywordAsName { keyword }));
+        }
+        Ok(())
     }
 
     /// The `:` that ends a line which opens a block, then the end of that line. Returns the
@@ -112,7 +124,8 @@ impl Parser {
         if self.current.kind != TokenKind::Indent {
             return Err(self.no_block(opening));
         }
-        if !self.fits_deeper() {
+        // Around a statement, the levels are all blocks.
+        if self.depth >= MAX_BLOCK_DEPTH {
             let kind = ParseErrorKind::TooDeep;
             return Err(ParseError {
                 kind,
@@ -136,6 +149,10 @@ impl Parser {
     /// The error of the line `opening` when no line is indented under it, the current token
     /// being what follows: the block is empty, unless a comment line stands where its lines
     /// would be, indented further than `opening`.
+    ///
+    /// The columns count characters: a comment indented by tabs under a line indented by
+    /// spaces may be taken for one that isn't in the block. Both errors say that the block
+    /// has no line, and the editor writes spaces.
     fn no_block(&self, opening: Span) -> ParseError {
         let next = self.current.span.start;
         let comment = self.comments.iter().find(|comment| {

@@ -1,6 +1,8 @@
 //! The tests of the parser, grouped by the rules of the specifications.
 
-use super::{ForeignWord, MAX_DEPTH, ParseError, ParseErrorKind as E, SyntaxError, parse};
+use super::{
+    ForeignWord, MAX_BLOCK_DEPTH, MAX_DEPTH, ParseError, ParseErrorKind as E, SyntaxError, parse,
+};
 use crate::ast::{
     BinaryOperator, Expression, ExpressionKind, Statement, StatementKind, UnaryOperator,
 };
@@ -1104,6 +1106,7 @@ mod block_errors {
             ("if a:\n    # todo", 2, 5, 11),
             ("if a:\n    # todo\n", 2, 5, 11),
             ("if a:\n\n    # one\n    # two\nb()\n", 3, 5, 10),
+            ("repeat 3:\n    # todo  \nb()\n", 2, 5, 11),
             ("while a:\n    if b:\n        # todo\n    c()\n", 3, 9, 15),
             ("while a:\n    if b:\n        # todo\nc()\n", 3, 9, 15),
             ("if a:\n    b()\nelse:\n    # todo\nc()\n", 4, 5, 11),
@@ -1224,11 +1227,30 @@ mod block_errors {
             ("if a(b:\n    c()\n", 5),
             ("if a(b, :\n    c()\n", 5),
             ("if (a + (b):\n    c()\n", 4),
+            ("if a(b:  # one\n    c()\n", 5),
+            ("if a(b:", 5),
         ] {
             let error = error(source);
             assert_eq!(error.kind, E::UnclosedParen, "{source}");
             assert_eq!(error.span, span(1, column, column + 1), "{source}");
         }
+    }
+
+    #[test]
+    fn a_colon_inside_parentheses_that_are_closed_is_an_error_at_the_colon() {
+        for (source, column) in [
+            ("print(a: b)", 8),
+            ("paint_side(3:)", 13),
+            ("let x = (1: 2)", 11),
+            ("if a(b: c):\n    d()\n", 7),
+        ] {
+            let error = error(source);
+            assert_eq!(error.kind, E::UnexpectedToken, "{source}");
+            assert_eq!(error.span, span(1, column, column + 1), "{source}");
+        }
+        let error = error("if front_is_clear(:)\n    a()\n");
+        assert_eq!(error.kind, E::ExpectedValue);
+        assert_eq!(error.span, span(1, 19, 20));
     }
 
     #[test]
@@ -1250,6 +1272,26 @@ mod block_errors {
         ] {
             assert_eq!(error_kind(source), E::KeywordAsName { keyword }, "{source}");
         }
+    }
+
+    #[test]
+    fn a_keyword_after_the_block_of_an_if_is_not_assigned_either() {
+        let error = error_of_else("else = 3\n");
+        assert_eq!(
+            error.kind,
+            E::KeywordAsName {
+                keyword: Keyword::Else
+            }
+        );
+        assert_eq!(error.span, span(3, 1, 5));
+        let error = error_of_else("else if = 3\n");
+        assert_eq!(
+            error.kind,
+            E::KeywordAsName {
+                keyword: Keyword::If
+            }
+        );
+        assert_eq!(error.span, span(3, 6, 8));
     }
 
     #[test]
@@ -1281,6 +1323,7 @@ mod depth {
     use super::*;
 
     const MAX: usize = MAX_DEPTH as usize;
+    const BLOCKS: usize = MAX_BLOCK_DEPTH as usize;
 
     /// The number of levels of the tree of `expression`, 1 for a value alone.
     fn height(expression: &Expression) -> usize {
@@ -1386,16 +1429,23 @@ mod depth {
         assert_eq!(statements(&source).len(), 2);
     }
 
-    /// `count` blocks one inside the other, the innermost holding `body`.
-    fn blocks(count: usize, body: &str) -> String {
+    /// `count` blocks one inside the other, the innermost holding `body`. `opening` gives
+    /// the lines that open the block of a level, from this level and its indentation.
+    pub(super) fn blocks_with(
+        count: usize,
+        opening: impl Fn(usize, &str) -> String,
+        body: &str,
+    ) -> String {
         let mut source = String::new();
         for level in 0..count {
-            source.push_str(&" ".repeat(level * 4));
-            source.push_str("if a:\n");
+            source.push_str(&opening(level, &" ".repeat(level * 4)));
         }
-        source.push_str(&" ".repeat(count * 4));
-        source.push_str(body);
-        source
+        source + &" ".repeat(count * 4) + body
+    }
+
+    /// `count` blocks of `if` one inside the other, the innermost holding `body`.
+    fn blocks(count: usize, body: &str) -> String {
+        blocks_with(count, |_, indent| format!("{indent}if a:\n"), body)
     }
 
     /// The number of levels of the tree of `statement`: its blocks, then its deepest
@@ -1423,27 +1473,27 @@ mod depth {
     }
 
     #[test]
-    fn blocks_as_deep_as_the_limit() {
-        let mut statements = statements(&blocks(MAX - 1, "b()"));
-        assert_eq!(statement_height(&statements.pop().unwrap()), MAX);
-        let error = error(&blocks(MAX, "b()"));
+    fn blocks_as_deep_as_their_limit() {
+        let mut statements = statements(&blocks(BLOCKS, "b()"));
+        assert_eq!(statement_height(&statements.pop().unwrap()), BLOCKS + 1);
+        let error = error(&blocks(BLOCKS + 1, "b()"));
         assert_eq!(error.kind, E::TooDeep);
-        let column = u32::try_from((MAX - 1) * 4 + 1).unwrap();
+        let column = u32::try_from(BLOCKS * 4 + 1).unwrap();
         assert_eq!(
             error.span,
-            span(MAX_DEPTH, column, column + 5),
+            span(MAX_BLOCK_DEPTH + 1, column, column + 5),
             "the line that opens the block too many"
         );
     }
 
     #[test]
     fn a_block_too_deep_is_an_error_whatever_it_holds() {
-        assert_eq!(error_kind(&blocks(MAX, "break")), E::TooDeep);
+        assert_eq!(error_kind(&blocks(BLOCKS + 1, "break")), E::TooDeep);
     }
 
     #[test]
     fn the_blocks_and_the_expressions_add_up() {
-        for count in [1, 2, 50, MAX - 1] {
+        for count in [1, 2, BLOCKS] {
             let fits = blocks(count, &chain(MAX - count));
             let mut statements = statements(&fits);
             assert_eq!(statement_height(&statements.pop().unwrap()), MAX, "{count}");
@@ -1477,45 +1527,45 @@ mod depth {
     #[test]
     fn every_kind_of_block_counts() {
         let nested = |count: usize| {
-            let mut source = String::new();
-            for level in 0..count {
-                source.push_str(&" ".repeat(level * 4));
-                source.push_str(match level % 3 {
-                    0 => "if a:\n",
-                    1 => "while a:\n",
-                    _ => "repeat 3:\n",
-                });
-            }
-            source + &" ".repeat(count * 4) + "b()"
+            let opening = |level: usize, indent: &str| {
+                let line = ["if a:", "while a:", "repeat 3:"][level % 3];
+                format!("{indent}{line}\n")
+            };
+            blocks_with(count, opening, "b()")
         };
-        assert!(parse(&nested(MAX - 1)).is_ok());
-        assert_eq!(error_kind(&nested(MAX)), E::TooDeep);
+        assert!(parse(&nested(BLOCKS)).is_ok());
+        assert_eq!(error_kind(&nested(BLOCKS + 1)), E::TooDeep);
     }
 
     #[test]
     fn the_blocks_of_an_else_count_as_those_of_an_if() {
         // Each `else:` holds the next `if`: one level per `else`.
         let nested = |count: usize| {
-            let mut source = String::new();
-            for level in 0..count {
-                let indent = " ".repeat(level * 4);
-                source += &[
-                    format!("{indent}if a:\n"),
-                    format!("{indent}    b()\n"),
-                    format!("{indent}else:\n"),
-                ]
-                .concat();
-            }
-            source + &" ".repeat(count * 4) + "b()"
+            let opening =
+                |_, indent: &str| format!("{indent}if a:\n{indent}    b()\n{indent}else:\n");
+            blocks_with(count, opening, "b()")
         };
-        assert!(parse(&nested(MAX - 1)).is_ok());
-        assert_eq!(error_kind(&nested(MAX)), E::TooDeep);
+        assert!(parse(&nested(BLOCKS)).is_ok());
+        assert_eq!(error_kind(&nested(BLOCKS + 1)), E::TooDeep);
+    }
+
+    #[test]
+    fn a_long_chain_of_else_if_at_the_deepest_level_is_fine() {
+        let indent = " ".repeat((BLOCKS - 1) * 4);
+        let chain = format!("{indent}else if a:\n{indent}    b()\n").repeat(100);
+        let source = blocks(BLOCKS, "b()\n") + &chain;
+        assert!(parse(&source).is_ok());
     }
 
     #[test]
     fn the_depth_starts_again_after_a_block() {
-        let source = format!("{}\n{}\n", blocks(MAX - 1, "b()"), chain(MAX));
-        assert_eq!(statements(&source).len(), 2);
+        let source = format!(
+            "{}\n{}\n{}\n",
+            blocks(BLOCKS, "b()"),
+            blocks(BLOCKS, "b()"),
+            chain(MAX)
+        );
+        assert_eq!(statements(&source).len(), 3);
     }
 
     #[test]
@@ -1540,27 +1590,12 @@ mod depth {
 }
 
 mod robustness {
-    use super::depth::statement_height;
+    use super::depth::{blocks_with, statement_height};
     use super::*;
+    use crate::test_support::Random;
 
     const MAX: usize = MAX_DEPTH as usize;
-
-    /// A small generator of numbers, the same at every run, without a dependency.
-    struct Random(u64);
-
-    impl Random {
-        fn next(&mut self) -> usize {
-            self.0 = self
-                .0
-                .wrapping_mul(6_364_136_223_846_793_005)
-                .wrapping_add(1_442_695_040_888_963_407);
-            usize::try_from(self.0 >> 33).unwrap()
-        }
-
-        fn pick<'a>(&mut self, pieces: &[&'a str]) -> &'a str {
-            pieces[self.next() % pieces.len()]
-        }
-    }
+    const BLOCKS: usize = MAX_BLOCK_DEPTH as usize;
 
     /// Checks that the tree of `source`, when it has one, is never deeper than the limit, and
     /// returns whether it has one. A panic or a loop without end fails the test by itself.
@@ -1665,20 +1700,17 @@ mod robustness {
         let mut read = 0;
         let mut refused = 0;
         for _ in 0..300 {
-            let mut source = String::new();
-            let blocks = random.next() % (MAX + 20);
-            for level in 0..blocks {
-                source.push_str(&" ".repeat(level * 4));
-                source.push_str(random.pick(&["if a:\n", "while a:\n", "repeat 3:\n"]));
-            }
-            source.push_str(&" ".repeat(blocks * 4));
+            let kinds: Vec<&str> = (0..random.next() % (BLOCKS + 20))
+                .map(|_| random.pick(&["if a:", "while a:", "repeat 3:"]))
+                .collect();
             let count = random.next() % (MAX + 20);
             let expression = match random.next() % 3 {
                 0 => vec!["1"; count + 1].join(" + "),
                 1 => format!("{}1{}", "(".repeat(count), ")".repeat(count)),
                 _ => format!("{}true", "not ".repeat(count)),
             };
-            source.push_str(&expression);
+            let opening = |level: usize, indent: &str| format!("{indent}{}\n", kinds[level]);
+            let source = blocks_with(kinds.len(), opening, &expression);
             if bounded(&source) {
                 read += 1;
             } else {

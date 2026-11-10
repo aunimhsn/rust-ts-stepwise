@@ -52,6 +52,7 @@ else:
 - A block has at least one line: a `:` with no line under it is an error. A block that holds only comments is an error of its own: the comments don't count as lines. Only the comments indented further than the line that opens the block are in it: a comment back at the level of that line belongs to what follows, and the block is empty.
 - Nothing follows the `:` on its line, except a comment: `if front_is_clear(): forward()` is an error that recalls that the block goes on the lines under it.
 - `#` starts a comment, up to the end of the line. Empty lines and comment lines are ignored, whatever their indentation: a line of spaces, tabs or other blank characters (such as a non-breaking space pasted from a document) is empty.
+- Blocks nest up to 50 deep; beyond, an error. Nobody reaches it by hand: at 20, the indentation already takes the 80 characters of a line.
 - A line can't be split in two, even inside parentheses.
 
 ### Names
@@ -87,7 +88,7 @@ Lists and decimal numbers come later (see the [backlog](docs/backlog.md)).
 - Parentheses group as usual and are never required: `if front_is_clear():` and `if (front_is_clear()):` both work.
 - Priority, from the strongest: parentheses and calls; `-` in front of a value; `*`, `/`, `%`; `+`, `-`; comparisons; `not`; `and`; `or`. As in Python, `not` comes after the comparisons: `not sides == 4` is `not (sides == 4)`. So `not` is written at the start of an expression or after `and` or `or`; right after another operator (`a == not b`), it is an error that asks for parentheses (`a == (not b)`).
 - `=` where `==` is expected is an error that suggests `==`, anywhere in an expression (`if x = 3:`, `let a = b = 3`, `print(x = 3)`).
-- Expressions nest up to 200 deep, with the blocks around them and the long chains of operators (`1 + 1 + 1 + …`); beyond, an error. Nobody reaches it by hand.
+- Expressions nest up to 200 deep, with the blocks around them (themselves up to 50, see [Lines and indentation](#lines-and-indentation)) and the long chains of operators (`1 + 1 + 1 + …`); beyond, an error. Nobody reaches it by hand.
 
 ### Statements
 

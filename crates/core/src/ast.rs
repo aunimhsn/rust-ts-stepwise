@@ -51,8 +51,8 @@ pub enum StatementKind {
     },
     /// `if`, with its `else if` and its `else`.
     If {
-        /// The `if` and each `else if`, in order: the block of the first true condition
-        /// runs. A list rather than an `if` inside each `else`, so that a long chain of
+        /// The `if` and each `else if`, in order, never empty: the block of the first true
+        /// condition runs. A list rather than an `if` inside each `else`, so that a long chain of
         /// `else if` doesn't deepen the tree.
         branches: Vec<Branch>,
         /// The block of the `else`, if any.

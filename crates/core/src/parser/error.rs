@@ -61,8 +61,8 @@ pub enum ParseErrorKind {
     /// What follows can't be there: the statement or the value before it is complete
     /// (`forward() forward()`, `print("a" "b")`, `break 3`).
     UnexpectedToken,
-    /// A `(` whose `)` is missing on its line, the line or its `:` ending where a value or
-    /// the `)` is expected (`forward(`, `if front_is_clear(:`). The span is the `(`.
+    /// A `(` whose `)` is missing on its line, the line or the `:` at its end coming where a
+    /// value or the `)` is expected (`forward(`, `if front_is_clear(:`). The span is the `(`.
     UnclosedParen,
     /// A `)` that closes no `(`.
     UnmatchedParen,
@@ -78,8 +78,8 @@ pub enum ParseErrorKind {
     },
     /// No name after `let`.
     ExpectedName,
-    /// A keyword where a name is expected (`let repeat = 3`, `repeat = 3`): keywords are
-    /// reserved.
+    /// A keyword where a name is expected (`let repeat = 3`, `repeat = 3`, `else = 3`):
+    /// keywords are reserved. The span is the keyword.
     KeywordAsName {
         /// The keyword.
         keyword: Keyword,
@@ -108,7 +108,9 @@ pub enum ParseErrorKind {
     /// The span is the `else` too many.
     ElseAfterElse,
     /// Parentheses, operators, calls and blocks nested deeper than
-    /// [`MAX_DEPTH`](super::MAX_DEPTH). For a block, the span is the line that opens it.
+    /// [`MAX_DEPTH`](super::MAX_DEPTH), or blocks alone deeper than
+    /// [`MAX_BLOCK_DEPTH`](super::MAX_BLOCK_DEPTH). For a block, the span is the line that
+    /// opens it.
     TooDeep,
 }
 

@@ -41,8 +41,8 @@ pub const INDENT_WIDTH: u32 = 4;
 pub struct Lexed {
     /// The tokens, ending with [`TokenKind::End`].
     pub tokens: Vec<Token>,
-    /// The comment of each line that holds only a comment, from its `#` to the end of the
-    /// line, in the order of the source. These lines give no token.
+    /// The comment of each line that holds only a comment, from its `#` to its last
+    /// character, in the order of the source. These lines give no token.
     pub comments: Vec<Span>,
 }
 
@@ -79,7 +79,7 @@ pub fn tokenize(source: &str) -> Result<Lexed, LexError> {
 /// The state kept from one line to the next.
 struct Lexer {
     tokens: Vec<Token>,
-    /// The comment of each comment line read, from its `#` to the end of the line.
+    /// The comment of each comment line read, from its `#` to its last character.
     comments: Vec<Span>,
     /// The indentation of each block still open, in spaces, the innermost last: empty at the
     /// top level.
@@ -107,10 +107,15 @@ impl Lexer {
             return Ok(end);
         }
         if content.starts_with('#') {
-            let before = line.chars().count().saturating_sub(content.chars().count());
-            let column = u32::try_from(before).unwrap_or(u32::MAX).saturating_add(1);
-            self.comments
-                .push(Span::new(Position::new(number, column), end));
+            // Without the blank characters before the `#` nor those after the comment.
+            let width = u32::try_from(content.trim_end().chars().count()).unwrap_or(u32::MAX);
+            let before =
+                length.saturating_sub(u32::try_from(content.chars().count()).unwrap_or(u32::MAX));
+            let start = before.saturating_add(1);
+            self.comments.push(Span::new(
+                Position::new(number, start),
+                Position::new(number, start.saturating_add(width)),
+            ));
             return Ok(end);
         }
         let mut cursor = Cursor::new(line, number);

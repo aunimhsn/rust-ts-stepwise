@@ -28,8 +28,16 @@ use crate::ast::{Name, Program, Statement, StatementKind};
 use crate::lexer::{Keyword, Lexed, Token, TokenKind, tokenize};
 use crate::span::{Position, Span};
 
+/// The deepest the blocks nest, one inside the other.
+///
+/// Far beyond what a learner writes (an indentation of 200 spaces), and lower than
+/// [`MAX_DEPTH`], since a level of blocks takes several times the stack of a level of
+/// parentheses, in the parser and in whoever walks the tree after it.
+pub const MAX_BLOCK_DEPTH: u32 = 50;
+
 /// The deepest a syntax tree goes: the blocks, the parentheses, the operators and the calls
-/// around a value each count for one level, and the value itself for one.
+/// around a value each count for one level, and the value itself for one. The blocks alone
+/// stop at [`MAX_BLOCK_DEPTH`].
 ///
 /// A long chain of operators counts too (`1 + 1 + 1 + …` is a tree as deep as it is long).
 /// The limit keeps the recursions of the parser, the checker and the interpreter, and the one
@@ -131,8 +139,7 @@ impl Parser {
     }
 
     /// Runs `parse` one level deeper, and comes back whatever its result. The caller checks
-    /// first that a value [fits there](Self::fits_deeper), since the place of the error is
-    /// its own.
+    /// the depth first, since the limit and the place of the error are its own.
     fn deeper<T>(
         &mut self,
         parse: impl FnOnce(&mut Self) -> Result<T, ParseError>,
@@ -182,6 +189,19 @@ impl Parser {
         let span = Span::new(start, self.previous_end);
         self.end_of_line()?;
         Ok(Statement { kind, span })
+    }
+
+    /// Whether the current token ends the line: its end, or the `:` of a line that opens a
+    /// block, which is the last token of its line.
+    fn at_end_of_line(&mut self) -> bool {
+        match self.current.kind {
+            TokenKind::Newline | TokenKind::End => true,
+            TokenKind::Colon => self
+                .rest
+                .peek()
+                .is_none_or(|token| matches!(token.kind, TokenKind::Newline | TokenKind::End)),
+            _ => false,
+        }
     }
 
     /// Whether the token after the current one is a `=`.
