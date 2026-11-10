@@ -1,0 +1,9 @@
+# The core must never panic (see crates/core/src/lib.rs). These methods panic on a byte index
+# inside a character, which the lints of the core don't catch.
+disallowed-methods = [
+    { path = "str::split_at", reason = "panics on a byte index inside a character: use split_once or get" },
+    { path = "str::split_at_mut", reason = "panics on a byte index inside a character: use split_once or get" },
+]
+
+# The names written in the doc comments that aren't code (the default list kept with "..").
+doc-valid-idents = ["WebAssembly", "JavaScript", "TypeScript", ".."]

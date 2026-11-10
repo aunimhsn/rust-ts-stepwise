@@ -1,3 +1,6 @@
 [toolchain]
 channel = "stable"
 components = ["rustfmt", "clippy"]
+# The interface loads the core compiled to WebAssembly: listed here, the target is installed
+# with the toolchain, without a `rustup target add`.
+targets = ["wasm32-unknown-unknown"]

@@ -99,22 +99,26 @@ Follow [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.
 
 ## Code review
 
-- Before opening any pull request that changes code or its build (`src/`, tests, `Cargo.toml`, `build.rs`, `rust-toolchain.toml`, `.github/workflows/`), run the `code-reviewer` subagent (`.claude/agents/code-reviewer.md`) on the branch.
+- Before opening any pull request that changes code or its build (`crates/`, tests, `Cargo.toml`, `clippy.toml`, `build.rs`, `rust-toolchain.toml`, `.github/workflows/`), run the `code-reviewer` subagent (`.claude/agents/code-reviewer.md`) on the branch.
 - Run it once per pull request, on the whole branch, to save tokens; a step too large for one review is split into sub-steps in `roadmap.md`.
 - It writes its recommendations, in French, to `outputs/<YYYY-MM-DD>-<branch>-code-review.md`. These notes are ignored by Git.
 - Summarize the recommendations to the user and apply only the ones they approve, then open the pull request.
 
 ## Development
 
+- The Rust code is a Cargo workspace: `crates/core` (`stepwise-core`), the language and the map, a plain library tested without a browser; `crates/wasm` (`stepwise-wasm`), the bridge that exposes the core to the interface in WebAssembly, which only converts the arguments and the results.
 - Before committing, run and make sure all of these pass:
   - `cargo fmt --all --check`
-  - `cargo clippy --all-targets --all-features -- -D warnings`
-  - `cargo test --all-features`
+  - `cargo clippy --workspace --all-targets --all-features -- -D warnings`
+  - `cargo clippy --workspace --all-features --target wasm32-unknown-unknown -- -D warnings`
+  - `cargo test --workspace --all-features`
 - The same checks run in CI (`.github/workflows/ci.yml`) on every pull request.
-- `unsafe` code is forbidden and Clippy pedantic lints are enabled (see `[lints]` in `Cargo.toml`).
+- `unsafe` code is forbidden and Clippy pedantic lints are enabled (see `[workspace.lints]` in `Cargo.toml`).
+- The core never panics: the lints at the top of `crates/core/src/lib.rs` and the methods forbidden by `clippy.toml` rule out `unwrap`, `expect`, indexing, `panic!` and the like outside the tests. A panic would abort the WebAssembly module and the page; return an error instead.
 - `rust-version` in `Cargo.toml` is the minimum Rust version: CI also builds with it. Raise it when a dependency or a language feature needs a newer Rust.
+- The `wasm-bindgen` crate is pinned to an exact version (`=x.y.z` in `Cargo.toml`): the command-line tool that generates the JavaScript glue must match it exactly. Update both together.
 
 ## Releases
 
-- Pushing a version tag (e.g. `v0.1.0`) that matches the version of `Cargo.toml` publishes a GitHub release with the executables for Windows, macOS and Linux (`.github/workflows/release.yml`).
-- This workflow suits a command-line or terminal application. For a desktop application (installers) or a web application (deployment), adapt or replace it, and record the choice in `docs/technical-choices.md`.
+- Stepwise is a website: there is no release workflow. Each merge into `main` is deployed to GitHub Pages (set up by step 4c, see `docs/github-pages-usage.md`).
+- A version tag (e.g. `v0.1.0`) matching the version of `[workspace.package]` in `Cargo.toml` names a version; it builds nothing on its own.
