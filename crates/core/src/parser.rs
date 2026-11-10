@@ -1,7 +1,8 @@
 //! The parser: turns the tokens of a program into its syntax tree.
 //!
-//! Written by hand, as a recursive descent: one method per statement, and for the
-//! expressions a loop over the operators that climbs their priorities (see `expression.rs`).
+//! Written by hand, as a recursive descent: one method per statement (see `block.rs` for
+//! those that open a block), and for the expressions a loop over the operators that climbs
+//! their priorities (see `expression.rs`).
 //! It stops at the first error, since what follows can't be read reliably, and leaves to
 //! the checker what needs the names of the program: a function defined in a block, a `break`
 //! outside a loop, an expression alone on its line that isn't a call.
@@ -11,6 +12,7 @@
 //! [`Parser::error`] where it isn't: whatever the error would have been, the word explains it
 //! better.
 
+mod block;
 mod error;
 mod expression;
 
@@ -23,11 +25,11 @@ use std::iter::Peekable;
 use std::vec::IntoIter;
 
 use crate::ast::{Name, Program, Statement, StatementKind};
-use crate::lexer::{Keyword, Token, TokenKind, tokenize};
+use crate::lexer::{Keyword, Token, TokenKind, Tokens, tokenize};
 use crate::span::{Position, Span};
 
-/// The deepest a syntax tree goes: the parentheses, the operators and the calls around a
-/// value each count for one level, and the value itself for one.
+/// The deepest a syntax tree goes: the blocks, the parentheses, the operators and the calls
+/// around a value each count for one level, and the value itself for one.
 ///
 /// A long chain of operators counts too (`1 + 1 + 1 + …` is a tree as deep as it is long).
 /// The limit keeps the recursions of the parser, the checker and the interpreter, and the one
@@ -54,12 +56,14 @@ struct Parser {
     previous_end: Position,
     /// The number of levels of the tree around what is being parsed.
     depth: u32,
+    /// The comment of each comment line, in the order of the source.
+    comments: Vec<Span>,
 }
 
 impl Parser {
-    fn new(tokens: Vec<Token>) -> Self {
+    fn new(tokens: Tokens) -> Self {
         let start = Position::new(1, 1);
-        let mut rest = tokens.into_iter().peekable();
+        let mut rest = tokens.tokens.into_iter().peekable();
         let current = rest.next().unwrap_or(Token {
             kind: TokenKind::End,
             span: Span::at(start),
@@ -69,6 +73,7 @@ impl Parser {
             rest,
             previous_end: start,
             depth: 0,
+            comments: tokens.comments,
         }
     }
 
@@ -120,7 +125,13 @@ impl Parser {
         Ok(Program { statements })
     }
 
-    /// The statement of one line, with the end of the line.
+    /// Whether a value fits one level deeper: the levels around it leave room for its own.
+    fn fits_deeper(&self) -> bool {
+        self.depth.saturating_add(1) < MAX_DEPTH
+    }
+
+    /// The statement of one line, with the end of the line, and with its block when the line
+    /// opens one.
     fn statement(&mut self) -> Result<Statement, ParseError> {
         let start = self.current.span.start;
         let assigns = self.next_is_equal();
@@ -142,10 +153,16 @@ impl Parser {
                 };
                 StatementKind::Return { value }
             }
-            // The statements that open a block come with step 6b.
-            TokenKind::Keyword(
-                Keyword::If | Keyword::Else | Keyword::While | Keyword::Repeat | Keyword::Function,
-            ) => return Err(self.error(ParseErrorKind::UnexpectedToken)),
+            TokenKind::Keyword(Keyword::If) => return self.conditional(),
+            TokenKind::Keyword(Keyword::While) => return self.while_loop(),
+            TokenKind::Keyword(Keyword::Repeat) => return self.repeat_loop(),
+            TokenKind::Keyword(Keyword::Else) => {
+                return Err(self.error(ParseErrorKind::ElseWithoutIf));
+            }
+            // The functions come with step 6c.
+            TokenKind::Keyword(Keyword::Function) => {
+                return Err(self.error(ParseErrorKind::UnexpectedToken));
+            }
             TokenKind::Name(_) if assigns => self.assignment()?,
             _ => StatementKind::Expression(self.expression()?),
         };

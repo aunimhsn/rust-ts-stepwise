@@ -86,10 +86,29 @@ pub enum ParseErrorKind {
     },
     /// No `=` after the name of a `let`: a variable is declared with its first value.
     ExpectedEqual,
-    /// A line indented further than the line above, which opens no block.
+    /// A line indented further than the line above, which opens no block. The span is its
+    /// indentation.
     UnexpectedIndent,
-    /// Parentheses, operators and calls nested deeper than
-    /// [`MAX_DEPTH`](super::MAX_DEPTH).
+    /// No `:` at the end of a line that opens a block (`if front_is_clear()`). The span is
+    /// what stands there instead, or the end of the line.
+    ExpectedColon,
+    /// Something after the `:` of a line that opens a block (`if front_is_clear(): forward()`):
+    /// the block goes on the lines under it. The span is what follows the `:`, up to the end
+    /// of the line.
+    AfterColon,
+    /// No line under a line that opens a block. The span is that line.
+    EmptyBlock,
+    /// Only comments under a line that opens a block, at least one of them indented further
+    /// than that line: the comments don't count as lines. The span is the first of these
+    /// comments.
+    CommentOnlyBlock,
+    /// An `else` that follows no block of an `if` at its indentation. The span is the `else`.
+    ElseWithoutIf,
+    /// An `else` or an `else if` after the `else` of an `if`: the `else` comes last, once.
+    /// The span is the `else` too many.
+    ElseAfterElse,
+    /// Parentheses, operators, calls and blocks nested deeper than
+    /// [`MAX_DEPTH`](super::MAX_DEPTH). For a block, the span is the line that opens it.
     TooDeep,
 }
 

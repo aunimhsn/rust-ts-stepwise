@@ -49,7 +49,7 @@ else:
 
 - One statement per line. A line ending with `:` opens a block: the lines under it, indented by **exactly four more spaces**, until a line goes back to the level of the opening line.
 - Indentation uses spaces only. A tab, or an indentation that isn't four spaces more than the line that opens the block, is an error. The editor inserts four spaces when the Tab key is pressed.
-- A block has at least one line: a `:` with no line under it is an error. A block that holds only comments is an error of its own: the comments don't count as lines.
+- A block has at least one line: a `:` with no line under it is an error. A block that holds only comments is an error of its own: the comments don't count as lines. Only the comments indented further than the line that opens the block are in it: a comment back at the level of that line belongs to what follows, and the block is empty.
 - Nothing follows the `:` on its line, except a comment: `if front_is_clear(): forward()` is an error that recalls that the block goes on the lines under it.
 - `#` starts a comment, up to the end of the line. Empty lines and comment lines are ignored, whatever their indentation: a line of spaces, tabs or other blank characters (such as a non-breaking space pasted from a document) is empty.
 - A line can't be split in two, even inside parentheses.
@@ -95,7 +95,7 @@ Lists and decimal numbers come later (see the [backlog](docs/backlog.md)).
 |---|---|
 | `let name = expression` | Declares a variable. |
 | `name = expression` | Changes a declared variable. |
-| `if condition:` then `else if condition:` (any number) then `else:` (optional) | Runs the block of the first true condition. |
+| `if condition:` then `else if condition:` (any number) then `else:` (optional) | Runs the block of the first true condition. An `else` follows the block of an `if` or of an `else if`, at the indentation of its `if`: anywhere else, it is an error. An `else if` or a second `else` after the `else` is an error of its own: the `else` comes last, once. |
 | `while condition:` | Runs its block as long as the condition is true. |
 | `repeat count:` | Runs its block `count` times; `count` is a whole number evaluated once, `0` runs nothing, a negative number is an error. |
 | `break` | Leaves the innermost `while` or `repeat`. Outside a loop, an error. |

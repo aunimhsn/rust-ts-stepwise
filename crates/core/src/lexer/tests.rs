@@ -5,16 +5,26 @@ use crate::span::{Position, Span};
 
 /// The kinds of the tokens of `source`, which must have no error.
 fn kinds(source: &str) -> Vec<T> {
-    tokenize(source)
-        .unwrap()
-        .into_iter()
-        .map(|token| token.kind)
-        .collect()
+    tokens(source).into_iter().map(|token| token.kind).collect()
 }
 
 /// The tokens of `source`, which must have no error.
 fn tokens(source: &str) -> Vec<Token> {
-    tokenize(source).unwrap()
+    tokenize(source).unwrap().tokens
+}
+
+/// The comment lines of `source`, which must have no error, each as its line, the column of
+/// its `#` and the column after its last character.
+fn comments(source: &str) -> Vec<(u32, u32, u32)> {
+    tokenize(source)
+        .unwrap()
+        .comments
+        .into_iter()
+        .map(|comment| {
+            assert_eq!(comment.start.line, comment.end.line);
+            (comment.start.line, comment.start.column, comment.end.column)
+        })
+        .collect()
 }
 
 /// The `n`-th token of `source` (from 0) of the kind `kind`, which must have no error.
@@ -792,6 +802,34 @@ mod comments {
             line_kinds("print(\"#\") # print a hash"),
             vec![name("print"), T::LeftParen, text("#"), T::RightParen]
         );
+    }
+
+    #[test]
+    fn a_comment_line_is_kept_aside_from_its_hash_to_the_end_of_the_line() {
+        let source = "# one\nif a:\n    # two\n        # three \r\n    b\n#\n";
+        assert_eq!(
+            comments(source),
+            [(1, 1, 6), (3, 5, 10), (4, 9, 17), (6, 1, 2)]
+        );
+    }
+
+    #[test]
+    fn a_comment_after_a_statement_is_not_a_comment_line() {
+        assert_eq!(comments("forward() # one\nif a: # two\n    b\n"), []);
+    }
+
+    #[test]
+    fn the_column_of_a_comment_line_counts_any_blank_character() {
+        assert_eq!(
+            comments("\t# one\n\u{a0}\u{a0}# two\n \t # three"),
+            [(1, 2, 7), (2, 3, 8), (3, 4, 11)]
+        );
+    }
+
+    #[test]
+    fn a_source_without_comment_lines_has_none() {
+        assert_eq!(comments(""), []);
+        assert_eq!(comments("forward()\n\n   \n"), []);
     }
 
     #[test]
@@ -1956,7 +1994,7 @@ mod robustness {
             let source: String = (0..length)
                 .map(|_| PIECES[random.next() % PIECES.len()])
                 .collect();
-            let Ok(tokens) = tokenize(&source) else {
+            let Ok(tokens) = tokenize(&source).map(|read| read.tokens) else {
                 continue;
             };
             read += 1;
@@ -1987,7 +2025,7 @@ mod robustness {
                 source.push_str(&" ".repeat(depth * 4));
                 source.push_str("a:\n");
             }
-            let Ok(tokens) = tokenize(&source) else {
+            let Ok(tokens) = tokenize(&source).map(|read| read.tokens) else {
                 // Only a line indented by more than one level at once is refused.
                 assert!(matches!(error_kind(&source), E::WrongIndent { .. }));
                 continue;

@@ -219,11 +219,10 @@ impl Parser {
         &mut self,
         parse: impl FnOnce(&mut Self) -> Result<Deep, ParseError>,
     ) -> Result<Deep, ParseError> {
-        let depth = self.depth.saturating_add(1);
-        if depth >= MAX_DEPTH {
+        if !self.fits_deeper() {
             return Err(self.error(ParseErrorKind::TooDeep));
         }
-        self.depth = depth;
+        self.depth = self.depth.saturating_add(1);
         let result = parse(self);
         self.depth = self.depth.saturating_sub(1);
         result
