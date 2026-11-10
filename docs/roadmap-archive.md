@@ -77,3 +77,7 @@ A fake program of a few steps in Rust, advanced by `step()` at each animation fr
 ### 4d. Deployment (#22)
 
 The website deployed to GitHub Pages by a workflow at `stepwise.sylent.tools` (the path never hard-coded; the owner adds the DNS records, see [GitHub Pages usage](github-pages-usage.md#address)); `main` protected by a ruleset requiring the check `CI` (the last job of `.github/workflows/ci.yml`).
+
+## 5. Lexer (#23)
+
+The tokens of the language with their positions, the indentation turned into block starts and ends (four spaces, no tab), the texts and their escapes, the comments; every error as a code with its values and its position. Tests of every rule of [Lines and indentation](../specs.md#lines-and-indentation) and [Names](../specs.md#names).

@@ -49,7 +49,8 @@ else:
 
 - One statement per line. A line ending with `:` opens a block: the lines under it, indented by **exactly four more spaces**, until a line goes back to the level of the opening line.
 - Indentation uses spaces only. A tab, or an indentation that isn't four spaces more than the line that opens the block, is an error. The editor inserts four spaces when the Tab key is pressed.
-- A block has at least one line. A block that holds only comments is an error of its own: the comments don't count as lines.
+- A block has at least one line: a `:` with no line under it is an error. A block that holds only comments is an error of its own: the comments don't count as lines.
+- Nothing follows the `:` on its line, except a comment: `if front_is_clear(): forward()` is an error that recalls that the block goes on the lines under it.
 - `#` starts a comment, up to the end of the line. Empty lines and comment lines are ignored, whatever their indentation: a line of spaces, tabs or other blank characters (such as a non-breaking space pasted from a document) is empty.
 - A line can't be split in two, even inside parentheses.
 
@@ -58,7 +59,7 @@ else:
 - Variables and functions are written in `snake_case`: lowercase letters from `a` to `z` without accents, digits and underscores, starting with a letter (`sides`, `paint_side`, `count_2`). Any other name (`paintSide`, `côté`) is an error that recalls the rule, without writing the name for the learner.
 - The keywords, the built-in functions and the colors are reserved: a variable, a function or a parameter can't take their names.
 - Keywords: `let`, `if`, `else`, `while`, `repeat`, `break`, `function`, `return`, `and`, `or`, `not`, `true`, `false`.
-- The words a learner may write from another language are reserved too, each with a message that shows the Stepwise way: `elif` (→ `else if`), `def` (→ `function`), `var` and `const` (→ `let`), `for`, `continue`, `pass`, `none`, `null`.
+- The words a learner may write from another language are reserved too, each with a message that shows the Stepwise way: `elif` (→ `else if`), `def` (→ `function`), `var` and `const` (→ `let`), `for`, `continue`, `pass`, `none`, `null`. Wherever one of them is written, it is a syntax error.
 
 ### Values
 
@@ -81,11 +82,12 @@ Lists and decimal numbers come later (see the [backlog](docs/backlog.md)).
 
 - Arithmetic on whole numbers: `+`, `-`, `*`, `/` (whole division, `7 / 2` is `3`), `%` (remainder). Dividing by zero stops the program with an error.
 - `+` also joins two texts. Adding a text and a number is an error: `print` takes several values instead (`print("Sides:", sides)`).
-- Comparisons: `==`, `!=` (two values of the same type), `<`, `<=`, `>`, `>=` (whole numbers). Comparisons don't chain: `1 < x < 5` is an error that says to join two comparisons with `and`, without rewriting them.
-- Logic: `and`, `or`, `not`, on booleans, evaluated from left to right and stopping as soon as the result is known.
+- Comparisons: `==`, `!=` (two values of the same type), `<`, `<=`, `>`, `>=` (whole numbers). Comparisons don't chain, whichever they are (`1 < x < 5`, `a == b == c`): an error that says to join two comparisons with `and`, without rewriting them.
+- Logic: `and`, `or`, `not`, on booleans, evaluated from left to right and stopping as soon as the result is known. `not` and `-` can be repeated (`not not done`, `- -3`).
 - Parentheses group as usual and are never required: `if front_is_clear():` and `if (front_is_clear()):` both work.
-- Priority, from the strongest: parentheses and calls; `-` and `not` in front of a value; `*`, `/`, `%`; `+`, `-`; comparisons; `and`; `or`.
-- `=` where `==` is expected (`if x = 3:`) is an error that suggests `==`.
+- Priority, from the strongest: parentheses and calls; `-` in front of a value; `*`, `/`, `%`; `+`, `-`; comparisons; `not`; `and`; `or`. As in Python, `not` comes after the comparisons: `not sides == 4` is `not (sides == 4)`. So `not` is written at the start of an expression or after `and` or `or`; right after another operator (`a == not b`), it is an error that asks for parentheses (`a == (not b)`).
+- `=` where `==` is expected is an error that suggests `==`, anywhere in an expression (`if x = 3:`, `let a = b = 3`, `print(x = 3)`).
+- Expressions nest up to 200 deep, with the blocks around them and the long chains of operators (`1 + 1 + 1 + …`); beyond, an error. Nobody reaches it by hand.
 
 ### Statements
 
@@ -99,13 +101,13 @@ Lists and decimal numbers come later (see the [backlog](docs/backlog.md)).
 | `break` | Leaves the innermost `while` or `repeat`. Outside a loop, an error. |
 | `function name(parameter, …):` | Defines a function, at the top level of the program only (not in a block, not in another function). |
 | `return` or `return expression` | Leaves the function, with a value or without. Outside a function, an error. |
-| A call alone on its line | `forward()`, `paint_side(3)`. |
+| A call alone on its line | `forward()`, `paint_side(3)`. Any other expression alone on its line (`3 + 4`, `sides`, `sides == 4`) does nothing: an error found by the checks before running. |
 
 ### Functions
 
 - **A function is defined before it is called**, in the reading order of the program: calling it on a line above its definition is an error found before the program runs (*"`paint_side` is called on line 3 but defined on line 12. Move its definition above."*). There is no hoisting.
 - A function can call itself (recursion), since it is defined when its body runs. Two functions can't call each other.
-- A call gives exactly as many values as the function has parameters; another number is an error found before the program runs.
+- A call gives exactly as many values as the function has parameters; another number is an error found before the program runs. No comma after the last value or the last parameter (`paint_side(3,)` is an error of its own).
 - A function that ends without `return expression` gives back no value: using its result in an expression stops the program with an error.
 - Calls nest up to 200 deep; beyond, the program stops with an error (a recursion that never ends).
 - A function named without parentheses (`forward`), or a variable called like a function (`sides()`), is an error that shows the right way.
@@ -137,7 +139,7 @@ The robot stands on one cell and faces one of the four directions. It can carry 
 The program is checked as the learner types (a short moment after the last key) and again when **Run** is pressed. The checks find:
 
 - the syntax errors: the first one only, since the rest of the program can't be read reliably after it;
-- once the syntax is right, every error of names and structure: unknown names, variables used before their `let`, functions called above their definition, a wrong number of values in a call, `break` or `return` out of place, a function defined in a block, a reserved name, a name not in `snake_case`.
+- once the syntax is right, every error of names and structure: unknown names, variables used before their `let`, functions called above their definition, a wrong number of values in a call, `break` or `return` out of place, a function defined in a block, a reserved name, a name not in `snake_case`, an expression alone on its line that isn't a call.
 
 Every error found is underlined in the editor, with its message on hover, and listed in the console. **Run** doesn't start a program that has errors: it shows them in the console.
 
