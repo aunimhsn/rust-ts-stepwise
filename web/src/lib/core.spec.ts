@@ -11,6 +11,7 @@ const workspaceVersion = /\[workspace\.package\]\nversion = "([^"]+)"/.exec(
 
 describe('the WebAssembly module', () => {
 	it('gives the version of the workspace, computed in Rust', () => {
+		expect(workspaceVersion).toMatch(/^\d+\.\d+\.\d+/);
 		initSync({ module: readFileSync(new URL('./wasm/stepwise_bg.wasm', import.meta.url)) });
 		expect(coreVersion()).toBe(workspaceVersion);
 	});

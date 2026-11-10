@@ -15,6 +15,8 @@ export default defineConfig({
 	],
 	test: {
 		expect: { requireAssertions: true },
+		// Each test starts with the real functions, whatever the spies of the one before.
+		restoreMocks: true,
 		projects: [
 			{
 				extends: './vite.config.ts',

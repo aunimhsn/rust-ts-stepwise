@@ -2,6 +2,9 @@
 	"extends": "$app/tsconfig",
 	"compilerOptions": {
 		"strict": true,
+		// Only types that can be erased (no enum, no namespace): Node.js runs the scripts by
+		// stripping their types, without compiling them.
+		"erasableSyntaxOnly": true,
 		"types": ["$app/types", "node"]
 	},
 	"include": ["src", "scripts", "vite.config.ts", "prettier.config.js", "eslint.config.js"],

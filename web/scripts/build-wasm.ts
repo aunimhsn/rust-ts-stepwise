@@ -5,11 +5,10 @@
 //     node scripts/build-wasm.ts --release  the optimized build, for `npm run build`
 //
 // The glue comes from the `wasm-bindgen` command-line tool, which must be at the very version
-// of the `wasm-bindgen` crate, or the module refuses to load: the version is read from
-// `Cargo.lock` and checked before anything is built (see docs/technical-choices.md).
+// of the `wasm-bindgen` crate, or the module refuses to load: the version of the crate is
+// asked to Cargo and checked before anything is built (see docs/technical-choices.md).
 
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
 const webDirectory = path.resolve(import.meta.dirname, '..');
@@ -23,16 +22,29 @@ function fail(message: string): never {
 	process.exit(1);
 }
 
-/** Runs a command in the workspace, its output shown as it goes. */
+/** Runs a command in the workspace, its output shown as it goes; stops the script if it fails. */
 function run(command: string, args: string[]): void {
-	execFileSync(command, args, { cwd: workspaceDirectory, stdio: 'inherit' });
+	try {
+		execFileSync(command, args, { cwd: workspaceDirectory, stdio: 'inherit' });
+	} catch {
+		fail(`${command} failed (see its output above).`);
+	}
 }
 
-/** The version of the `wasm-bindgen` crate the workspace is built with. */
+/** Runs a command in the workspace and returns what it prints; stops the script if it fails. */
+function read(command: string, args: string[]): string {
+	try {
+		return execFileSync(command, args, { cwd: workspaceDirectory, encoding: 'utf8' });
+	} catch {
+		return fail(`${command} ${args.join(' ')} failed.`);
+	}
+}
+
+/** The version of the `wasm-bindgen` crate the workspace is built with, from `Cargo.lock`. */
 function crateVersion(): string {
-	const lock = readFileSync(path.join(workspaceDirectory, 'Cargo.lock'), 'utf8');
-	const version = /\[\[package\]\]\nname = "wasm-bindgen"\nversion = "([^"]+)"/.exec(lock)?.[1];
-	return version ?? fail('the wasm-bindgen crate is missing from Cargo.lock.');
+	// For example `registry+https://github.com/rust-lang/crates.io-index#wasm-bindgen@0.2.130`.
+	const version = /@(\S+)$/.exec(read('cargo', ['pkgid', 'wasm-bindgen']).trim())?.[1];
+	return version ?? fail('Cargo gave no version for the wasm-bindgen crate.');
 }
 
 /** The version of the `wasm-bindgen` command-line tool, or `undefined` if it isn't installed. */
@@ -47,10 +59,7 @@ function toolVersion(): string | undefined {
 
 /** The folder where Cargo writes its builds, which `CARGO_TARGET_DIR` can move. */
 function targetDirectory(): string {
-	const metadata = execFileSync('cargo', ['metadata', '--format-version', '1', '--no-deps'], {
-		cwd: workspaceDirectory,
-		encoding: 'utf8'
-	});
+	const metadata = read('cargo', ['metadata', '--format-version', '1', '--no-deps']);
 	return (JSON.parse(metadata) as { target_directory: string }).target_directory;
 }
 

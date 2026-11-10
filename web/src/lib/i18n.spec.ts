@@ -1,9 +1,23 @@
+import { FluentParser } from '@fluent/syntax';
 import { describe, expect, it, vi } from 'vitest';
 import english from '../../locales/en.ftl?raw';
 import { createBundle, formatMessage, t } from './i18n.ts';
 
 describe('locales/en.ftl', () => {
-	it('reads without a syntax error', () => {
+	// The parser of the bundle skips a message it can't read without a word: the full parser
+	// keeps it as `Junk`, with what went wrong.
+	it('has no syntax error', () => {
+		const junk = new FluentParser()
+			.parse(english)
+			.body.filter((entry) => entry.type === 'Junk')
+			.map((entry) => ({
+				content: entry.content,
+				errors: entry.annotations.map((a) => a.message)
+			}));
+		expect(junk).toEqual([]);
+	});
+
+	it('defines each message once', () => {
 		expect(createBundle('en', english).errors).toEqual([]);
 	});
 });
@@ -19,14 +33,12 @@ describe('formatMessage', () => {
 		const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
 		expect(formatMessage(bundle, 'farewell')).toBe('farewell');
 		expect(warn).toHaveBeenCalledOnce();
-		warn.mockRestore();
 	});
 
 	it('shows the name of a missing value and warns', () => {
 		const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
 		expect(formatMessage(bundle, 'greeting')).toBe('Hello, {$name}!');
 		expect(warn).toHaveBeenCalledOnce();
-		warn.mockRestore();
 	});
 });
 

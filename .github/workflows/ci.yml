@@ -17,9 +17,8 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  # A pull request that changes only documentation runs no check. The jobs below are then
-  # skipped rather than left out, and a skipped job counts as passed for the checks a
-  # ruleset requires: the pull request can still be merged.
+  # A pull request that changes only documentation runs no check: the jobs below are then
+  # skipped rather than left out, so that the workflow still ends with the job `CI`.
   changes:
     name: Changed files
     runs-on: ubuntu-latest
@@ -99,18 +98,17 @@ jobs:
         with:
           targets: wasm32-unknown-unknown
       - uses: Swatinem/rust-cache@v2
-      # The command-line tool at the exact version of the crate, read from Cargo.lock, as
+      # The command-line tool at the exact version of the crate in Cargo.lock, as
       # scripts/build-wasm.ts checks it.
-      - name: Read the version of wasm-bindgen from Cargo.lock
+      - name: Read the version of the wasm-bindgen crate
         id: wasm-bindgen
-        working-directory: .
-        run: echo "version=$(sed -n '/^name = "wasm-bindgen"$/{n;s/^version = "\(.*\)"/\1/p;}' Cargo.lock)" >> "$GITHUB_OUTPUT"
+        run: echo "version=$(cargo pkgid wasm-bindgen | sed 's/.*@//')" >> "$GITHUB_OUTPUT"
       - uses: taiki-e/install-action@v2
         with:
           tool: wasm-bindgen@${{ steps.wasm-bindgen.outputs.version }}
       - uses: actions/setup-node@v7
         with:
-          node-version: 24
+          node-version-file: web/package.json
           cache: npm
           cache-dependency-path: web/package-lock.json
       - run: npm ci
@@ -118,3 +116,17 @@ jobs:
       - run: npm run check
       - run: npm test
       - run: npm run build
+
+  # The one check the ruleset of `main` requires: it fails when a job above failed or was
+  # cancelled, and passes when they passed or were skipped. A skipped job alone would count
+  # as passed, even when skipped because the job `changes` failed; and the jobs above can be
+  # renamed or added without touching the ruleset.
+  ci:
+    name: CI
+    needs: [changes, check, msrv, web]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the results of the jobs
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: exit 1

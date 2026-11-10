@@ -8,8 +8,9 @@ import english from '../../locales/en.ftl?raw';
 export type MessageArguments = Record<string, FluentVariable>;
 
 /**
- * Reads a Fluent file into a bundle. A syntax error of the file is returned with the bundle
- * rather than thrown: the messages around it still load.
+ * Reads a Fluent file into a bundle, with the messages it defines twice (only the first one is
+ * kept). A message with a syntax error is skipped without an error, and the messages around it
+ * still load: the syntax of the files is checked by the tests, with `@fluent/syntax`.
  */
 export function createBundle(
 	locale: string,

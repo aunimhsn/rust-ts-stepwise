@@ -7,8 +7,16 @@ export interface Core {
 	version: string;
 }
 
-/** Loads the WebAssembly module, fetched once whatever the number of calls. */
+/**
+ * Loads the WebAssembly module, fetched once whatever the number of calls. A failure is written
+ * to the console with its cause, then passed on to the page, which says it.
+ */
 export async function loadCore(): Promise<Core> {
-	await init();
+	try {
+		await init();
+	} catch (error) {
+		console.error('core: the WebAssembly module could not load', error);
+		throw error;
+	}
 	return { version: coreVersion() };
 }
