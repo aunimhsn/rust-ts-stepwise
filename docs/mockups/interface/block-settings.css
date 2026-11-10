@@ -1,0 +1,35 @@
+/* The panel of the settings: a row per setting, its title and its sentence on the left, its control on the right. */
+.app-settings { position: relative; width: 500px; box-sizing: border-box; padding: 18px 22px 8px; }
+.settings-row { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 14px 0; border-top: 1px solid var(--hover); }
+.app-shortcuts-head + .settings-row { margin-top: 10px; }
+.settings-row b { font-weight: var(--strong-weight); }
+.settings-row p { margin: 2px 0 0; color: var(--weak); line-height: 1.4; }
+/* The cards of the themes take their own line under the sentence. */
+.settings-row.is-wide { flex-direction: column; align-items: stretch; gap: 10px; }
+.app-window .settings-row .app-chip { padding: 6px 14px; }
+
+/* 1 · Two segments side by side, the one chosen dark (or light at night) as the chosen tab of a map. */
+.settings-segments { display: flex; flex: none; padding: 2px; background: var(--chip); border-radius: var(--radius-small); }
+.app-window .settings-segments button { padding: 5px 12px; background: none; border: 0; border-radius: var(--radius-small); color: var(--weak); font-weight: 500; white-space: nowrap; }
+.app-window .settings-segments button[aria-pressed="true"] { background: var(--chosen); color: var(--on-chosen); }
+
+/* 2 · A card per theme, with a small window of it; the one chosen framed in amber. */
+.settings-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.app-window .settings-card { display: flex; flex-direction: column; gap: 6px; padding: 6px 6px 7px; background: var(--chip); border: 2px solid transparent; border-radius: var(--radius-small); font-weight: 500; }
+.app-window .settings-card[aria-pressed="true"] { border-color: var(--accent); font-weight: var(--strong-weight); }
+.settings-preview { display: block; width: 100%; height: auto; border-radius: 2px; }
+.settings-switch, .settings-check { flex: none; }
+/* The switch of 2: a track that turns amber, its knob going to the right. */
+.app-window .settings-switch { position: relative; width: 40px; height: 22px; padding: 0; background: var(--idle); border: 0; border-radius: 11px; }
+.settings-switch i { position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; background: #fff; border-radius: 50%; box-shadow: 0 1px 2px #0004; transition: left .15s; }
+.app-window .settings-switch[aria-pressed="true"] { background: var(--accent); }
+.settings-switch[aria-pressed="true"] i { left: 21px; }
+
+/* 3 · A round mark per theme, with its swatch; a box to tick for the sounds. */
+.settings-radios { display: flex; flex-direction: column; gap: 4px; flex: none; }
+.app-window .settings-radio, .app-window .settings-check { display: flex; align-items: center; gap: 8px; padding: 3px 0; background: none; border: 0; white-space: nowrap; }
+.settings-radio i { width: 14px; height: 14px; box-sizing: border-box; border: 2px solid var(--weak); border-radius: 50%; }
+.settings-radio[aria-pressed="true"] i { border: 4px solid var(--accent); }
+.settings-swatch { width: 16px; height: 12px; border: 1px solid var(--line, #8888); border-radius: 2px; }
+.settings-check i { display: grid; place-items: center; width: 16px; height: 16px; box-sizing: border-box; border: 2px solid var(--weak); border-radius: var(--radius-small); color: transparent; }
+.settings-check[aria-pressed="true"] i { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }

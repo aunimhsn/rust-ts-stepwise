@@ -1,0 +1,20 @@
+/* A message in place of the screen: the logo, the title and its sentences in one centered column. */
+.app-message { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; padding: 24px; background: var(--surface); text-align: center; }
+.app-message .app-name { margin-bottom: 26px; }
+.message-title { margin: 0 0 14px; font: var(--title-weight) 26px/1.25 var(--font-title); }
+.app-message p { max-width: 460px; margin: 0 0 6px; font-size: 15px; line-height: 1.5; }
+.app-message .message-note { margin-top: 18px; color: var(--weak); }
+.app-message .message-size { font-weight: var(--strong-weight); font-variant-numeric: tabular-nums; }
+.app-message .message-address { margin-top: 8px; font: var(--code-weight) 17px var(--font-code); color: var(--text); }
+.app-window .app-message button.app-primary { margin-top: 18px; padding: 8px 22px; font-size: 15px; }
+.app-message.is-phone { padding: 28px; }
+.app-message.is-phone .message-title { font-size: 28px; }
+.app-message.is-phone p { font-size: 17px; }
+.app-message.is-phone .message-address { font-size: 19px; }
+/* 9 · The scene of the robot under the text, on the gray of the map block. */
+.message-scene { margin-top: 30px; padding: 14px 18px; background: var(--map-block); }
+.message-scene .app-map { box-shadow: var(--map-shadow); }
+
+/* The window too small, live: its corner drags. */
+.message-live { position: relative; resize: both; overflow: hidden; min-width: 360px; min-height: 480px; max-width: 1400px; max-height: 800px; box-shadow: 0 8px 30px #0006; }
+.message-live > .app-window { box-shadow: none; }

@@ -4,6 +4,9 @@
 // is a list and `range` a slider, both setting the CSS `variable` at once, without redrawing the page.
 const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(INTERFACE_STYLES).map(([key, style]) => [key, style.title])), fallback: Object.keys(INTERFACE_STYLES)[0] },
+  settingsControls: { label: "Settings controls", options: { segments: "1 · Segments", cards: "2 · Cards and a switch", radios: "3 · Round marks and a box" }, fallback: "segments" },
+  banner: { label: "Banner", options: { "amber-soft": "4 · Pale amber", "red-soft": "5 · Pale red", amber: "6 · Amber", "band-edge": "7 · Header tone, amber edge" }, fallback: "amber-soft" },
+  messages: { label: "Messages", options: { logo: "8 · The logo alone", scene: "9 · A scene of the robot" }, fallback: "logo" },
 };
 
 const params = new URLSearchParams(location.search);

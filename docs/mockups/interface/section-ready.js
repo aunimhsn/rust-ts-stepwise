@@ -5,6 +5,7 @@ const readyWindow = overrides => appWindow({
   map: appWorld({ robot: "2,1", facing: "east" }),
   panels: { tab: "Console", content: '<span class="app-weak">Run your program to see what it prints.</span>' },
   overlay: overrides?.overlay,
+  banner: overrides?.banner,
 });
 
 SECTIONS.push(["Ready", () => `<div class="page-row"><div class="page-slot"><span>1280 × 720, the map at its start, its goal marks in sight</span>${readyWindow()}</div></div>`]);
