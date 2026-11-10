@@ -6,7 +6,7 @@ const VARIANTS = {
   theme: { label: "Style", options: Object.fromEntries(Object.entries(INTERFACE_STYLES).map(([key, style]) => [key, style.title])), fallback: Object.keys(INTERFACE_STYLES)[0] },
   settingsControls: { label: "Settings controls", options: { segments: "1 · Segments", cards: "2 · Cards and a switch", radios: "3 · Round marks and a box" }, fallback: "segments" },
   clearHold: { label: "Clear all progress, hold", range: { min: 1, max: 3, step: 0.25 }, variable: "--clear-hold", unit: "s", fallback: "2" },
-  messages: { label: "Messages", options: { logo: "8 · The logo alone", scene: "9 · A scene of the robot" }, fallback: "logo" },
+  messages: { label: "Messages", options: { logo: "8 · The head alone", scene: "9 · A scene of the robot" }, fallback: "logo" },
 };
 
 const params = new URLSearchParams(location.search);

@@ -1,6 +1,6 @@
 /* A message in place of the screen: the logo, the title and its sentences in one centered column. */
 .app-message { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; padding: 24px; background: var(--surface); text-align: center; }
-.app-message .app-name { margin-bottom: 26px; }
+.message-head { margin-bottom: 22px; }
 .message-title { margin: 0 0 14px; font: var(--title-weight) 26px/1.25 var(--font-title); }
 .app-message p { max-width: 460px; margin: 0 0 6px; font-size: 15px; line-height: 1.5; }
 .app-message .message-size { font-weight: var(--strong-weight); font-variant-numeric: tabular-nums; }

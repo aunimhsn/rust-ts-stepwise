@@ -1,4 +1,5 @@
-// The messages that replace the whole screen, under the logo: the window too small, the phone, the browser
+// The messages that replace the whole screen, under the head of the disappointed robot (as an empty search),
+// without the name: the window too small, the phone, the browser
 // too old, the files that can't load. With the tab Messages on 9, a small scene of the robot under the text.
 
 // The scenes: the robot between two walls, the robot before a wall with its eyes dim, its stroke broken.
@@ -19,7 +20,7 @@ function appMessage(kind, [width, height]) {
   };
   const [title, body] = texts[kind];
   const scene = chosen.messages === "scene" ? `<div class="message-scene">${MESSAGE_SCENES[kind === "phone" ? "small" : kind]()}</div>` : "";
-  return `<div class="app-message ${kind === "phone" ? "is-phone" : ""}">${appWordmark(kind === "phone" ? 30 : 34)}<div class="message-title">${title}</div>${body}${scene}</div>`;
+  return `<div class="app-message ${kind === "phone" ? "is-phone" : ""}"><img class="message-head" src="world-elements/daylight/logo-disappointed.svg" height="${kind === "phone" ? 64 : 72}" alt=""><div class="message-title">${title}</div>${body}${scene}</div>`;
 }
 
 const messageWindow = (kind, size) => `<div class="app-window" style="width:${size[0]}px;height:${size[1]}px">${appMessage(kind, size)}</div>`;
