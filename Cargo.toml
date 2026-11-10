@@ -1,23 +1,34 @@
-[package]
-name = "stepwise"
+# The core of Stepwise, in Rust: a plain library tested with `cargo test`, and the thin crate
+# that exposes it to JavaScript once compiled to WebAssembly (see docs/technical-choices.md).
+[workspace]
+members = ["crates/core", "crates/wasm"]
+resolver = "3"
+
+[workspace.package]
 version = "0.1.0"
 edition = "2024"
 rust-version = "1.93"
-description = "Learn to program step by step by writing programs that drive a robot, in the browser."
 authors = ["Aunim HASSAN"]
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/aunimhsn/rust-ts-stepwise"
-readme = "README.md"
 # An application, never published on crates.io.
 publish = false
 
-[dependencies]
+[workspace.dependencies]
+stepwise-core = { path = "crates/core" }
+# Pinned to an exact version: the `wasm-bindgen` command-line tool that generates the
+# JavaScript glue must be at the very same version, or the module refuses to load.
+wasm-bindgen = "=0.2.130"
 
-[lints.rust]
+[workspace.lints.rust]
 unsafe_code = "forbid"
 
-[lints.clippy]
+[workspace.lints.clippy]
 pedantic = { level = "warn", priority = -1 }
+# An exception to a lint is an `#[expect(..., reason = "...")]`: it says why, and it warns
+# once the code no longer needs it.
+allow_attributes = "warn"
+allow_attributes_without_reason = "warn"
 
 [profile.release]
 lto = true

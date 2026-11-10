@@ -1,0 +1,19 @@
+# Methods that panic on an index out of bounds or inside a character, which the lints of
+# `crates/core` and `crates/wasm` don't catch: `indexing_slicing` only sees the `x[i]` syntax.
+# The core must never panic (see crates/core/src/lib.rs). Forbidden in the whole workspace,
+# tests included: each has a safe variant that returns an `Option` or checks first.
+disallowed-methods = [
+    { path = "str::split_at", reason = "panics inside a character: use split_at_checked or split_once" },
+    { path = "str::split_at_mut", reason = "panics inside a character: use split_at_mut_checked" },
+    { path = "slice::split_at", reason = "panics out of bounds: use split_at_checked" },
+    { path = "slice::split_at_mut", reason = "panics out of bounds: use split_at_mut_checked" },
+    { path = "std::string::String::truncate", reason = "panics inside a character" },
+    { path = "std::string::String::remove", reason = "panics out of bounds or inside a character: use pop or char_indices" },
+    { path = "std::string::String::insert", reason = "panics out of bounds or inside a character" },
+    { path = "std::string::String::insert_str", reason = "panics out of bounds or inside a character" },
+    { path = "std::string::String::split_off", reason = "panics out of bounds or inside a character" },
+    { path = "std::vec::Vec::remove", reason = "panics out of bounds: check the index or use pop" },
+    { path = "std::vec::Vec::insert", reason = "panics out of bounds" },
+    { path = "std::vec::Vec::swap_remove", reason = "panics out of bounds" },
+    { path = "std::vec::Vec::split_off", reason = "panics out of bounds" },
+]

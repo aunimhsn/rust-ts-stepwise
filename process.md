@@ -106,7 +106,7 @@ The mock-up is then updated to use exactly these tokens. At the end of the phase
 For each step of `roadmap.md`, in order:
 
 1. Branch `<type>/<short-description>` from `main`. If the owner isn't testing anything, work in the main folder so that they can follow the changes in VS Code; otherwise, in a Git worktree outside the project.
-2. Code, with the tests; then `cargo fmt --all --check`, `cargo clippy --all-targets --all-features -- -D warnings`, `cargo test --all-features`.
+2. Code, with the tests; then the checks of the Development section of `CLAUDE.md` (formatting, Clippy, tests).
 3. Run the `code-reviewer` subagent: its notes, in French, go to `outputs/`. Claude Code summarizes them; the owner chooses which to apply.
 4. Commit (Conventional Commits), push, open the pull request; it checks the step's box in `roadmap.md`.
 5. The CI passes; the owner reviews and squash merges; `git pull` on `main`.
@@ -146,3 +146,4 @@ After the release, or after any phase that went badly:
 | stepwise | Claude Code in VS Code installed as a Flatpak couldn't see Firefox, so the SVG were checked without their page; Playwright and its own Chromium now take the screenshots and report the errors of the browser console. |
 | stepwise | Twenty fixed boards of fonts couldn't show the combinations: one list per role at the top of the page, applied at once and kept in the address, made the mock-up something the owner tunes themselves. |
 | stepwise | Two series of proposals, one numbered and one lettered, led to a misunderstanding on "the B" and a whole iteration lost: number the proposals once, across every series. |
+| stepwise | Fable 5.2 on the parser, the checker, the interpreter and the bridge, whose design lasts; Opus 5.5 on the others; at the start of each step, a short form asks the owner to switch with `/model`. First compared by two reviews of step 4a: the same `code-reviewer` launched twice in parallel, one per model (the `model` of the subagent set at launch), each in its own file; the owner wants to keep it for critical code or tasks. To judge at the retrospective. |

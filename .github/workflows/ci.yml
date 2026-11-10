@@ -25,10 +25,14 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
+          targets: wasm32-unknown-unknown
       - uses: Swatinem/rust-cache@v2
       - run: cargo fmt --all --check
-      - run: cargo clippy --locked --all-targets --all-features -- -D warnings
-      - run: cargo test --locked --all-features
+      - run: cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+      # The bridge as the browser loads it: the code behind `cfg(target_arch = "wasm32")`
+      # is only checked for this target.
+      - run: cargo clippy --locked --workspace --all-features --target wasm32-unknown-unknown -- -D warnings
+      - run: cargo test --locked --workspace --all-features
 
   msrv:
     name: Minimum Rust version
@@ -41,6 +45,8 @@ jobs:
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ steps.msrv.outputs.version }}
+          targets: wasm32-unknown-unknown
       - uses: Swatinem/rust-cache@v2
       # `+version` overrides the stable channel of rust-toolchain.toml.
-      - run: cargo +${{ steps.msrv.outputs.version }} check --locked --all-targets --all-features
+      - run: cargo +${{ steps.msrv.outputs.version }} check --locked --workspace --all-targets --all-features
+      - run: cargo +${{ steps.msrv.outputs.version }} check --locked --workspace --all-features --target wasm32-unknown-unknown
