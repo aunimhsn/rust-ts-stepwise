@@ -21,11 +21,7 @@ Model: the steps whose design lasts, marked *(Fable 5.2)*, run on Fable 5.2; the
 - [x] **1. Sheet of the world elements** (#4, #5)
 - [x] **2. Wireframes** (#6, #7, #8, #9)
 - [x] **3. Mock-up** (#11, #12, #13, #14, #15, #16, #17)
-- [x] **4. Workspace and probe**: the template adapted to a web application, and a probe from end to end, thrown away by the next steps. Done when `https://stepwise.sylent.tools/` shows the probe running.
-  - [x] **4a. Cargo workspace** (#18)
-  - [x] **4b. SvelteKit application** (#19)
-  - [x] **4c. Probe** (#21)
-  - [x] **4d. Deployment** (#22): the website deployed to GitHub Pages by a workflow at `stepwise.sylent.tools` (the path never hard-coded; the owner adds the DNS records, see [GitHub Pages usage](docs/github-pages-usage.md#address)); `main` protected by a ruleset requiring the check `CI` (the last job of `.github/workflows/ci.yml`).
+- [x] **4. Workspace and probe** (#18, #19, #21, #22)
 - [ ] **5. Lexer**: the tokens of the language with their positions, the indentation turned into block starts and ends (four spaces, no tab), the texts and their escapes, the comments; every error as a code with its values and its position. Tests of every rule of [Lines and indentation](specs.md#lines-and-indentation) and [Names](specs.md#names).
 - [ ] **6. Parser** *(Fable 5.2)*: the syntax tree of every statement and expression, the priorities, the first syntax error with the helpful messages (`elif`, `=` for `==`, chained comparisons, a missing `:`); a maximum depth of nesting, an error rather than an overflow of the stack of the browser by a recursive descent.
 - [ ] **7. Checker** *(Fable 5.2)*: names and scopes, `let` before use, no hoisting, the number of values of a call, `break` and `return` in place, functions at the top level, reserved and `snake_case` names; every error found, not only the first.
