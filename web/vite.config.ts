@@ -2,6 +2,12 @@ import { defineConfig } from 'vitest/config';
 import adapter from '@sveltejs/adapter-static';
 import { sveltekit } from '@sveltejs/kit/vite';
 
+// The path the website is served from, given by the deployment workflow: empty at the root of a
+// domain (`https://stepwise.sylent.tools/`), `/rust-ts-stepwise` at the default address of GitHub
+// Pages. Never hard-coded, so that the domain can change without changing the code.
+// SvelteKit refuses a value that doesn't start with `/` or ends with it.
+const base = (process.env.BASE_PATH ?? '') as '' | `/${string}`;
+
 export default defineConfig({
 	plugins: [
 		sveltekit({
@@ -10,7 +16,8 @@ export default defineConfig({
 				runes: ({ filename }) =>
 					filename.split(/[/\\]/).includes('node_modules') ? undefined : true
 			},
-			adapter: adapter()
+			adapter: adapter(),
+			paths: { base }
 		})
 	],
 	test: {

@@ -6,7 +6,7 @@
 
 // `kind` is the message, `size` the window in pixels; the window too small says its own size.
 function appMessage(kind, [width, height]) {
-  const address = '<p class="message-address">stepwise.sylent.art</p>';
+  const address = '<p class="message-address">stepwise.sylent.tools</p>';
   const texts = {
     small: ["Stepwise needs a larger window", `<p>At least 1280 × 720 pixels. This one is <b class="message-size">${width} × ${height}</b>.</p><p>Widen the window, or zoom out with Ctrl and −.</p>`],
     phone: ["Stepwise needs a laptop", "<p>It is made for a large window.</p>"],

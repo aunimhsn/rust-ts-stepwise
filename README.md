@@ -51,7 +51,7 @@ npm test         # Vitest
 
 ## Deployment
 
-Stepwise is a static website, published on GitHub Pages at each merge into `main` (set up by a coming step of the roadmap). A version tag, such as `v0.1.0`, names a version: it matches `version` in `[workspace.package]` of `Cargo.toml`.
+Stepwise is a static website, published on GitHub Pages at <https://stepwise.sylent.tools/> at each merge into `main` (see [GitHub Pages usage](docs/github-pages-usage.md)). A version tag, such as `v0.1.0`, names a version: it matches `version` in `[workspace.package]` of `Cargo.toml`.
 
 ## License
 

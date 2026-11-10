@@ -122,5 +122,5 @@ Follow [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.
 
 ## Releases
 
-- Stepwise is a website: there is no release workflow. Each merge into `main` is deployed to GitHub Pages (set up by step 4c, see `docs/github-pages-usage.md`).
+- Stepwise is a website: there is no release workflow. Each merge into `main` is deployed to GitHub Pages (set up by step 4d, see `docs/github-pages-usage.md`).
 - A version tag (e.g. `v0.1.0`) matching the version of `[workspace.package]` in `Cargo.toml` names a version; it builds nothing on its own.
