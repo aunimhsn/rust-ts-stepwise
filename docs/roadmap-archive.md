@@ -51,3 +51,7 @@ The success panel, with the robot that paints its top and turns into the logo; t
 ### 3e. Home screen (#15)
 
 The path of the levels with its chapters, the stones and the squares of their maps, the robot on the level chosen; the panel of a level to play, done and locked with its code; the large screen, and more levels than fit.
+
+### 3f. Manual (#16)
+
+A section with its commands and examples, the search and its results, **On this page**, the drawer over the level screen, the large screen.
