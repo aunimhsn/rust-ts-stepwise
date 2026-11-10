@@ -22,7 +22,7 @@ Model: the steps whose design lasts, marked *(Fable 5.2)*, run on Fable 5.2; the
 - [x] **2. Wireframes** (#6, #7, #8, #9)
 - [x] **3. Mock-up** (#11, #12, #13, #14, #15, #16, #17)
 - [x] **4. Workspace and probe** (#18, #19, #21, #22)
-- [ ] **5. Lexer**: the tokens of the language with their positions, the indentation turned into block starts and ends (four spaces, no tab), the texts and their escapes, the comments; every error as a code with its values and its position. Tests of every rule of [Lines and indentation](specs.md#lines-and-indentation) and [Names](specs.md#names).
+- [x] **5. Lexer**: the tokens of the language with their positions, the indentation turned into block starts and ends (four spaces, no tab), the texts and their escapes, the comments; every error as a code with its values and its position. Tests of every rule of [Lines and indentation](specs.md#lines-and-indentation) and [Names](specs.md#names).
 - [ ] **6. Parser** *(Fable 5.2)*: the syntax tree of every statement and expression, the priorities, the first syntax error with the helpful messages (`elif`, `=` for `==`, chained comparisons, a missing `:`); a maximum depth of nesting, an error rather than an overflow of the stack of the browser by a recursive descent.
 - [ ] **7. Checker** *(Fable 5.2)*: names and scopes, `let` before use, no hoisting, the number of values of a call, `break` and `return` in place, functions at the top level, reserved and `snake_case` names; every error found, not only the first.
 - [ ] **8. Map and levels**: the map (cells, paints, painted passages, items, robot with its brush and eraser), the JSON level format with its version, its validation and its goals; a test that reads every level file of the repository.

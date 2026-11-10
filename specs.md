@@ -50,7 +50,7 @@ else:
 - One statement per line. A line ending with `:` opens a block: the lines under it, indented by **exactly four more spaces**, until a line goes back to the level of the opening line.
 - Indentation uses spaces only. A tab, or an indentation that isn't four spaces more than the line that opens the block, is an error. The editor inserts four spaces when the Tab key is pressed.
 - A block has at least one line.
-- `#` starts a comment, up to the end of the line. Empty lines and comment lines are ignored, whatever their indentation.
+- `#` starts a comment, up to the end of the line. Empty lines and comment lines are ignored, whatever their indentation: a line of spaces, tabs or other blank characters (such as a non-breaking space pasted from a document) is empty.
 - A line can't be split in two, even inside parentheses.
 
 ### Names
