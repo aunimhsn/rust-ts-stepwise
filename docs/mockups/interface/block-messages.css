@@ -9,10 +9,6 @@
 .app-message.is-phone { padding: 28px; }
 .app-message.is-phone .message-title { font-size: 28px; }
 .app-message.is-phone p { font-size: 17px; }
-.app-message.is-phone .message-address { font-size: 19px; }
-/* 9 · The scene of the robot under the text, on the gray of the map block. */
-.message-scene { margin-top: 30px; padding: 14px 18px; background: var(--map-block); }
-.message-scene .app-map { box-shadow: var(--map-shadow); }
 
 /* The window too small, live: its corner drags. */
 .message-live { position: relative; resize: both; overflow: hidden; min-width: 360px; min-height: 480px; max-width: 1400px; max-height: 800px; box-shadow: 0 8px 30px #0006; }

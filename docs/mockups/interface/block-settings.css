@@ -10,7 +10,7 @@
    left, the text turning white with it. */
 .app-window .settings-clear { position: relative; padding: 7px 16px; background: var(--chip); color: var(--on-chip); border: 0; border-radius: var(--radius-small); font-weight: 500; cursor: default; }
 .settings-clear-fill { position: absolute; inset: 0; display: grid; place-items: center; background: var(--danger); color: var(--on-danger); border-radius: inherit; clip-path: inset(0 100% 0 0); transition: clip-path .2s ease-out; }
-.settings-clear:hover .settings-clear-fill, .settings-clear:focus-visible .settings-clear-fill { clip-path: inset(0 0 0 0); transition: clip-path var(--clear-hold, 2s) linear; }
+.settings-clear:hover .settings-clear-fill, .settings-clear:focus-visible .settings-clear-fill { clip-path: inset(0 0 0 0); transition: clip-path 2s linear; }
 .app-window .settings-clear.is-ready { cursor: pointer; }
 
 /* Two segments side by side, the one chosen dark (or light at night). */

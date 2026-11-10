@@ -1,13 +1,8 @@
 // The messages that replace the whole screen, under the head of the disappointed robot (as an empty search),
 // without the name: the window too small, the phone, the browser
-// too old, the files that can't load. With the tab Messages on 9, a small scene of the robot under the text.
+// too old, the files that can't load. They follow the theme saved: the two written in the page itself read
+// it with a small script, and stay in Day Desk when JavaScript doesn't run.
 
-// The scenes: the robot between two walls, the robot before a wall with its eyes dim, its stroke broken.
-const MESSAGE_SCENES = {
-  small: () => appMap(["#.#"], { "1,0": { robot: "south" } }, 44),
-  old: () => appMap(["..#"], { "1,0": { robot: "east", lit: "failure" } }, 44),
-  offline: () => appMap(["rr.rr"], { "1,0": { robot: "east" } }, 44, ["0,0 1,0", "3,0 4,0"]),
-};
 
 // `kind` is the message, `size` the window in pixels; the window too small says its own size.
 function appMessage(kind, [width, height]) {
@@ -19,8 +14,7 @@ function appMessage(kind, [width, height]) {
     offline: ["Stepwise couldn't load", '<p>The connection seems to be lost. Check it, then try again.</p><button type="button" class="app-primary">Try again</button>'],
   };
   const [title, body] = texts[kind];
-  const scene = chosen.messages === "scene" ? `<div class="message-scene">${MESSAGE_SCENES[kind === "phone" ? "small" : kind]()}</div>` : "";
-  return `<div class="app-message ${kind === "phone" ? "is-phone" : ""}"><img class="message-head" src="world-elements/daylight/logo-disappointed.svg" height="${kind === "phone" ? 64 : 72}" alt=""><div class="message-title">${title}</div>${body}${scene}</div>`;
+  return `<div class="app-message ${kind === "phone" ? "is-phone" : ""}"><img class="message-head" src="world-elements/daylight/logo-disappointed.svg" height="${kind === "phone" ? 64 : 72}" alt=""><div class="message-title">${title}</div>${body}</div>`;
 }
 
 const messageWindow = (kind, size) => `<div class="app-window" style="width:${size[0]}px;height:${size[1]}px">${appMessage(kind, size)}</div>`;
