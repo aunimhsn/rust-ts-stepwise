@@ -59,3 +59,9 @@ A section with its commands and examples, the search and its results, **On this 
 ### 3g. Settings and messages (#17)
 
 The settings with the theme, the storage refused, the window too small and the phone, the browser too old, offline.
+
+## 4. Workspace and probe
+
+### 4a. Cargo workspace (#18)
+
+`crates/core` (a plain library with the lints that forbid panics), `crates/wasm` (its bridge, built for `wasm32-unknown-unknown`), `src/main.rs` and the release workflow removed, the Rust CI on the whole workspace (with the WebAssembly target and the minimum version), `CLAUDE.md` and the README updated (commands, `--workspace`). Reviewed twice, by `code-reviewer` on Opus 5.5 and on Fable 5.2, to compare the two models.
