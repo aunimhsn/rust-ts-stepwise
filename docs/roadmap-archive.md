@@ -87,3 +87,7 @@ The tokens of the language with their positions, the indentation turned into blo
 ### 6a. Expressions and simple statements (#25)
 
 The syntax tree and `parse(source)`; the expressions with their priorities and the calls; `let`, the assignment, `break`, `return`, an expression alone on its line; the errors of the expressions (`=` for `==`, chained comparisons, a parenthesis not closed, a value missing, a comma at the end) and the words of other languages (`elif`, `def`, `for`…), wherever they are; a maximum depth of 200 for the tree, long chains of operators included, an error rather than an overflow of the stack of the browser, in the parser or later in the checker and the interpreter. A line that opens a block is still an error.
+
+### 6b. Blocks (#26)
+
+`if`, `else if`, `else`, `while`, `repeat`; the errors of the blocks (a missing `:`, something after the `:`, an empty block, a block that holds only comments, which are the comments indented further than the line of the `:`, the lexer giving the lines of the comments it drops, an indentation that follows no `:`, an `else` without its `if`, an `else` after the `else`); each block counts for one level of the maximum depth, and the blocks alone nest up to 50 deep.

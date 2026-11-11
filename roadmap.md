@@ -25,7 +25,7 @@ Model: the steps whose design lasts, marked *(Fable 5.2)*, run on Fable 5.2; the
 - [x] **5. Lexer** (#23)
 - [ ] **6. Parser** *(Fable 5.2)*: the syntax tree of every statement and expression, the first syntax error with its helpful messages, a maximum depth of the tree.
   - [x] **6a. Expressions and simple statements** (#25)
-  - [x] **6b. Blocks**: `if`, `else if`, `else`, `while`, `repeat`; the errors of the blocks (a missing `:`, something after the `:`, an empty block, a block that holds only comments, which are the comments indented further than the line of the `:`, the lexer giving the lines of the comments it drops, an indentation that follows no `:`, an `else` without its `if`, an `else` after the `else`); each block counts for one level of the maximum depth, and the blocks alone nest up to 50 deep.
+  - [x] **6b. Blocks** (#26)
   - [ ] **6c. Functions**: `function` with its parameters and the errors of its line (a missing name, a comma after the last parameter); the stack the parser needs at the maximum depth, measured again in WebAssembly with 50 blocks around the deepest expression, the worst case (see [Technical choices](docs/technical-choices.md), Parser).
 - [ ] **7. Checker** *(Fable 5.2)*: names and scopes, `let` before use, no hoisting, the number of values of a call, `break` and `return` in place, functions at the top level, reserved and `snake_case` names; every error found, not only the first.
 - [ ] **8. Map and levels**: the map (cells, paints, painted passages, items, robot with its brush and eraser), the JSON level format with its version, its validation and its goals; a test that reads every level file of the repository.
