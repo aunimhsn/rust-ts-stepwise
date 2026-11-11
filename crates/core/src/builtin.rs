@@ -57,7 +57,7 @@ impl Builtin {
     /// The number of values a call gives the function, or `None` for `print`, which takes
     /// any number of them.
     #[must_use]
-    pub const fn parameters(self) -> Option<usize> {
+    pub const fn parameter_count(self) -> Option<usize> {
         match self {
             Self::Forward
             | Self::TurnLeft
@@ -104,7 +104,7 @@ mod tests {
             } else {
                 Some(0)
             };
-            assert_eq!(builtin.parameters(), expected, "{}", builtin.as_str());
+            assert_eq!(builtin.parameter_count(), expected, "{}", builtin.as_str());
         }
     }
 

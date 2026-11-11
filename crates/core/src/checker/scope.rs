@@ -117,18 +117,23 @@ fn declared_names(statements: &[Statement]) -> impl Iterator<Item = (&str, Span)
         })
 }
 
-/// Adds to `names` every variable of the main program made of `statements`, wherever its
-/// `let` is, in a block or not. The variables of the functions are not among them.
-pub(super) fn main_program_variables<'a>(
-    statements: &'a [Statement],
-    names: &mut HashSet<&'a str>,
-) {
+/// Every variable of the main program made of `statements`, wherever its `let` is, in a
+/// block or not. The variables of the functions are not among them.
+pub(super) fn main_program_variables(statements: &[Statement]) -> HashSet<&str> {
+    let mut names = HashSet::new();
+    add_variables(statements, &mut names);
+    names
+}
+
+/// Adds to `names` the variables declared in `statements` and in their blocks, those of
+/// the functions left out.
+fn add_variables<'a>(statements: &'a [Statement], names: &mut HashSet<&'a str>) {
     names.extend(declared_names(statements).map(|(name, _)| name));
     for statement in statements {
         // The variables of a function are its own.
         if !matches!(statement.kind, StatementKind::Function { .. }) {
             for block in statement.blocks() {
-                main_program_variables(block, names);
+                add_variables(block, names);
             }
         }
     }

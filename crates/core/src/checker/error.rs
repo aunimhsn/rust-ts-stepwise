@@ -111,7 +111,8 @@ pub enum CheckErrorKind {
         defined: Span,
     },
     /// A call that doesn't give as many values as the function has parameters, built-in
-    /// functions included (`forward(3)`). The span is the call, from the name to its `)`.
+    /// functions included (`forward(3)`). The span is the name in the call, as for every error
+    /// of a call.
     WrongArgumentCount {
         /// The name of the function.
         name: String,

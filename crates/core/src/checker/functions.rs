@@ -11,10 +11,10 @@ use crate::span::Span;
 /// A function of the program, as its definition gives it.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(super) struct Function {
-    /// Its name in its definition.
-    pub(super) name: Span,
+    /// Where its name is in its definition.
+    pub(super) defined: Span,
     /// The number of its parameters, as written: one refused for its name counts too.
-    pub(super) parameters: usize,
+    pub(super) parameter_count: usize,
 }
 
 /// A function that a call may name.
@@ -28,10 +28,10 @@ pub(super) enum Callee {
 
 impl Callee {
     /// The number of values a call gives it, or `None` when it takes any number.
-    pub(super) const fn parameters(self) -> Option<usize> {
+    pub(super) const fn parameter_count(self) -> Option<usize> {
         match self {
-            Self::Builtin(builtin) => builtin.parameters(),
-            Self::Defined(function) => Some(function.parameters),
+            Self::Builtin(builtin) => builtin.parameter_count(),
+            Self::Defined(function) => Some(function.parameter_count),
         }
     }
 }
@@ -63,8 +63,8 @@ impl<'a> Functions<'a> {
                 && !ReservedWord::is_reserved(&name.text)
             {
                 self.0.entry(&name.text).or_insert(Function {
-                    name: name.span,
-                    parameters: parameters.len(),
+                    defined: name.span,
+                    parameter_count: parameters.len(),
                 });
             }
             for block in statement.blocks() {

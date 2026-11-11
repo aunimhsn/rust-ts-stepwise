@@ -25,10 +25,10 @@ use scope::{Missing, Variables, main_program_variables};
 #[must_use]
 pub fn check(program: &Program) -> Vec<CheckError> {
     let mut checker = Checker {
+        main_variables: main_program_variables(&program.statements),
         functions: Functions::of(&program.statements),
         ..Checker::default()
     };
-    main_program_variables(&program.statements, &mut checker.main_variables);
     checker.block(&program.statements, Place::TOP_LEVEL);
     checker.errors
 }
@@ -170,7 +170,7 @@ impl<'a> Checker<'a> {
                 if !place.top_level {
                     self.report(CheckErrorKind::NestedFunction, statement.span);
                 }
-                self.function_name(name);
+                self.check_function_name(name);
                 self.function(parameters, body);
             }
             StatementKind::Expression(expression) => {
@@ -269,7 +269,7 @@ impl<'a> Checker<'a> {
                 function,
                 arguments,
             } => {
-                self.call(function, arguments.len(), expression.span);
+                self.call(function, arguments.len());
                 for argument in arguments {
                     self.expression(argument, place);
                 }
@@ -309,9 +309,10 @@ impl<'a> Checker<'a> {
         self.report(kind, span);
     }
 
-    /// A call of `function` with `given` values, written at `call`: the name is a function,
-    /// defined above the call when it is one of the program, that has as many parameters.
-    fn call(&mut self, function: &Name, given: usize, call: Span) {
+    /// A call of `function` with `given` values: the name is a function, defined above the
+    /// call when it is one of the program, that has as many parameters. Every error of a
+    /// call is on its name.
+    fn call(&mut self, function: &Name, given: usize) {
         // The name is copied only when there is an error to hold it.
         let name = || function.text.clone();
         let Some(callee) = self.functions.callee(&function.text) else {
@@ -327,7 +328,7 @@ impl<'a> Checker<'a> {
         };
         // The order of the source is enough: a call in the body of the function itself
         // (a recursion) is under its name.
-        if let Callee::Defined(Function { name: defined, .. }) = callee
+        if let Callee::Defined(Function { defined, .. }) = callee
             && function.span.start < defined.start
         {
             let name = name();
@@ -336,7 +337,7 @@ impl<'a> Checker<'a> {
                 function.span,
             );
         }
-        if let Some(expected) = callee.parameters()
+        if let Some(expected) = callee.parameter_count()
             && expected != given
         {
             let name = name();
@@ -346,19 +347,19 @@ impl<'a> Checker<'a> {
                     expected,
                     given,
                 },
-                call,
+                function.span,
             );
         }
     }
 
     /// The name of a function in its definition: in `snake_case`, not reserved, and not the
     /// one of a function defined above.
-    fn function_name(&mut self, name: &Name) {
+    fn check_function_name(&mut self, name: &Name) {
         self.check_snake_case(name);
         let kind = match ReservedWord::from_word(&name.text) {
             Some(word) => CheckErrorKind::ReservedName { word },
             None => match self.functions.get(&name.text) {
-                Some(Function { name: first, .. }) if first != name.span => {
+                Some(Function { defined: first, .. }) if first != name.span => {
                     let name = name.text.clone();
                     CheckErrorKind::DuplicateFunction { name, first }
                 }
@@ -389,7 +390,7 @@ impl<'a> Checker<'a> {
     fn check_variable_name(&mut self, name: &Name) -> bool {
         let kind = if let Some(word) = ReservedWord::from_word(&name.text) {
             CheckErrorKind::ReservedName { word }
-        } else if let Some(Function { name: defined, .. }) = self.functions.get(&name.text) {
+        } else if let Some(Function { defined, .. }) = self.functions.get(&name.text) {
             let name = name.text.clone();
             CheckErrorKind::NameOfFunction { name, defined }
         } else {

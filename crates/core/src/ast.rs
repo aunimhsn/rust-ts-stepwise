@@ -238,3 +238,60 @@ impl BinaryOperator {
         )
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::parser::parse;
+
+    /// The number of statements of each block of the first statement of `source`.
+    fn block_lengths(source: &str) -> Vec<usize> {
+        let program = parse(source).unwrap();
+        program.statements[0].blocks().map(<[_]>::len).collect()
+    }
+
+    #[test]
+    fn an_if_has_the_blocks_of_its_branches_in_order() {
+        let source = "\
+if true:
+    forward()
+else if false:
+    forward()
+    forward()
+else:
+    forward()
+    forward()
+    forward()
+";
+        assert_eq!(block_lengths(source), [1, 2, 3]);
+        assert_eq!(block_lengths("if true:\n    forward()\n"), [1]);
+    }
+
+    #[test]
+    fn a_loop_or_a_function_has_one_block() {
+        assert_eq!(block_lengths("while true:\n    forward()\n"), [1]);
+        assert_eq!(
+            block_lengths("repeat 3:\n    forward()\n    forward()\n"),
+            [2]
+        );
+        assert_eq!(block_lengths("function walk():\n    forward()\n"), [1]);
+    }
+
+    #[test]
+    fn the_blocks_inside_a_block_are_not_among_them() {
+        let source = "while true:\n    if true:\n        forward()\n        forward()\n";
+        assert_eq!(block_lengths(source), [1]);
+    }
+
+    #[test]
+    fn the_other_statements_have_none() {
+        for source in [
+            "let sides = 4",
+            "sides = 4",
+            "break",
+            "return 3",
+            "forward()",
+        ] {
+            assert_eq!(block_lengths(source), [], "{source}");
+        }
+    }
+}

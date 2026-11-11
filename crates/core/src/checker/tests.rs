@@ -227,7 +227,7 @@ function later():
                 },
                 CheckError {
                     kind: wrong_count("later", 0, 1),
-                    span: span(15, 1, 13),
+                    span: span(15, 1, 6),
                 },
                 CheckError {
                     kind: E::ExpressionAlone,
@@ -1358,6 +1358,27 @@ inner(2)
     }
 
     #[test]
+    fn a_function_in_any_block_is_refused_but_known() {
+        let source = "\
+if false:
+    forward()
+else:
+    function in_else():
+        forward()
+while true:
+    function in_while(side):
+        forward()
+repeat 2:
+    function in_repeat():
+        forward()
+in_else()
+in_while(1)
+in_repeat()
+";
+        assert_eq!(kinds(source), [(); 3].map(|()| E::NestedFunction));
+    }
+
+    #[test]
     fn a_function_whose_name_is_not_in_snake_case_is_known() {
         let source = "function Walk():\n    forward()\nWalk()\n";
         assert_eq!(kinds(source), [E::NotSnakeCase]);
@@ -1458,6 +1479,52 @@ function pong():
     }
 
     #[test]
+    fn a_call_between_parentheses_has_its_errors_on_its_name() {
+        let source = "(walk(1))\nprint((walk(1)))\nfunction walk():\n    forward()\n";
+        let defined = span(3, 10, 14);
+        assert_eq!(
+            errors(source),
+            [
+                CheckError {
+                    kind: called_before("walk", defined),
+                    span: span(1, 2, 6),
+                },
+                CheckError {
+                    kind: wrong_count("walk", 0, 1),
+                    span: span(1, 2, 6),
+                },
+                CheckError {
+                    kind: called_before("walk", defined),
+                    span: span(2, 8, 12),
+                },
+                CheckError {
+                    kind: wrong_count("walk", 0, 1),
+                    span: span(2, 8, 12),
+                },
+            ]
+        );
+    }
+
+    #[test]
+    fn a_call_above_two_definitions_gives_the_first() {
+        let source = "\
+walk()
+function walk():
+    forward()
+function walk():
+    forward()
+";
+        let first = span(2, 10, 14);
+        assert_eq!(
+            kinds(source),
+            [
+                called_before("walk", first),
+                duplicate_function("walk", first)
+            ]
+        );
+    }
+
+    #[test]
     fn the_definition_may_be_one_that_is_refused() {
         let source = "walk()\nif true:\n    function walk():\n        forward()\n";
         assert_eq!(
@@ -1541,6 +1608,25 @@ function walk():
     forward()
 ";
         assert_eq!(kinds(source), [duplicate_function("walk", span(1, 10, 14))]);
+    }
+
+    #[test]
+    fn the_second_function_that_calls_itself_calls_the_first() {
+        // The name is the first function: each line that takes it for the second has its
+        // error, and they all go away with another name.
+        let source = "\
+function walk():
+    forward()
+function walk(steps):
+    walk(steps - 1)
+";
+        assert_eq!(
+            kinds(source),
+            [
+                duplicate_function("walk", span(1, 10, 14)),
+                wrong_count("walk", 0, 1)
+            ]
+        );
     }
 
     #[test]
@@ -1662,6 +1748,57 @@ mod names_of_functions {
     }
 
     #[test]
+    fn a_parameter_that_took_the_name_of_its_function_is_the_function() {
+        let source = "function walk(walk):\n    walk(1)\n    print(walk)\n";
+        assert_eq!(
+            kinds(source),
+            [
+                name_of_function("walk", span(1, 10, 14)),
+                without_parentheses("walk")
+            ]
+        );
+    }
+
+    #[test]
+    fn a_variable_of_a_function_does_not_take_the_name_of_a_function_defined_below() {
+        let source = "\
+function walk():
+    let run = 1
+    print(run)
+function run():
+    forward()
+";
+        assert_eq!(
+            kinds(source),
+            [
+                name_of_function("run", span(4, 10, 13)),
+                without_parentheses("run")
+            ]
+        );
+    }
+
+    #[test]
+    fn every_line_that_uses_the_name_as_a_variable_has_its_error() {
+        let source = "\
+function walk():
+    forward()
+let walk = 3
+print(walk)
+walk = walk + 1
+";
+        let defined = span(1, 10, 14);
+        assert_eq!(
+            kinds(source),
+            [
+                name_of_function("walk", defined),
+                without_parentheses("walk"),
+                name_of_function("walk", defined),
+                without_parentheses("walk")
+            ]
+        );
+    }
+
+    #[test]
     fn no_variable_of_a_function_takes_its_name() {
         let source = "function walk():\n    let walk = 1\n";
         assert_eq!(kinds(source), [name_of_function("walk", span(1, 10, 14))]);
@@ -1765,13 +1902,13 @@ walk()
     }
 
     #[test]
-    fn another_number_is_an_error_on_the_whole_call() {
+    fn another_number_is_an_error_on_the_name() {
         let source = "function paint(length, color):\n    forward()\npaint(3)\n";
         assert_eq!(
             error(source),
             CheckError {
                 kind: wrong_count("paint", 2, 1),
-                span: span(3, 1, 9),
+                span: span(3, 1, 6),
             }
         );
         let source = "function paint(length, color):\n    forward()\npaint(3, red, 4)\n";
@@ -1785,7 +1922,7 @@ walk()
             error("forward(3)\n"),
             CheckError {
                 kind: wrong_count("forward", 0, 1),
-                span: span(1, 1, 11),
+                span: span(1, 1, 8),
             }
         );
         assert_eq!(
@@ -1804,7 +1941,7 @@ walk()
             let name = builtin.as_str();
             let call = |given: usize| format!("{name}({})\n", vec!["red"; given].join(", "));
             for given in 0..3 {
-                let expected = builtin.parameters();
+                let expected = builtin.parameter_count();
                 let wrong = expected.filter(|expected| *expected != given);
                 let kinds = kinds(&call(given));
                 match wrong {
@@ -1835,11 +1972,11 @@ walk()
             [
                 CheckError {
                     kind: wrong_count("forward", 0, 1),
-                    span: span(1, 7, 17),
+                    span: span(1, 7, 14),
                 },
                 CheckError {
                     kind: wrong_count("turn_left", 0, 1),
-                    span: span(1, 19, 31),
+                    span: span(1, 19, 28),
                 },
             ]
         );
@@ -2227,6 +2364,11 @@ mod robustness {
             "sides()",
             "sides + forward",
             "print(forward(1), red())",
+            "(walk(1, 2))",
+            "print((run()), (jump))",
+            "let step = 1 + (later(sides))",
+            "function later():",
+            "(sides)",
         ];
         let mut random = Random(7);
         let mut with_several_errors = 0;
