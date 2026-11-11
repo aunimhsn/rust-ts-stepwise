@@ -21,6 +21,9 @@
 )]
 
 pub mod ast;
+pub mod builtin;
+pub mod checker;
+pub mod color;
 pub mod lexer;
 pub mod parser;
 pub mod probe;

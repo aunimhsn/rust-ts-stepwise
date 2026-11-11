@@ -59,6 +59,7 @@ else:
 
 - Variables and functions are written in `snake_case`: lowercase letters from `a` to `z` without accents, digits and underscores, starting with a letter (`sides`, `paint_side`, `count_2`). Any other name (`paintSide`, `côté`) is an error that recalls the rule, without writing the name for the learner.
 - The keywords, the built-in functions and the colors are reserved: a variable, a function or a parameter can't take their names.
+- A name is one thing in the whole program: two functions can't have the same name, and a variable or a parameter can't take the name of a function of the program, wherever that function is defined. So `paint_side` and `paint_side()` never are two different things.
 - Keywords: `let`, `if`, `else`, `while`, `repeat`, `break`, `function`, `return`, `and`, `or`, `not`, `true`, `false`.
 - The words a learner may write from another language are reserved too, each with a message that shows the Stepwise way: `elif` (→ `else if`), `def` (→ `function`), `var` and `const` (→ `let`), `for`, `continue`, `pass`, `none`, `null`. Wherever one of them is written, it is a syntax error.
 
@@ -76,8 +77,9 @@ Lists and decimal numbers come later (see the [backlog](docs/backlog.md)).
 ### Variables
 
 - `let name = value` declares a variable; `name = value` changes it afterwards. Changing a variable that was never declared is an error that suggests `let`, which catches the typos (`sides = sidse + 1`).
-- A variable exists from its `let` to the end of the block where it is declared. Declaring a name already declared in that block or in a block around it is an error.
-- A function sees only its parameters and its own variables, never the variables of the main program.
+- A variable exists from its `let` to the end of the block where it is declared. Using it after the end of that block is an error of its own, which recalls this rule and gives the line of its `let`. Declaring a name already declared in that block or in a block around it is an error, which recalls that `let` declares once and that `=` alone changes the value.
+- A function sees only its parameters and its own variables, never the variables of the main program. Using a variable of the main program in a function is an error of its own, which recalls this rule. A function may declare a variable that has the name of a variable of the main program: they are two distinct variables, and neither changes the other.
+- A parameter is a variable of its function: it can be changed (`length = length - 1`).
 
 ### Expressions
 
@@ -100,7 +102,7 @@ Lists and decimal numbers come later (see the [backlog](docs/backlog.md)).
 | `while condition:` | Runs its block as long as the condition is true. |
 | `repeat count:` | Runs its block `count` times; `count` is a whole number evaluated once, `0` runs nothing, a negative number is an error. |
 | `break` | Leaves the innermost `while` or `repeat`. Outside a loop, an error. |
-| `function name(parameter, …):` | Defines a function, at the top level of the program only (not in a block, not in another function). |
+| `function name(parameter, …):` | Defines a function, at the top level of the program only (not in a block, not in another function). Anywhere else, it is an error; its body is checked all the same, and its name is known, so that one mistake gives one error. |
 | `return` or `return expression` | Leaves the function, with a value or without. Outside a function, an error. |
 | A call alone on its line | `forward()`, `paint_side(3)`. Any other expression alone on its line (`3 + 4`, `sides`, `sides == 4`) does nothing: an error found by the checks before running. |
 
@@ -108,7 +110,7 @@ Lists and decimal numbers come later (see the [backlog](docs/backlog.md)).
 
 - **A function is defined before it is called**, in the reading order of the program: calling it on a line above its definition is an error found before the program runs (*"`paint_side` is called on line 3 but defined on line 12. Move its definition above."*). There is no hoisting.
 - A function can call itself (recursion), since it is defined when its body runs. Two functions can't call each other.
-- A call gives exactly as many values as the function has parameters; another number is an error found before the program runs. No comma after the last value or the last parameter (`paint_side(3,)` is an error of its own).
+- A call gives exactly as many values as the function has parameters, the built-in functions included (`forward(3)`); another number is an error found before the program runs. No comma after the last value or the last parameter (`paint_side(3,)` is an error of its own).
 - A function is written with its parentheses, even when it has no parameter: `function square:` is an error of its own.
 - The parameters are names separated by commas, and nothing else: a value, an operator or a `=` between the parentheses (`function f(3):`, `function f(a = 3):`) is an error that recalls it. Two parameters of a function can't have the same name.
 - A function that ends without `return expression` gives back no value: using its result in an expression stops the program with an error.
@@ -135,14 +137,14 @@ The robot stands on one cell and faces one of the four directions. It can carry 
 | Sense | `item_here()`, `item_in_front()` | `true` when its cell, or the cell in front, has an item. | Never. |
 | Sense | `is_carrying()` | `true` when the robot carries an item. | Never. |
 | Sense | `is_painting()`, `is_erasing()` | `true` when the brush, or the eraser, is down. | Never. |
-| Write | `print(value, …)` | Writes its values to the console, separated by spaces, on one line. | Never. |
+| Write | `print(value, …)` | Writes its values to the console, separated by spaces, on one line. Without a value (`print()`), it writes an empty line. | Never. |
 
 ### Checks before running
 
 The program is checked as the learner types (a short moment after the last key) and again when **Run** is pressed. The checks find:
 
 - the syntax errors: the first one only, since the rest of the program can't be read reliably after it;
-- once the syntax is right, every error of names and structure: unknown names, variables used before their `let`, functions called above their definition, a wrong number of values in a call, two parameters of the same name, `break` or `return` out of place, a function defined in a block, a reserved name, a name not in `snake_case`, an expression alone on its line that isn't a call.
+- once the syntax is right, every error of names and structure: unknown names, variables used before their `let`, after the end of their block or from a function that doesn't see them, functions called above their definition, a wrong number of values in a call, two parameters or two functions of the same name, a variable named as a function, `break` or `return` out of place, a function defined in a block, a reserved name, a name not in `snake_case`, an expression alone on its line that isn't a call.
 
 Every error found is underlined in the editor, with its message on hover, and listed in the console. **Run** doesn't start a program that has errors: it shows them in the console.
 
