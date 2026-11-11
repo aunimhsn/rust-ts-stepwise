@@ -116,7 +116,7 @@ pub enum ParseErrorKind {
     /// No `(` after the name of a function (`function paint_side:`): a function is written
     /// with its parentheses, even when it has no parameter. The span is what stands there
     /// instead, or the end of the line.
-    ExpectedParameterList,
+    ExpectedParentheses,
     /// Something else than names separated by `,` between the parentheses of a function
     /// (`function f(3):`, `function f(a + b):`, `function f(a = 3):`, `function f(, a):`).
     /// The span is the first token that can't be there.

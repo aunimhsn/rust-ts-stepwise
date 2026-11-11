@@ -68,11 +68,11 @@ impl Parser {
     ///
     /// Wherever it is written: a function in a block is refused by the checker, which gives
     /// every error of the program.
-    pub(super) fn function(&mut self) -> Result<Statement, ParseError> {
+    pub(super) fn function_definition(&mut self) -> Result<Statement, ParseError> {
         let start = self.current.span.start;
         self.advance();
         let Some(name) = self.name()? else {
-            return Err(self.name_error(ParseErrorKind::ExpectedFunctionName));
+            return Err(self.not_a_name(ParseErrorKind::ExpectedFunctionName));
         };
         let parameters = self.parameters()?;
         let span = self.colon(start)?;
@@ -87,35 +87,22 @@ impl Parser {
 
     /// The parameters of a function between their parentheses, from the `(`: names separated
     /// by `,`, with no `,` after the last one.
+    ///
+    /// A keyword is refused as wherever a name is expected, even one that is a value or an
+    /// operator (`function f(true):`, `function f(not a):`), as after a `let`: it is reserved
+    /// before it is misplaced.
     fn parameters(&mut self) -> Result<Vec<Name>, ParseError> {
         if self.current.kind != TokenKind::LeftParen {
-            return Err(self.error(ParseErrorKind::ExpectedParameterList));
+            return Err(self.error(ParseErrorKind::ExpectedParentheses));
         }
         let open = self.current.span;
         self.advance();
-        let mut parameters = Vec::new();
-        while self.current.kind != TokenKind::RightParen {
-            self.unclosed_at_end_of_line(open)?;
-            let Some(parameter) = self.name()? else {
-                return Err(self.name_error(ParseErrorKind::InvalidParameter));
-            };
-            parameters.push(parameter);
-            match self.current.kind {
-                TokenKind::RightParen => break,
-                TokenKind::Comma => {}
-                _ => {
-                    self.unclosed_at_end_of_line(open)?;
-                    return Err(self.error(ParseErrorKind::InvalidParameter));
-                }
-            }
-            let comma = self.current.span;
-            self.advance();
-            if self.current.kind == TokenKind::RightParen {
-                let kind = ParseErrorKind::TrailingComma;
-                return Err(ParseError { kind, span: comma });
-            }
-        }
-        self.advance();
+        let parameters = self.comma_separated(open, |parser| {
+            parser
+                .name()?
+                .ok_or_else(|| parser.not_a_name(ParseErrorKind::InvalidParameter))
+        })?;
+        self.close(open, ParseErrorKind::InvalidParameter)?;
         Ok(parameters)
     }
 

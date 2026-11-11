@@ -134,7 +134,7 @@ impl Parser {
         self.advance();
         self.unclosed_at_end_of_line(open)?;
         let inner = self.nested(|parser| parser.operators(Priority::Lowest))?;
-        let end = self.close(open)?;
+        let end = self.close(open, ParseErrorKind::UnexpectedToken)?;
         // No node is made, so `node` checks nothing here, and nothing needs it: `nested`
         // let the inside be parsed one level deeper, where its height was checked.
         Ok(Deep {
@@ -153,26 +153,12 @@ impl Parser {
         }
         let open = self.current.span;
         self.advance();
-        let mut arguments = Vec::new();
-        let mut below = 0;
-        if self.current.kind != TokenKind::RightParen {
-            loop {
-                self.unclosed_at_end_of_line(open)?;
-                let argument = self.nested(|parser| parser.operators(Priority::Lowest))?;
-                below = below.max(argument.height);
-                arguments.push(argument.expression);
-                if self.current.kind != TokenKind::Comma {
-                    break;
-                }
-                let comma = self.current.span;
-                self.advance();
-                if self.current.kind == TokenKind::RightParen {
-                    let kind = ParseErrorKind::TrailingComma;
-                    return Err(ParseError { kind, span: comma });
-                }
-            }
-        }
-        let end = self.close(open)?;
+        let values = self.comma_separated(open, |parser| {
+            parser.nested(|parser| parser.operators(Priority::Lowest))
+        })?;
+        let end = self.close(open, ParseErrorKind::UnexpectedToken)?;
+        let below = values.iter().map(|value| value.height).max().unwrap_or(0);
+        let arguments = values.into_iter().map(|value| value.expression).collect();
         let span = Span::new(name.span.start, end);
         let kind = ExpressionKind::Call {
             function: name,
@@ -181,10 +167,37 @@ impl Parser {
         self.node(kind, span, below)
     }
 
-    /// The error of the `(` at `open` when the line ends right where a value is expected
-    /// inside it: the `)` is missing, more surely than a value (`forward(`). The `:` that
-    /// ends a line which opens a block ends it as well (`if front_is_clear(:`).
-    pub(super) fn unclosed_at_end_of_line(&mut self, open: Span) -> Result<(), ParseError> {
+    /// What stands between the `(` at `open`, just read, and its `)`: nothing, or items
+    /// separated by `,`, each read by `item`, with no `,` after the last one. Stops at the
+    /// `)`, or at what stands in its place: [`Parser::close`] reads it.
+    pub(super) fn comma_separated<T>(
+        &mut self,
+        open: Span,
+        mut item: impl FnMut(&mut Self) -> Result<T, ParseError>,
+    ) -> Result<Vec<T>, ParseError> {
+        let mut items = Vec::new();
+        if self.current.kind == TokenKind::RightParen {
+            return Ok(items);
+        }
+        loop {
+            self.unclosed_at_end_of_line(open)?;
+            items.push(item(self)?);
+            if self.current.kind != TokenKind::Comma {
+                return Ok(items);
+            }
+            let comma = self.current.span;
+            self.advance();
+            if self.current.kind == TokenKind::RightParen {
+                let kind = ParseErrorKind::TrailingComma;
+                return Err(ParseError { kind, span: comma });
+            }
+        }
+    }
+
+    /// The error of the `(` at `open` when the line ends right where a value or a parameter
+    /// is expected inside it: the `)` is missing, more surely than a value (`forward(`). The
+    /// `:` that ends a line which opens a block ends it as well (`if front_is_clear(:`).
+    fn unclosed_at_end_of_line(&mut self, open: Span) -> Result<(), ParseError> {
         if self.at_end_of_line() {
             return Err(ParseError {
                 kind: ParseErrorKind::UnclosedParen,
@@ -195,20 +208,23 @@ impl Parser {
     }
 
     /// Takes the `)` that closes the `(` at `open`, and returns the position after it.
-    fn close(&mut self, open: Span) -> Result<Position, ParseError> {
+    ///
+    /// # Errors
+    ///
+    /// The `(` isn't closed when the line ends there; anything else that stands there is the
+    /// error `otherwise`.
+    pub(super) fn close(
+        &mut self,
+        open: Span,
+        otherwise: ParseErrorKind,
+    ) -> Result<Position, ParseError> {
         if self.current.kind == TokenKind::RightParen {
             let end = self.current.span.end;
             self.advance();
             return Ok(end);
         }
-        Err(if self.at_end_of_line() {
-            ParseError {
-                kind: ParseErrorKind::UnclosedParen,
-                span: open,
-            }
-        } else {
-            self.error(ParseErrorKind::UnexpectedToken)
-        })
+        self.unclosed_at_end_of_line(open)?;
+        Err(self.error(otherwise))
     }
 
     /// Parses one level deeper: the value of an operator, the inside of parentheses, a value

@@ -1445,16 +1445,84 @@ let sides = 0
         let keyword = Keyword::Repeat;
         assert_eq!(found.kind, E::KeywordAsName { keyword });
         assert_eq!(found.span, span(1, 10, 16));
-        let found = error("function f(a, true):\n    b()");
-        let keyword = Keyword::True;
+        let found = error("function f(a, repeat):\n    b()");
         assert_eq!(found.kind, E::KeywordAsName { keyword });
-        assert_eq!(found.span, span(1, 15, 19));
+        assert_eq!(found.span, span(1, 15, 21));
+        assert_eq!(
+            error_kind("function f(repeat):\n    b()"),
+            E::KeywordAsName { keyword }
+        );
         let keyword = Keyword::Function;
         assert_eq!(
             error_kind("function function():\n    b()"),
             E::KeywordAsName { keyword }
         );
         assert_eq!(error_kind("function = 3"), E::KeywordAsName { keyword });
+    }
+
+    /// As after a `let`: `true` is reserved before it is a value where a name is expected.
+    #[test]
+    fn a_keyword_that_is_a_value_or_an_operator_is_no_parameter_either() {
+        for (source, keyword) in [
+            ("function f(true):", Keyword::True),
+            ("function f(a, false):", Keyword::False),
+            ("function f(not a):", Keyword::Not),
+            ("function f(and):", Keyword::And),
+        ] {
+            let source = format!("{source}\n    b()");
+            assert_eq!(
+                error_kind(&source),
+                E::KeywordAsName { keyword },
+                "{source}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_keyword_after_a_parameter_is_no_name_expected() {
+        let found = error("function f(a and b):\n    b()");
+        assert_eq!(found.kind, E::InvalidParameter);
+        assert_eq!(found.span, span(1, 14, 17));
+        assert_eq!(
+            error_kind("function f(a repeat):\n    b()"),
+            E::InvalidParameter
+        );
+    }
+
+    #[test]
+    fn what_can_not_be_a_parameter_wins_over_a_parenthesis_not_closed() {
+        for (source, start, end) in [
+            ("function f(3", 12, 13),
+            ("function f(a b", 14, 15),
+            ("function f(a +", 14, 15),
+            ("function f(a, 3:", 15, 16),
+        ] {
+            let found = error(source);
+            assert_eq!(found.kind, E::InvalidParameter, "{source}");
+            assert_eq!(found.span, span(1, start, end), "{source}");
+        }
+    }
+
+    #[test]
+    fn a_function_is_given_no_value() {
+        let found = error("function f = 3");
+        assert_eq!(found.kind, E::ExpectedParentheses);
+        assert_eq!(found.span, span(1, 12, 13));
+    }
+
+    #[test]
+    fn a_function_has_one_pair_of_parentheses() {
+        let found = error("function f()():\n    b()");
+        assert_eq!(found.kind, E::ExpectedColon);
+        assert_eq!(found.span, span(1, 13, 14));
+    }
+
+    #[test]
+    fn functions_follow_each_other() {
+        assert_eq!(
+            program("function f():\n    a()\nfunction g(b):\n    return b\nf()"),
+            ["function f() { a() }", "function g(b) { return b }", "f()"]
+        );
     }
 
     #[test]
@@ -1478,22 +1546,19 @@ let sides = 0
     #[test]
     fn missing_parentheses_are_an_error_after_the_name() {
         let found = error("function paint_side:\n    b()");
-        assert_eq!(found.kind, E::ExpectedParameterList);
+        assert_eq!(found.kind, E::ExpectedParentheses);
         assert_eq!(found.span, span(1, 20, 21));
         let found = error("function paint_side");
-        assert_eq!(found.kind, E::ExpectedParameterList);
+        assert_eq!(found.kind, E::ExpectedParentheses);
         assert_eq!(found.span, span(1, 20, 20));
         let found = error("function paint side():\n    b()");
-        assert_eq!(found.kind, E::ExpectedParameterList);
+        assert_eq!(found.kind, E::ExpectedParentheses);
         assert_eq!(found.span, span(1, 16, 20));
         assert_eq!(
             error_kind("function f length:\n    b()"),
-            E::ExpectedParameterList
+            E::ExpectedParentheses
         );
-        assert_eq!(
-            error_kind("function f):\n    b()"),
-            E::ExpectedParameterList
-        );
+        assert_eq!(error_kind("function f):\n    b()"), E::ExpectedParentheses);
     }
 
     #[test]
@@ -1526,6 +1591,7 @@ let sides = 0
         assert_eq!(found.kind, E::TrailingComma);
         assert_eq!(found.span, span(1, 27, 28));
         let found = error("function f(a, b , ):\n    b()");
+        assert_eq!(found.kind, E::TrailingComma);
         assert_eq!(found.span, span(1, 17, 18));
     }
 

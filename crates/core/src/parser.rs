@@ -127,7 +127,7 @@ impl Parser {
 
     /// The error of the current token where a name is expected: the one of a keyword taken
     /// as a name when it is one, `kind` otherwise.
-    fn name_error(&self, kind: ParseErrorKind) -> ParseError {
+    fn not_a_name(&self, kind: ParseErrorKind) -> ParseError {
         self.error(match self.current.kind {
             TokenKind::Keyword(keyword) => ParseErrorKind::KeywordAsName { keyword },
             _ => kind,
@@ -188,7 +188,7 @@ impl Parser {
             TokenKind::Keyword(Keyword::Else) => {
                 return Err(self.error(ParseErrorKind::ElseWithoutIf));
             }
-            TokenKind::Keyword(Keyword::Function) => return self.function(),
+            TokenKind::Keyword(Keyword::Function) => return self.function_definition(),
             TokenKind::Name(_) if assigns => self.assignment()?,
             _ => StatementKind::Expression(self.expression()?),
         };
@@ -221,7 +221,7 @@ impl Parser {
     fn declaration(&mut self) -> Result<StatementKind, ParseError> {
         self.advance();
         let Some(name) = self.name()? else {
-            return Err(self.name_error(ParseErrorKind::ExpectedName));
+            return Err(self.not_a_name(ParseErrorKind::ExpectedName));
         };
         if self.current.kind != TokenKind::Equal {
             return Err(self.error(ParseErrorKind::ExpectedEqual));
