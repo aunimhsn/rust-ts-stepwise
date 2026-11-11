@@ -1314,7 +1314,7 @@ mod robustness {
             let mut source = String::new();
             let mut level = 0;
             let mut opens = false;
-            for _ in 0..(1 + random.next() % 12) {
+            for _ in 0..=(random.next() % 12) {
                 if opens {
                     level += 1;
                 } else {
