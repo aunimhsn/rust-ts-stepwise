@@ -1,6 +1,7 @@
 //! The tokens the lexer gives to the parser.
 
 use crate::span::Span;
+use crate::word_enum::word_enum;
 
 /// A token, with the stretch of the source it comes from.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -69,83 +70,37 @@ pub enum TokenKind {
     End,
 }
 
-/// The keywords of the language, reserved for it.
-///
-/// The words a learner may bring from another language (`elif`, `def`…) are names: the
-/// parser and the checker give them their own messages.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Keyword {
-    /// `let`
-    Let,
-    /// `if`
-    If,
-    /// `else`
-    Else,
-    /// `while`
-    While,
-    /// `repeat`
-    Repeat,
-    /// `break`
-    Break,
-    /// `function`
-    Function,
-    /// `return`
-    Return,
-    /// `and`
-    And,
-    /// `or`
-    Or,
-    /// `not`
-    Not,
-    /// `true`
-    True,
-    /// `false`
-    False,
-}
-
-impl Keyword {
-    /// Every keyword, in the order of the specifications.
-    pub const ALL: [Self; 13] = [
-        Self::Let,
-        Self::If,
-        Self::Else,
-        Self::While,
-        Self::Repeat,
-        Self::Break,
-        Self::Function,
-        Self::Return,
-        Self::And,
-        Self::Or,
-        Self::Not,
-        Self::True,
-        Self::False,
-    ];
-
-    /// The keyword written `word`, if it is one.
-    #[must_use]
-    pub fn from_word(word: &str) -> Option<Self> {
-        Self::ALL
-            .into_iter()
-            .find(|keyword| keyword.as_str() == word)
-    }
-
-    /// The keyword as it is written.
-    #[must_use]
-    pub const fn as_str(self) -> &'static str {
-        match self {
-            Self::Let => "let",
-            Self::If => "if",
-            Self::Else => "else",
-            Self::While => "while",
-            Self::Repeat => "repeat",
-            Self::Break => "break",
-            Self::Function => "function",
-            Self::Return => "return",
-            Self::And => "and",
-            Self::Or => "or",
-            Self::Not => "not",
-            Self::True => "true",
-            Self::False => "false",
-        }
+word_enum! {
+    /// The keywords of the language, reserved for it.
+    ///
+    /// The words a learner may bring from another language (`elif`, `def`…) are names: the
+    /// parser and the checker give them their own messages.
+    pub enum Keyword {
+        /// `let`
+        Let => "let",
+        /// `if`
+        If => "if",
+        /// `else`
+        Else => "else",
+        /// `while`
+        While => "while",
+        /// `repeat`
+        Repeat => "repeat",
+        /// `break`
+        Break => "break",
+        /// `function`
+        Function => "function",
+        /// `return`
+        Return => "return",
+        /// `and`
+        And => "and",
+        /// `or`
+        Or => "or",
+        /// `not`
+        Not => "not",
+        /// `true`
+        True => "true",
+        /// `false`
+        False => "false",
     }
 }
