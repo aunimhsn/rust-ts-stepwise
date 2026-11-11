@@ -7,12 +7,10 @@ use super::ReservedWord;
 use crate::ast::{Branch, Statement, StatementKind};
 use crate::span::Span;
 
-/// What a name is at the place where it is read or changed. Each case holds the name of the
-/// variable in its `let`, for the line the message gives.
+/// Why a name is no variable at the place where it is read or changed. A case that knows
+/// the variable meant holds its name in its `let`, for the line the message gives.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(super) enum Lookup {
-    /// A variable that exists there.
-    Declared,
+pub(super) enum Missing {
     /// A variable whose `let` is further down, in the block or in a block around it.
     BeforeLet(Span),
     /// A variable whose block has ended.
@@ -45,8 +43,8 @@ impl<'a> Variables<'a> {
     /// Opens the block made of `statements`.
     pub(super) fn open(&mut self, statements: &'a [Statement]) {
         let mut lets = HashMap::new();
-        for name in declared_names(statements) {
-            lets.entry(name.0).or_insert(name.1);
+        for (name, span) in declared_names(statements) {
+            lets.entry(name).or_insert(span);
         }
         self.blocks.push(Block {
             lets,
@@ -76,25 +74,25 @@ impl<'a> Variables<'a> {
             .find_map(|block| block.declared.get(name).copied())
     }
 
-    /// What `name` is here. When several answers hold, the variable that belongs to this place
-    /// comes first: one that exists, then one declared further down, then one whose block
-    /// has ended.
-    pub(super) fn lookup(&self, name: &str) -> Lookup {
+    /// Why `name` is no variable here, or `None` when it is one. When several reasons hold,
+    /// the variable that belongs to this place comes first: one declared further down, then
+    /// one whose block has ended.
+    pub(super) fn missing(&self, name: &str) -> Option<Missing> {
         if self.declared(name).is_some() {
-            return Lookup::Declared;
+            return None;
         }
         let later = self
             .blocks
             .iter()
             .rev()
             .find_map(|block| block.lets.get(name).copied());
-        if let Some(span) = later {
-            Lookup::BeforeLet(span)
+        Some(if let Some(span) = later {
+            Missing::BeforeLet(span)
         } else if let Some(span) = self.ended.get(name).copied() {
-            Lookup::AfterBlock(span)
+            Missing::AfterBlock(span)
         } else {
-            Lookup::Unknown
-        }
+            Missing::Unknown
+        })
     }
 
     /// Takes the variables of a function that has ended, `function`, as variables whose block

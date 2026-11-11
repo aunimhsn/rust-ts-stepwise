@@ -118,6 +118,14 @@ if true:
     function red(side, side):
         break
 return
+print(total)
+let total = 0
+let total = 1
+if true:
+    let step = 1
+step = 2
+function walk():
+    total = sidse
 ";
         assert_eq!(
             errors(source),
@@ -149,6 +157,26 @@ return
                 CheckError {
                     kind: E::ReturnOutsideFunction,
                     span: span(6, 1, 7),
+                },
+                CheckError {
+                    kind: before_let("total", span(8, 5, 10)),
+                    span: span(7, 7, 12),
+                },
+                CheckError {
+                    kind: already_declared("total", span(8, 5, 10)),
+                    span: span(9, 5, 10),
+                },
+                CheckError {
+                    kind: after_block("step", span(11, 9, 13)),
+                    span: span(12, 1, 5),
+                },
+                CheckError {
+                    kind: main_variable("total"),
+                    span: span(14, 5, 10),
+                },
+                CheckError {
+                    kind: unknown("sidse"),
+                    span: span(14, 13, 18),
                 },
             ]
         );
@@ -657,10 +685,44 @@ mod unknown_names {
     }
 
     #[test]
-    fn changing_a_name_declares_nothing() {
+    fn every_use_of_a_name_that_is_no_variable_has_its_error() {
+        // Changing a name declares nothing: each line where the name doesn't exist says so.
+        let source = "\
+count = 0
+while count < 3:
+    count = count + 1
+print(count)
+";
         assert_eq!(
-            kinds("sides = sides + 1\nprint(sides)\n"),
-            [undeclared("sides"), unknown("sides"), unknown("sides")]
+            kinds(source),
+            [
+                undeclared("count"),
+                unknown("count"),
+                undeclared("count"),
+                unknown("count"),
+                unknown("count")
+            ]
+        );
+    }
+
+    #[test]
+    fn the_errors_of_a_line_are_in_its_order() {
+        assert_eq!(
+            errors("return sidse\n"),
+            [
+                CheckError {
+                    kind: E::ReturnOutsideFunction,
+                    span: span(1, 1, 13),
+                },
+                CheckError {
+                    kind: unknown("sidse"),
+                    span: span(1, 8, 13),
+                },
+            ]
+        );
+        assert_eq!(
+            kinds("sidse = sidsa\n"),
+            [undeclared("sidse"), unknown("sidsa")]
         );
     }
 
@@ -780,6 +842,43 @@ print(sides)
     }
 
     #[test]
+    fn a_variable_of_a_branch_is_not_seen_by_the_branches_after_it() {
+        let source = "\
+if true:
+    let side = 1
+else if side == 1:
+    forward()
+else:
+    side = 2
+";
+        let declared = span(2, 9, 13);
+        assert_eq!(
+            errors(source),
+            [
+                CheckError {
+                    kind: after_block("side", declared),
+                    span: span(3, 9, 13),
+                },
+                CheckError {
+                    kind: after_block("side", declared),
+                    span: span(6, 5, 9),
+                },
+            ]
+        );
+    }
+
+    #[test]
+    fn a_name_is_free_again_after_a_function() {
+        assert_valid("function count():\n    let total = 0\nlet total = 1\nprint(total)\n");
+    }
+
+    #[test]
+    fn a_variable_declared_further_down_comes_before_one_of_a_function() {
+        let source = "function count():\n    let total = 0\nprint(total)\nlet total = 1\n";
+        assert_eq!(kinds(source), [before_let("total", span(4, 5, 10))]);
+    }
+
+    #[test]
     fn a_name_is_free_again_after_its_block() {
         assert_valid(
             "\
@@ -847,6 +946,59 @@ while true:
         assert_eq!(
             kinds(source),
             [main_variable("sides"), main_variable("sides")]
+        );
+    }
+
+    #[test]
+    fn even_when_their_block_has_ended() {
+        let source = "\
+if true:
+    let sides = 0
+function walk():
+    print(sides)
+";
+        assert_eq!(kinds(source), [main_variable("sides")]);
+    }
+
+    #[test]
+    fn a_variable_of_the_function_whose_block_ended_comes_first() {
+        let source = "\
+let total = 0
+function count():
+    if true:
+        let total = 1
+    print(total)
+";
+        assert_eq!(kinds(source), [after_block("total", span(4, 13, 18))]);
+    }
+
+    #[test]
+    fn a_parameter_written_twice_is_one_variable() {
+        let source = "function walk(side, side):\n    print(side)\n";
+        assert_eq!(kinds(source), [duplicate("side")]);
+    }
+
+    #[test]
+    fn a_parameter_with_a_reserved_name_is_no_variable() {
+        // The name read in the body is the color.
+        let source = "function walk(red):\n    print(red)\n";
+        assert_eq!(kinds(source), [reserved("red")]);
+    }
+
+    #[test]
+    fn a_function_in_a_function_does_not_know_the_variables_around_it() {
+        // Accepted: they are unknown names rather than variables the function doesn't see,
+        // since the function is refused where it is, and its errors go away with it (see
+        // the backlog).
+        let source = "\
+function walk(length):
+    let step = 0
+    function turn():
+        print(length, step)
+";
+        assert_eq!(
+            kinds(source),
+            [E::NestedFunction, unknown("length"), unknown("step")]
         );
     }
 
@@ -1035,6 +1187,10 @@ mod robustness {
             "let sides = sides + 1",
             "print(sides, total)",
             "let total = 0",
+            "while sides < 3:",
+            "if total == 0:",
+            "function run(total):",
+            "return sidse",
             "forward()",
             "if true:",
             "else:",
@@ -1054,7 +1210,11 @@ mod robustness {
                 source.push('\n');
             }
             if let Ok(program) = parse(&source) {
-                let _ = check(&program);
+                let errors = check(&program);
+                assert!(
+                    errors.is_sorted_by_key(|error| error.span.start),
+                    "errors out of order in {source:?}"
+                );
                 checked += 1;
             }
         }

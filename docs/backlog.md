@@ -9,6 +9,7 @@ The ideas, polish and edge cases found along the way that the current step doesn
 - Two functions that call each other (needs a way to declare a function before its body, or hoisting).
 - Messages of their own, rather than *unexpected character*, for `1.5` (no decimal numbers in version 1), `;` (one statement per line) and the typographic quotes `“ ”` pasted from a document (seen at step 5); the error already carries the character, so this may be done in the messages alone.
 
+- A function written in another function that uses a variable or a parameter of the function around it: today an unknown name, while the same mistake in a block of the main program is a variable the function doesn't see. And a variable used after a block that held a function declaring the same name: the `let` given is the one of the block, not the closest above. Both already have the error of a function defined in a block, and go away with it (seen in the review of step 7b).
 - The words of Python written with a capital, `True`, `False` and `None`: today names that aren't in `snake_case`, so the checker recalls the rule of the names instead of showing `true`, `false` or that there is no empty value (seen at step 6a).
 
 ## Interface

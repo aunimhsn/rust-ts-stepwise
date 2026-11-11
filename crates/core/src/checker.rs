@@ -16,7 +16,7 @@ use std::collections::HashSet;
 
 use crate::ast::{Branch, Expression, ExpressionKind, Name, Program, Statement, StatementKind};
 use crate::span::Span;
-use scope::{Lookup, Variables, main_program_variables};
+use scope::{Missing, Variables, main_program_variables};
 
 /// Every error of names and of structure of `program`, in the order of the source.
 #[must_use]
@@ -254,15 +254,17 @@ impl<'a> Checker<'a> {
 
     /// A variable read or changed at `span`: it must exist there.
     fn variable(&mut self, name: &str, span: Span, access: Access, place: Place) {
+        let Some(missing) = self.variables.missing(name) else {
+            return;
+        };
+        let of_main_program = place.in_function && self.main_variables.contains(name);
+        // The name is copied only now that there is an error to hold it.
         let name = name.to_owned();
-        let kind = match self.variables.lookup(&name) {
-            Lookup::Declared => return,
-            Lookup::BeforeLet(declared) => CheckErrorKind::VariableBeforeLet { name, declared },
-            Lookup::AfterBlock(declared) => CheckErrorKind::VariableAfterBlock { name, declared },
-            Lookup::Unknown if place.in_function && self.main_variables.contains(name.as_str()) => {
-                CheckErrorKind::MainVariableInFunction { name }
-            }
-            Lookup::Unknown => match access {
+        let kind = match missing {
+            Missing::BeforeLet(declared) => CheckErrorKind::VariableBeforeLet { name, declared },
+            Missing::AfterBlock(declared) => CheckErrorKind::VariableAfterBlock { name, declared },
+            Missing::Unknown if of_main_program => CheckErrorKind::MainVariableInFunction { name },
+            Missing::Unknown => match access {
                 Access::Read => CheckErrorKind::UnknownName { name },
                 Access::Change => CheckErrorKind::UndeclaredVariableChanged { name },
             },
