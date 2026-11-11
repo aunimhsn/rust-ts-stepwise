@@ -84,6 +84,64 @@ pub enum CheckErrorKind {
         /// The name where it was declared first.
         first: Span,
     },
+    /// A function that has the name of a function defined above it: a name is one thing in
+    /// the whole program. The first stays the function. The span is the name.
+    DuplicateFunction {
+        /// The name.
+        name: String,
+        /// The name in the first definition.
+        first: Span,
+    },
+    /// A variable or a parameter that takes the name of a function of the program, wherever
+    /// that function is defined, in a `let`, with `=` alone or between the parentheses of a
+    /// function (`let paint_side = 3`, `paint_side = 3`). The span is the name.
+    NameOfFunction {
+        /// The name.
+        name: String,
+        /// The name in the definition of the function.
+        defined: Span,
+    },
+    /// A function of the program called above its definition, in the reading order of the
+    /// source, even from the body of a function that runs later: a function is defined above
+    /// the lines that call it. The span is the name in the call.
+    CalledBeforeDefinition {
+        /// The name.
+        name: String,
+        /// The name in the definition of the function.
+        defined: Span,
+    },
+    /// A call that doesn't give as many values as the function has parameters, built-in
+    /// functions included (`forward(3)`). The span is the call, from the name to its `)`.
+    WrongArgumentCount {
+        /// The name of the function.
+        name: String,
+        /// The number of parameters of the function.
+        expected: usize,
+        /// The number of values the call gives.
+        given: usize,
+    },
+    /// A function, built-in or of the program, named without its parentheses (`forward`,
+    /// `let go = forward`). The span is the name, with the parentheses around it if any.
+    FunctionWithoutParentheses {
+        /// The name.
+        name: String,
+    },
+    /// A variable that exists at this place called like a function (`sides()`): a variable
+    /// isn't called. The span is the name.
+    VariableCalled {
+        /// The name.
+        name: String,
+    },
+    /// A call of a name that is no function, nor a variable of this place (`paint_sid()`,
+    /// `red()`). The span is the name.
+    UnknownFunction {
+        /// The name.
+        name: String,
+    },
+    /// An expression alone on its line that isn't a call (`3 + 4`, `sides`, `sides == 4`):
+    /// it does nothing. A function named without its parentheses has its own error only.
+    /// The span is the statement.
+    ExpressionAlone,
 }
 
 /// A word that belongs to the language and that isn't a keyword: the keywords are refused by
@@ -103,6 +161,12 @@ impl ReservedWord {
         Builtin::from_word(word)
             .map(Self::Builtin)
             .or_else(|| Color::from_word(word).map(Self::Color))
+    }
+
+    /// Whether `word` is a reserved word.
+    #[must_use]
+    pub fn is_reserved(word: &str) -> bool {
+        Self::from_word(word).is_some()
     }
 
     /// The word as it is written.

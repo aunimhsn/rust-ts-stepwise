@@ -4,7 +4,7 @@
 use std::collections::{HashMap, HashSet};
 
 use super::ReservedWord;
-use crate::ast::{Branch, Statement, StatementKind};
+use crate::ast::{Statement, StatementKind};
 use crate::span::Span;
 
 /// Why a name is no variable at the place where it is read or changed. A case that knows
@@ -104,14 +104,13 @@ impl<'a> Variables<'a> {
 
 /// The name of every `let` written in `statements` themselves, not in their blocks, with its
 /// place. The reserved names are left out: they never become variables. A precaution: the
-/// walk never asks for a reserved name, and the lists stay right if it ever does.
+/// walk never asks for a reserved name, and the lists stay right if it ever does. Nor does
+/// it ask for a name that a function of the program has, which is kept here.
 fn declared_names(statements: &[Statement]) -> impl Iterator<Item = (&str, Span)> {
     statements
         .iter()
         .filter_map(|statement| match &statement.kind {
-            StatementKind::Let { name, value: _ }
-                if ReservedWord::from_word(&name.text).is_none() =>
-            {
+            StatementKind::Let { name, value: _ } if !ReservedWord::is_reserved(&name.text) => {
                 Some((name.text.as_str(), name.span))
             }
             _ => None,
@@ -126,26 +125,11 @@ pub(super) fn main_program_variables<'a>(
 ) {
     names.extend(declared_names(statements).map(|(name, _)| name));
     for statement in statements {
-        match &statement.kind {
-            StatementKind::If {
-                branches,
-                otherwise,
-            } => {
-                for Branch { body, .. } in branches {
-                    main_program_variables(body, names);
-                }
-                if let Some(body) = otherwise {
-                    main_program_variables(body, names);
-                }
+        // The variables of a function are its own.
+        if !matches!(statement.kind, StatementKind::Function { .. }) {
+            for block in statement.blocks() {
+                main_program_variables(block, names);
             }
-            StatementKind::While { condition: _, body }
-            | StatementKind::Repeat { count: _, body } => main_program_variables(body, names),
-            StatementKind::Let { .. }
-            | StatementKind::Assign { .. }
-            | StatementKind::Break
-            | StatementKind::Return { .. }
-            | StatementKind::Function { .. }
-            | StatementKind::Expression(_) => {}
         }
     }
 }

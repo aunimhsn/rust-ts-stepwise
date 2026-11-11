@@ -25,6 +25,35 @@ pub struct Statement {
     pub span: Span,
 }
 
+impl Statement {
+    /// The blocks the statement opens, in the order of the source: those of an `if` and of
+    /// its `else if` and `else`, the one of a loop or of a function, none for the others.
+    pub fn blocks(&self) -> impl Iterator<Item = &[Self]> {
+        let (branches, last): (&[Branch], Option<&[Self]>) = match &self.kind {
+            StatementKind::If {
+                branches,
+                otherwise,
+            } => (branches, otherwise.as_deref()),
+            StatementKind::While { condition: _, body }
+            | StatementKind::Repeat { count: _, body }
+            | StatementKind::Function {
+                name: _,
+                parameters: _,
+                body,
+            } => (&[], Some(body)),
+            StatementKind::Let { .. }
+            | StatementKind::Assign { .. }
+            | StatementKind::Break
+            | StatementKind::Return { .. }
+            | StatementKind::Expression(_) => (&[], None),
+        };
+        branches
+            .iter()
+            .map(|branch| branch.body.as_slice())
+            .chain(last)
+    }
+}
+
 /// What a statement is.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum StatementKind {

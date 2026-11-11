@@ -73,6 +73,45 @@ fn already_declared(name: &str, first: Span) -> E {
     E::AlreadyDeclared { name, first }
 }
 
+fn duplicate_function(name: &str, first: Span) -> E {
+    let name = name.to_owned();
+    E::DuplicateFunction { name, first }
+}
+
+fn name_of_function(name: &str, defined: Span) -> E {
+    let name = name.to_owned();
+    E::NameOfFunction { name, defined }
+}
+
+fn called_before(name: &str, defined: Span) -> E {
+    let name = name.to_owned();
+    E::CalledBeforeDefinition { name, defined }
+}
+
+fn wrong_count(name: &str, expected: usize, given: usize) -> E {
+    let name = name.to_owned();
+    E::WrongArgumentCount {
+        name,
+        expected,
+        given,
+    }
+}
+
+fn without_parentheses(name: &str) -> E {
+    let name = name.to_owned();
+    E::FunctionWithoutParentheses { name }
+}
+
+fn variable_called(name: &str) -> E {
+    let name = name.to_owned();
+    E::VariableCalled { name }
+}
+
+fn unknown_function(name: &str) -> E {
+    let name = name.to_owned();
+    E::UnknownFunction { name }
+}
+
 mod programs {
     use super::*;
 
@@ -126,6 +165,10 @@ if true:
 step = 2
 function walk():
     total = sidse
+later(total)
+total + 1
+function later():
+    walk
 ";
         assert_eq!(
             errors(source),
@@ -177,6 +220,22 @@ function walk():
                 CheckError {
                     kind: unknown("sidse"),
                     span: span(14, 13, 18),
+                },
+                CheckError {
+                    kind: called_before("later", span(17, 10, 15)),
+                    span: span(15, 1, 6),
+                },
+                CheckError {
+                    kind: wrong_count("later", 0, 1),
+                    span: span(15, 1, 13),
+                },
+                CheckError {
+                    kind: E::ExpressionAlone,
+                    span: span(16, 1, 10),
+                },
+                CheckError {
+                    kind: without_parentheses("walk"),
+                    span: span(18, 5, 9),
                 },
             ]
         );
@@ -653,7 +712,7 @@ repeat d:
 print(e, -f)
 function walk():
     return g + 1
-h
+let last = h
 ";
         let names = ["a", "b", "c", "d", "e", "f", "g", "h"];
         assert_eq!(kinds(source), names.map(unknown));
@@ -778,14 +837,8 @@ else if sidsa:
     }
 
     #[test]
-    fn the_values_of_a_call_are_checked_but_not_its_function() {
-        // Whether the function exists is checked with the functions.
-        assert_eq!(kinds("paint_side(sidse)\n"), [unknown("sidse")]);
-    }
-
-    #[test]
-    fn a_built_in_function_without_parentheses_is_left_to_the_check_of_the_functions() {
-        assert_valid("let go = forward\n");
+    fn the_values_of_a_call_are_checked() {
+        assert_eq!(kinds("print(sidse)\n"), [unknown("sidse")]);
     }
 }
 
@@ -1247,6 +1300,864 @@ function walk(length):
     }
 }
 
+mod calls {
+    use super::*;
+
+    #[test]
+    fn a_function_is_called_under_its_definition() {
+        assert_valid("function walk():\n    forward()\nwalk()\nwalk()\n");
+    }
+
+    #[test]
+    fn a_function_calls_itself() {
+        assert_valid("function walk(steps):\n    if steps > 0:\n        walk(steps - 1)\n");
+    }
+
+    #[test]
+    fn a_function_calls_one_defined_above_it() {
+        assert_valid("function step():\n    forward()\nfunction walk():\n    step()\nwalk()\n");
+    }
+
+    #[test]
+    fn a_call_is_checked_wherever_an_expression_is() {
+        let source = "\
+let a = jump()
+a = jump()
+if jump():
+    forward()
+else if jump():
+    forward()
+while jump():
+    forward()
+repeat jump():
+    forward()
+print(-jump(), 1 + jump())
+function walk():
+    return jump()
+jump()
+";
+        assert_eq!(kinds(source), [(); 10].map(|()| unknown_function("jump")));
+    }
+
+    #[test]
+    fn a_function_in_a_block_is_refused_but_known() {
+        let source = "if true:\n    function walk():\n        forward()\nwalk()\n";
+        assert_eq!(kinds(source), [E::NestedFunction]);
+    }
+
+    #[test]
+    fn a_function_in_a_function_is_refused_but_known() {
+        let source = "\
+function outer():
+    function inner(side):
+        forward()
+    inner(1)
+inner(2)
+";
+        assert_eq!(kinds(source), [E::NestedFunction]);
+    }
+
+    #[test]
+    fn a_function_whose_name_is_not_in_snake_case_is_known() {
+        let source = "function Walk():\n    forward()\nWalk()\n";
+        assert_eq!(kinds(source), [E::NotSnakeCase]);
+    }
+}
+
+mod calls_above_the_definition {
+    use super::*;
+
+    #[test]
+    fn a_call_above_the_definition_is_an_error_that_gives_the_definition() {
+        assert_eq!(
+            error("paint_side(3)\nfunction paint_side(length):\n    forward()\n"),
+            CheckError {
+                kind: called_before("paint_side", span(2, 10, 20)),
+                span: span(1, 1, 11),
+            }
+        );
+    }
+
+    #[test]
+    fn every_call_above_the_definition_has_its_error() {
+        let source = "\
+walk()
+if true:
+    walk()
+function walk():
+    forward()
+walk()
+";
+        let defined = span(4, 10, 14);
+        assert_eq!(
+            errors(source),
+            [
+                CheckError {
+                    kind: called_before("walk", defined),
+                    span: span(1, 1, 5),
+                },
+                CheckError {
+                    kind: called_before("walk", defined),
+                    span: span(3, 5, 9),
+                },
+            ]
+        );
+    }
+
+    #[test]
+    fn a_call_in_a_function_written_above_is_an_error_even_if_it_runs_later() {
+        let source = "\
+function first():
+    second()
+function second():
+    forward()
+first()
+";
+        assert_eq!(
+            error(source),
+            CheckError {
+                kind: called_before("second", span(3, 10, 16)),
+                span: span(2, 5, 11),
+            }
+        );
+    }
+
+    #[test]
+    fn two_functions_do_not_call_each_other() {
+        let source = "\
+function ping():
+    pong()
+function pong():
+    ping()
+";
+        assert_eq!(kinds(source), [called_before("pong", span(3, 10, 14))]);
+    }
+
+    #[test]
+    fn a_call_among_the_values_of_a_call_is_checked_too() {
+        let source = "print(double(2))\nfunction double(number):\n    return number * 2\n";
+        assert_eq!(
+            error(source),
+            CheckError {
+                kind: called_before("double", span(2, 10, 16)),
+                span: span(1, 7, 13),
+            }
+        );
+    }
+
+    #[test]
+    fn a_wrong_number_of_values_is_another_error() {
+        let source = "walk(1)\nfunction walk():\n    forward()\n";
+        assert_eq!(
+            kinds(source),
+            [
+                called_before("walk", span(2, 10, 14)),
+                wrong_count("walk", 0, 1)
+            ]
+        );
+    }
+
+    #[test]
+    fn the_definition_may_be_one_that_is_refused() {
+        let source = "walk()\nif true:\n    function walk():\n        forward()\n";
+        assert_eq!(
+            kinds(source),
+            [called_before("walk", span(3, 14, 18)), E::NestedFunction]
+        );
+    }
+
+    #[test]
+    fn a_call_in_a_function_defined_in_the_one_it_calls_is_under_its_definition() {
+        let source = "\
+function outer():
+    function inner():
+        outer()
+";
+        assert_eq!(kinds(source), [E::NestedFunction]);
+    }
+}
+
+mod functions_of_the_same_name {
+    use super::*;
+
+    #[test]
+    fn the_second_function_is_an_error_that_gives_the_first() {
+        let source = "function walk():\n    forward()\nfunction walk():\n    forward()\n";
+        assert_eq!(
+            error(source),
+            CheckError {
+                kind: duplicate_function("walk", span(1, 10, 14)),
+                span: span(3, 10, 14),
+            }
+        );
+    }
+
+    #[test]
+    fn every_function_after_the_first_gives_the_first() {
+        let source = "\
+function walk():
+    forward()
+function walk(steps):
+    forward()
+function walk(steps, color):
+    forward()
+";
+        let first = span(1, 10, 14);
+        assert_eq!(
+            kinds(source),
+            [
+                duplicate_function("walk", first),
+                duplicate_function("walk", first)
+            ]
+        );
+    }
+
+    #[test]
+    fn the_first_stays_the_function_for_the_number_of_values() {
+        let source = "\
+function walk(steps):
+    forward()
+function walk():
+    forward()
+walk(3)
+walk()
+";
+        assert_eq!(
+            kinds(source),
+            [
+                duplicate_function("walk", span(1, 10, 14)),
+                wrong_count("walk", 1, 0)
+            ]
+        );
+    }
+
+    #[test]
+    fn a_call_between_the_two_is_under_its_definition() {
+        let source = "\
+function walk():
+    forward()
+walk()
+function walk():
+    forward()
+";
+        assert_eq!(kinds(source), [duplicate_function("walk", span(1, 10, 14))]);
+    }
+
+    #[test]
+    fn the_body_of_the_second_function_is_still_checked() {
+        let source = "function walk():\n    forward()\nfunction walk():\n    break\n";
+        assert_eq!(
+            kinds(source),
+            [
+                duplicate_function("walk", span(1, 10, 14)),
+                E::BreakOutsideLoop
+            ]
+        );
+    }
+
+    #[test]
+    fn the_first_may_be_a_function_in_a_block() {
+        let source = "\
+if true:
+    function walk():
+        forward()
+function walk():
+    forward()
+";
+        assert_eq!(
+            kinds(source),
+            [
+                E::NestedFunction,
+                duplicate_function("walk", span(2, 14, 18))
+            ]
+        );
+    }
+
+    #[test]
+    fn a_function_in_a_function_of_the_same_name_is_an_error() {
+        let source = "function walk():\n    function walk():\n        forward()\n";
+        assert_eq!(
+            kinds(source),
+            [
+                E::NestedFunction,
+                duplicate_function("walk", span(1, 10, 14))
+            ]
+        );
+    }
+
+    #[test]
+    fn a_reserved_name_written_twice_keeps_its_one_error_each_time() {
+        let source = "function print():\n    forward()\nfunction print():\n    forward()\n";
+        assert_eq!(kinds(source), [reserved("print"), reserved("print")]);
+    }
+
+    #[test]
+    fn a_second_function_that_is_not_in_snake_case_has_both_errors() {
+        let source = "function Walk():\n    forward()\nfunction Walk():\n    forward()\n";
+        assert_eq!(
+            kinds(source),
+            [
+                E::NotSnakeCase,
+                E::NotSnakeCase,
+                duplicate_function("Walk", span(1, 10, 14))
+            ]
+        );
+    }
+}
+
+mod names_of_functions {
+    use super::*;
+
+    #[test]
+    fn no_variable_takes_the_name_of_a_function() {
+        let source = "function paint_side():\n    forward()\nlet paint_side = 3\n";
+        assert_eq!(
+            error(source),
+            CheckError {
+                kind: name_of_function("paint_side", span(1, 10, 20)),
+                span: span(3, 5, 15),
+            }
+        );
+    }
+
+    #[test]
+    fn wherever_the_function_is_defined() {
+        let source = "let walk = 3\nfunction walk():\n    forward()\n";
+        assert_eq!(kinds(source), [name_of_function("walk", span(2, 10, 14))]);
+        let source = "let walk = 3\nif true:\n    function walk():\n        forward()\n";
+        assert_eq!(
+            kinds(source),
+            [name_of_function("walk", span(3, 14, 18)), E::NestedFunction]
+        );
+    }
+
+    #[test]
+    fn a_function_is_given_no_value() {
+        let source = "function walk():\n    forward()\nwalk = 3\n";
+        assert_eq!(
+            error(source),
+            CheckError {
+                kind: name_of_function("walk", span(1, 10, 14)),
+                span: span(3, 1, 5),
+            }
+        );
+    }
+
+    #[test]
+    fn no_parameter_takes_the_name_of_a_function() {
+        let source = "function walk():\n    forward()\nfunction run(walk):\n    forward()\n";
+        assert_eq!(
+            error(source),
+            CheckError {
+                kind: name_of_function("walk", span(1, 10, 14)),
+                span: span(3, 14, 18),
+            }
+        );
+    }
+
+    #[test]
+    fn no_parameter_takes_the_name_of_its_own_function() {
+        let source = "function walk(walk):\n    forward()\n";
+        assert_eq!(kinds(source), [name_of_function("walk", span(1, 10, 14))]);
+    }
+
+    #[test]
+    fn no_variable_of_a_function_takes_its_name() {
+        let source = "function walk():\n    let walk = 1\n";
+        assert_eq!(kinds(source), [name_of_function("walk", span(1, 10, 14))]);
+    }
+
+    #[test]
+    fn the_name_stays_the_function() {
+        let source = "\
+function walk():
+    forward()
+let walk = 3
+walk()
+print(walk)
+";
+        assert_eq!(
+            kinds(source),
+            [
+                name_of_function("walk", span(1, 10, 14)),
+                without_parentheses("walk")
+            ]
+        );
+    }
+
+    #[test]
+    fn every_let_of_the_name_has_this_one_error() {
+        let source = "let walk = 1\nlet walk = 2\nfunction walk():\n    forward()\n";
+        let defined = span(3, 10, 14);
+        assert_eq!(
+            kinds(source),
+            [
+                name_of_function("walk", defined),
+                name_of_function("walk", defined)
+            ]
+        );
+    }
+
+    #[test]
+    fn a_parameter_written_twice_keeps_its_one_error_each_time() {
+        let source = "function walk():\n    forward()\nfunction run(walk, walk):\n    forward()\n";
+        let defined = span(1, 10, 14);
+        assert_eq!(
+            kinds(source),
+            [
+                name_of_function("walk", defined),
+                name_of_function("walk", defined)
+            ]
+        );
+    }
+
+    #[test]
+    fn the_value_given_to_the_name_is_still_checked() {
+        let source = "function walk():\n    forward()\nlet walk = sidse\nwalk = sidsa\n";
+        let defined = span(1, 10, 14);
+        assert_eq!(
+            kinds(source),
+            [
+                name_of_function("walk", defined),
+                unknown("sidse"),
+                name_of_function("walk", defined),
+                unknown("sidsa")
+            ]
+        );
+    }
+
+    #[test]
+    fn a_function_does_not_take_a_variable_of_the_main_program_for_its_name() {
+        // The name is the function, not a variable of the main program the function
+        // doesn't see.
+        let source = "let walk = 1\nfunction walk():\n    print(walk)\n";
+        assert_eq!(
+            kinds(source),
+            [
+                name_of_function("walk", span(2, 10, 14)),
+                without_parentheses("walk")
+            ]
+        );
+    }
+
+    #[test]
+    fn a_function_named_as_a_built_in_one_takes_no_name() {
+        // `print` stays the built-in function: its error is the one of a reserved name.
+        let source = "function print():\n    forward()\nlet print = 1\n";
+        assert_eq!(kinds(source), [reserved("print"), reserved("print")]);
+    }
+}
+
+mod numbers_of_values {
+    use super::*;
+
+    #[test]
+    fn a_call_gives_as_many_values_as_the_function_has_parameters() {
+        let source = "\
+function paint(length, color):
+    forward()
+function walk():
+    forward()
+paint(3, red)
+walk()
+";
+        assert_valid(source);
+    }
+
+    #[test]
+    fn another_number_is_an_error_on_the_whole_call() {
+        let source = "function paint(length, color):\n    forward()\npaint(3)\n";
+        assert_eq!(
+            error(source),
+            CheckError {
+                kind: wrong_count("paint", 2, 1),
+                span: span(3, 1, 9),
+            }
+        );
+        let source = "function paint(length, color):\n    forward()\npaint(3, red, 4)\n";
+        assert_eq!(kinds(source), [wrong_count("paint", 2, 3)]);
+    }
+
+    #[test]
+    fn the_built_in_functions_have_theirs() {
+        assert_valid("forward()\nstart_painting(red)\nif here_is(blue):\n    drop()\n");
+        assert_eq!(
+            error("forward(3)\n"),
+            CheckError {
+                kind: wrong_count("forward", 0, 1),
+                span: span(1, 1, 11),
+            }
+        );
+        assert_eq!(
+            kinds("start_painting()\n"),
+            [wrong_count("start_painting", 1, 0)]
+        );
+        assert_eq!(
+            kinds("print(front_is(red, blue))\n"),
+            [wrong_count("front_is", 1, 2)]
+        );
+    }
+
+    #[test]
+    fn every_built_in_function_is_called_with_its_number_of_values() {
+        for builtin in Builtin::ALL {
+            let name = builtin.as_str();
+            let call = |given: usize| format!("{name}({})\n", vec!["red"; given].join(", "));
+            for given in 0..3 {
+                let expected = builtin.parameters();
+                let wrong = expected.filter(|expected| *expected != given);
+                let kinds = kinds(&call(given));
+                match wrong {
+                    Some(expected) => assert_eq!(kinds, [wrong_count(name, expected, given)]),
+                    None => assert_eq!(kinds, [], "{name} with {given} values"),
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn print_takes_any_number_of_values() {
+        assert_valid("print()\nprint(1)\nprint(1, true, \"a\", red)\n");
+    }
+
+    #[test]
+    fn the_values_are_checked_whatever_their_number() {
+        assert_eq!(
+            kinds("forward(sidse)\n"),
+            [wrong_count("forward", 0, 1), unknown("sidse")]
+        );
+    }
+
+    #[test]
+    fn each_call_among_the_values_of_a_call_has_its_error() {
+        assert_eq!(
+            errors("print(forward(1), turn_left(2))\n"),
+            [
+                CheckError {
+                    kind: wrong_count("forward", 0, 1),
+                    span: span(1, 7, 17),
+                },
+                CheckError {
+                    kind: wrong_count("turn_left", 0, 1),
+                    span: span(1, 19, 31),
+                },
+            ]
+        );
+    }
+
+    #[test]
+    fn the_parameters_count_as_written() {
+        // A parameter that is refused is still a place between the parentheses.
+        let source = "function paint(side, side, red):\n    forward()\npaint(1, 2, 3)\npaint(1)\n";
+        assert_eq!(
+            kinds(source),
+            [
+                duplicate("side"),
+                reserved("red"),
+                wrong_count("paint", 3, 1)
+            ]
+        );
+    }
+
+    #[test]
+    fn a_function_that_calls_itself_gives_the_right_number_too() {
+        let source = "function walk(steps):\n    walk()\n";
+        assert_eq!(kinds(source), [wrong_count("walk", 1, 0)]);
+    }
+
+    #[test]
+    fn the_type_of_a_value_is_left_to_the_run() {
+        assert_valid("start_painting(3)\nforward()\n");
+    }
+}
+
+mod functions_without_parentheses {
+    use super::*;
+
+    #[test]
+    fn a_built_in_function_named_without_parentheses_is_an_error() {
+        assert_eq!(
+            error("let go = forward\n"),
+            CheckError {
+                kind: without_parentheses("forward"),
+                span: span(1, 10, 17),
+            }
+        );
+    }
+
+    #[test]
+    fn a_function_of_the_program_too() {
+        let source = "function walk():\n    forward()\nprint(walk)\n";
+        assert_eq!(
+            error(source),
+            CheckError {
+                kind: without_parentheses("walk"),
+                span: span(3, 7, 11),
+            }
+        );
+    }
+
+    #[test]
+    fn alone_on_its_line_it_has_this_one_error() {
+        assert_eq!(
+            error("forward\n"),
+            CheckError {
+                kind: without_parentheses("forward"),
+                span: span(1, 1, 8),
+            }
+        );
+        let source = "function walk():\n    forward()\nwalk\n";
+        assert_eq!(kinds(source), [without_parentheses("walk")]);
+    }
+
+    #[test]
+    fn between_parentheses_alone_on_its_line_too() {
+        assert_eq!(
+            error("(forward)\n"),
+            CheckError {
+                kind: without_parentheses("forward"),
+                span: span(1, 1, 10),
+            }
+        );
+    }
+
+    #[test]
+    fn in_a_condition() {
+        assert_eq!(
+            kinds("if front_is_clear:\n    forward()\n"),
+            [without_parentheses("front_is_clear")]
+        );
+        assert_eq!(
+            kinds("while not front_is_clear:\n    turn_left()\n"),
+            [without_parentheses("front_is_clear")]
+        );
+    }
+
+    #[test]
+    fn above_its_definition_it_has_this_one_error() {
+        let source = "print(walk)\nfunction walk():\n    forward()\n";
+        assert_eq!(kinds(source), [without_parentheses("walk")]);
+    }
+
+    #[test]
+    fn in_an_expression_alone_on_its_line_both_are_errors() {
+        // Parentheses after the name would not make this line do something.
+        assert_eq!(
+            kinds("not is_painting\n"),
+            [E::ExpressionAlone, without_parentheses("is_painting")]
+        );
+    }
+
+    #[test]
+    fn every_built_in_function_is_written_with_its_parentheses() {
+        for builtin in Builtin::ALL {
+            let name = builtin.as_str();
+            assert_eq!(kinds(&format!("{name}\n")), [without_parentheses(name)]);
+        }
+    }
+}
+
+mod variables_called {
+    use super::*;
+
+    #[test]
+    fn a_variable_called_like_a_function_is_an_error() {
+        assert_eq!(
+            errors("let sides = 3\nsides()\n"),
+            [CheckError {
+                kind: variable_called("sides"),
+                span: span(2, 1, 6),
+            }]
+        );
+    }
+
+    #[test]
+    fn a_parameter_is_not_called_either() {
+        let source = "function walk(steps):\n    print(steps(1))\n";
+        assert_eq!(kinds(source), [variable_called("steps")]);
+    }
+
+    #[test]
+    fn its_values_are_checked_but_not_their_number() {
+        assert_eq!(
+            kinds("let sides = 3\nsides(1, sidse)\n"),
+            [variable_called("sides"), unknown("sidse")]
+        );
+    }
+
+    #[test]
+    fn a_variable_that_does_not_exist_there_is_no_function() {
+        // Above its `let`.
+        assert_eq!(
+            kinds("sides()\nlet sides = 3\n"),
+            [unknown_function("sides")]
+        );
+        // After the end of its block.
+        assert_eq!(
+            kinds("if true:\n    let sides = 3\nsides()\n"),
+            [unknown_function("sides")]
+        );
+        // From a function that doesn't see it.
+        assert_eq!(
+            kinds("let sides = 3\nfunction walk():\n    sides()\n"),
+            [unknown_function("sides")]
+        );
+    }
+
+    #[test]
+    fn a_variable_that_took_the_name_of_a_function_is_the_function() {
+        let source = "let walk = 3\nfunction walk():\n    forward()\nwalk()\n";
+        assert_eq!(kinds(source), [name_of_function("walk", span(2, 10, 14))]);
+    }
+}
+
+mod unknown_functions {
+    use super::*;
+
+    #[test]
+    fn a_call_of_a_name_that_is_no_function_is_an_error_on_the_name() {
+        assert_eq!(
+            error("paint_sid(3)\n"),
+            CheckError {
+                kind: unknown_function("paint_sid"),
+                span: span(1, 1, 10),
+            }
+        );
+    }
+
+    #[test]
+    fn every_call_of_the_name_has_its_error() {
+        assert_eq!(
+            kinds("jump()\nprint(jump(), jump())\n"),
+            [(); 3].map(|()| unknown_function("jump"))
+        );
+    }
+
+    #[test]
+    fn its_values_are_checked_but_not_their_number() {
+        assert_eq!(
+            kinds("jump(1, sidse)\n"),
+            [unknown_function("jump"), unknown("sidse")]
+        );
+    }
+
+    #[test]
+    fn a_color_is_no_function() {
+        assert_eq!(kinds("red()\n"), [unknown_function("red")]);
+    }
+
+    #[test]
+    fn the_names_tell_the_case_of_the_letters() {
+        assert_eq!(kinds("Forward()\n"), [unknown_function("Forward")]);
+    }
+
+    #[test]
+    fn a_name_read_that_is_a_call_elsewhere_is_no_variable() {
+        assert_eq!(
+            kinds("jump()\nprint(jump)\n"),
+            [unknown_function("jump"), unknown("jump")]
+        );
+    }
+}
+
+mod expressions_alone {
+    use super::*;
+
+    #[test]
+    fn a_call_alone_on_its_line_does_something() {
+        assert_valid("forward()\nprint(1)\n(forward())\nfront_is_clear()\n");
+    }
+
+    #[test]
+    fn any_other_expression_alone_on_its_line_is_an_error_on_the_line() {
+        assert_eq!(
+            error("3 + 4  # Seven\n"),
+            CheckError {
+                kind: E::ExpressionAlone,
+                span: span(1, 1, 6),
+            }
+        );
+        for line in [
+            "3",
+            "-3",
+            "true",
+            "\"Stuck\"",
+            "red",
+            "(3)",
+            "1 == 1",
+            "not true",
+            "forward() + 1",
+            "not front_is_clear()",
+            "-forward()",
+            "front_is_clear() and left_is_clear()",
+        ] {
+            assert_eq!(kinds(&format!("{line}\n")), [E::ExpressionAlone], "{line}");
+        }
+    }
+
+    #[test]
+    fn a_variable_alone_on_its_line_is_an_error() {
+        assert_eq!(
+            kinds("let sides = 4\nsides\nsides == 4\n"),
+            [E::ExpressionAlone, E::ExpressionAlone]
+        );
+    }
+
+    #[test]
+    fn its_names_are_checked_too() {
+        assert_eq!(
+            errors("sidse\n"),
+            [
+                CheckError {
+                    kind: E::ExpressionAlone,
+                    span: span(1, 1, 6),
+                },
+                CheckError {
+                    kind: unknown("sidse"),
+                    span: span(1, 1, 6),
+                },
+            ]
+        );
+        assert_eq!(
+            kinds("sidse == jump(1)\n"),
+            [
+                E::ExpressionAlone,
+                unknown("sidse"),
+                unknown_function("jump")
+            ]
+        );
+    }
+
+    #[test]
+    fn in_a_block_and_in_a_function_too() {
+        let source = "\
+if true:
+    3
+function walk(steps):
+    steps
+    while true:
+        steps - 1
+";
+        assert_eq!(
+            errors(source),
+            [
+                CheckError {
+                    kind: E::ExpressionAlone,
+                    span: span(2, 5, 6),
+                },
+                CheckError {
+                    kind: E::ExpressionAlone,
+                    span: span(4, 5, 10),
+                },
+                CheckError {
+                    kind: E::ExpressionAlone,
+                    span: span(6, 9, 18),
+                },
+            ]
+        );
+    }
+}
+
 mod robustness {
     use super::*;
     use crate::parser::{MAX_BLOCK_DEPTH, MAX_DEPTH};
@@ -1306,6 +2217,16 @@ mod robustness {
             "function walk(side, side):",
             "function run(total):",
             "function Run():",
+            "function walk():",
+            "walk(1, 2)",
+            "run()",
+            "run(walk(sides), jump())",
+            "walk",
+            "let walk = 1",
+            "run = run",
+            "sides()",
+            "sides + forward",
+            "print(forward(1), red())",
         ];
         let mut random = Random(7);
         let mut with_several_errors = 0;
