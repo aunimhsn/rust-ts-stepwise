@@ -109,6 +109,8 @@ Lists and decimal numbers come later (see the [backlog](docs/backlog.md)).
 - **A function is defined before it is called**, in the reading order of the program: calling it on a line above its definition is an error found before the program runs (*"`paint_side` is called on line 3 but defined on line 12. Move its definition above."*). There is no hoisting.
 - A function can call itself (recursion), since it is defined when its body runs. Two functions can't call each other.
 - A call gives exactly as many values as the function has parameters; another number is an error found before the program runs. No comma after the last value or the last parameter (`paint_side(3,)` is an error of its own).
+- A function is written with its parentheses, even when it has no parameter: `function square:` is an error of its own.
+- The parameters are names separated by commas, and nothing else: a value, an operator or a `=` between the parentheses (`function f(3):`, `function f(a = 3):`) is an error that recalls it. Two parameters of a function can't have the same name.
 - A function that ends without `return expression` gives back no value: using its result in an expression stops the program with an error.
 - Calls nest up to 200 deep; beyond, the program stops with an error (a recursion that never ends).
 - A function named without parentheses (`forward`), or a variable called like a function (`sides()`), is an error that shows the right way.
@@ -140,7 +142,7 @@ The robot stands on one cell and faces one of the four directions. It can carry 
 The program is checked as the learner types (a short moment after the last key) and again when **Run** is pressed. The checks find:
 
 - the syntax errors: the first one only, since the rest of the program can't be read reliably after it;
-- once the syntax is right, every error of names and structure: unknown names, variables used before their `let`, functions called above their definition, a wrong number of values in a call, `break` or `return` out of place, a function defined in a block, a reserved name, a name not in `snake_case`, an expression alone on its line that isn't a call.
+- once the syntax is right, every error of names and structure: unknown names, variables used before their `let`, functions called above their definition, a wrong number of values in a call, two parameters of the same name, `break` or `return` out of place, a function defined in a block, a reserved name, a name not in `snake_case`, an expression alone on its line that isn't a call.
 
 Every error found is underlined in the editor, with its message on hover, and listed in the console. **Run** doesn't start a program that has errors: it shows them in the console.
 

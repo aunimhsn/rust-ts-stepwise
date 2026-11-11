@@ -23,11 +23,11 @@ Model: the steps whose design lasts, marked *(Fable 5.2)*, run on Fable 5.2; the
 - [x] **3. Mock-up** (#11, #12, #13, #14, #15, #16, #17)
 - [x] **4. Workspace and probe** (#18, #19, #21, #22)
 - [x] **5. Lexer** (#23)
-- [ ] **6. Parser** *(Fable 5.2)*: the syntax tree of every statement and expression, the first syntax error with its helpful messages, a maximum depth of the tree.
+- [x] **6. Parser** *(Fable 5.2)*: the syntax tree of every statement and expression, the first syntax error with its helpful messages, a maximum depth of the tree.
   - [x] **6a. Expressions and simple statements** (#25)
   - [x] **6b. Blocks** (#26)
-  - [ ] **6c. Functions**: `function` with its parameters and the errors of its line (a missing name, a comma after the last parameter); the stack the parser needs at the maximum depth, measured again in WebAssembly with 50 blocks around the deepest expression, the worst case (see [Technical choices](docs/technical-choices.md), Parser).
-- [ ] **7. Checker** *(Fable 5.2)*: names and scopes, `let` before use, no hoisting, the number of values of a call, `break` and `return` in place, functions at the top level, reserved and `snake_case` names; every error found, not only the first.
+  - [x] **6c. Functions**: `function` with its parameters and the errors of its line (a missing name, missing parentheses, a parameter that isn't a name alone, a comma after the last parameter); the stack the parser needs at the maximum depth, measured again in WebAssembly with 50 blocks around the deepest expression, the worst case (see [Technical choices](docs/technical-choices.md), Parser).
+- [ ] **7. Checker** *(Fable 5.2)*: names and scopes, `let` before use, no hoisting, the number of values of a call, two parameters of the same name, `break` and `return` in place, functions at the top level, reserved and `snake_case` names; every error found, not only the first.
 - [ ] **8. Map and levels**: the map (cells, paints, painted passages, items, robot with its brush and eraser), the JSON level format with its version, its validation and its goals; a test that reads every level file of the repository.
 - [ ] **9. Interpreter** *(Fable 5.2)*: the step-by-step machine with its stack of frames, the values and their errors, the statements, the functions and the limit of 200 calls, the built-in functions acting on the map (the brush and the eraser as modes), the events of each step (robot action, printed line, current line), the goals checked at the end; tests running whole programs.
 - [ ] **10. WebAssembly bridge** *(Fable 5.2)*: the API used by the interface (check, start, step, state of the map, variables, events) with its TypeScript types, and tests from TypeScript, one of which checks and runs a program at the maximum depth of the tree through the real module, so that the margin of the stack is tested where it matters.

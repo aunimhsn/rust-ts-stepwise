@@ -86,6 +86,15 @@ fn show_statement(statement: &Statement) -> String {
         StatementKind::Repeat { count, body } => {
             format!("repeat {} {}", show(count), show_block(body))
         }
+        StatementKind::Function {
+            name,
+            parameters,
+            body,
+        } => {
+            let parameters: Vec<&str> = parameters.iter().map(|name| &*name.text).collect();
+            let parameters = parameters.join(", ");
+            format!("function {}({parameters}) {}", name.text, show_block(body))
+        }
     }
 }
 
@@ -213,12 +222,6 @@ mod programs {
         let error = error("forward() forward()");
         assert_eq!(error.kind, E::UnexpectedToken);
         assert_eq!(error.span, span(1, 11, 18));
-    }
-
-    /// Until step 6c, which parses the functions.
-    #[test]
-    fn a_function_is_an_error_for_now() {
-        assert_eq!(error_kind("function f():"), E::UnexpectedToken);
     }
 }
 
@@ -1319,6 +1322,275 @@ mod block_errors {
     }
 }
 
+mod functions {
+    use super::*;
+
+    #[test]
+    fn a_function_without_parameters() {
+        assert_eq!(
+            line("function square():\n    forward()"),
+            "function square() { forward() }"
+        );
+    }
+
+    #[test]
+    fn a_function_with_parameters() {
+        assert_eq!(
+            line("function paint_side(length):\n    forward()"),
+            "function paint_side(length) { forward() }"
+        );
+        assert_eq!(
+            line("function f(a, b, c):\n    return a + b"),
+            "function f(a, b, c) { return (a + b) }"
+        );
+    }
+
+    #[test]
+    fn the_example_of_the_specifications() {
+        let source = "\
+# Paint a square of side 3
+function paint_side(length):
+    start_painting(red)
+    repeat length:
+        forward()
+    stop_painting()
+
+let sides = 0
+";
+        assert_eq!(
+            program(source),
+            [
+                "function paint_side(length) { start_painting(red); repeat length { forward() }; \
+                 stop_painting() }",
+                "let sides = 0"
+            ]
+        );
+    }
+
+    #[test]
+    fn the_names_keep_their_places() {
+        let mut statements = statements("function paint_side(length, color):\n    forward()");
+        let StatementKind::Function {
+            name, parameters, ..
+        } = statements.pop().unwrap().kind
+        else {
+            panic!("a function expected");
+        };
+        assert_eq!(
+            (name.text.as_str(), name.span),
+            ("paint_side", span(1, 10, 20))
+        );
+        let spans: Vec<Span> = parameters.iter().map(|name| name.span).collect();
+        assert_eq!(spans, [span(1, 21, 27), span(1, 29, 34)]);
+    }
+
+    #[test]
+    fn a_function_spans_its_line() {
+        let statements = statements("function f(a):  # c\n    forward()\n");
+        assert_eq!(statements[0].span, span(1, 1, 15));
+    }
+
+    #[test]
+    fn spaces_around_the_words_of_the_line_change_nothing() {
+        assert_eq!(
+            line("function  f ( a , b ) :\n    b()"),
+            "function f(a, b) { b() }"
+        );
+    }
+
+    #[test]
+    fn a_function_in_a_block_is_left_to_the_checker() {
+        assert_eq!(
+            line("if a:\n    function f():\n        b()"),
+            "if a { function f() { b() } }"
+        );
+        assert_eq!(
+            line("function f():\n    function g():\n        b()"),
+            "function f() { function g() { b() } }"
+        );
+    }
+
+    #[test]
+    fn the_names_are_left_to_the_checker() {
+        assert_eq!(
+            line("function paintSide(côté, côté):\n    b()"),
+            "function paintSide(côté, côté) { b() }"
+        );
+        assert_eq!(
+            line("function forward(red):\n    b()"),
+            "function forward(red) { b() }"
+        );
+    }
+
+    #[test]
+    fn a_missing_name_is_an_error_at_what_stands_there() {
+        for (source, start, end) in [
+            ("function (length):\n    b()", 10, 11),
+            ("function:\n    b()", 9, 10),
+            ("function 3():\n    b()", 10, 11),
+            ("function \"f\"():\n    b()", 10, 13),
+        ] {
+            let found = error(source);
+            assert_eq!(found.kind, E::ExpectedFunctionName, "{source}");
+            assert_eq!(found.span, span(1, start, end), "{source}");
+        }
+        let found = error("function");
+        assert_eq!(found.kind, E::ExpectedFunctionName);
+        assert_eq!(found.span, span(1, 9, 9));
+    }
+
+    #[test]
+    fn a_keyword_is_no_name_of_a_function_nor_of_a_parameter() {
+        let found = error("function repeat():\n    b()");
+        let keyword = Keyword::Repeat;
+        assert_eq!(found.kind, E::KeywordAsName { keyword });
+        assert_eq!(found.span, span(1, 10, 16));
+        let found = error("function f(a, true):\n    b()");
+        let keyword = Keyword::True;
+        assert_eq!(found.kind, E::KeywordAsName { keyword });
+        assert_eq!(found.span, span(1, 15, 19));
+        let keyword = Keyword::Function;
+        assert_eq!(
+            error_kind("function function():\n    b()"),
+            E::KeywordAsName { keyword }
+        );
+        assert_eq!(error_kind("function = 3"), E::KeywordAsName { keyword });
+    }
+
+    #[test]
+    fn a_word_of_another_language_is_its_own_error() {
+        let word = ForeignWord::Def;
+        assert_eq!(error_kind("def f():\n    b()"), E::ForeignWord { word });
+        assert_eq!(
+            error_kind("function def():\n    b()"),
+            E::ForeignWord { word }
+        );
+        let word = ForeignWord::Var;
+        let found = error("function f(a, var):\n    b()");
+        assert_eq!(found.kind, E::ForeignWord { word });
+        assert_eq!(found.span, span(1, 15, 18));
+        assert_eq!(
+            error_kind("function f(a var):\n    b()"),
+            E::ForeignWord { word }
+        );
+    }
+
+    #[test]
+    fn missing_parentheses_are_an_error_after_the_name() {
+        let found = error("function paint_side:\n    b()");
+        assert_eq!(found.kind, E::ExpectedParameterList);
+        assert_eq!(found.span, span(1, 20, 21));
+        let found = error("function paint_side");
+        assert_eq!(found.kind, E::ExpectedParameterList);
+        assert_eq!(found.span, span(1, 20, 20));
+        let found = error("function paint side():\n    b()");
+        assert_eq!(found.kind, E::ExpectedParameterList);
+        assert_eq!(found.span, span(1, 16, 20));
+        assert_eq!(
+            error_kind("function f length:\n    b()"),
+            E::ExpectedParameterList
+        );
+        assert_eq!(
+            error_kind("function f):\n    b()"),
+            E::ExpectedParameterList
+        );
+    }
+
+    #[test]
+    fn a_parameter_is_a_name_alone() {
+        for (source, start, end) in [
+            ("function f(3):", 12, 13),
+            ("function f(a, 3):", 15, 16),
+            ("function f(\"a\"):", 12, 15),
+            ("function f(a + b):", 14, 15),
+            ("function f(a = 3):", 14, 15),
+            ("function f(a == 3):", 14, 16),
+            ("function f(a b):", 14, 15),
+            ("function f((a)):", 12, 13),
+            ("function f(a(b)):", 13, 14),
+            ("function f(-a):", 12, 13),
+            ("function f(a: b):", 13, 14),
+            ("function f(, a):", 12, 13),
+            ("function f(a,, b):", 14, 15),
+            ("function f(,):", 12, 13),
+        ] {
+            let found = error(&format!("{source}\n    b()"));
+            assert_eq!(found.kind, E::InvalidParameter, "{source}");
+            assert_eq!(found.span, span(1, start, end), "{source}");
+        }
+    }
+
+    #[test]
+    fn a_comma_after_the_last_parameter_is_an_error() {
+        let found = error("function paint_side(length,):\n    b()");
+        assert_eq!(found.kind, E::TrailingComma);
+        assert_eq!(found.span, span(1, 27, 28));
+        let found = error("function f(a, b , ):\n    b()");
+        assert_eq!(found.span, span(1, 17, 18));
+    }
+
+    #[test]
+    fn parentheses_not_closed_are_an_error_at_the_parenthesis() {
+        for source in [
+            "function f(",
+            "function f(:",
+            "function f(a",
+            "function f(a:",
+            "function f(a,",
+            "function f(a,:",
+            "function f(a, b\n    b()",
+            "function f(a, b:\n    b()",
+        ] {
+            let found = error(source);
+            assert_eq!(found.kind, E::UnclosedParen, "{source}");
+            assert_eq!(found.span, span(1, 11, 12), "{source}");
+        }
+    }
+
+    #[test]
+    fn a_parenthesis_too_many_is_its_own_error() {
+        let found = error("function f(a)):\n    b()");
+        assert_eq!(found.kind, E::UnmatchedParen);
+        assert_eq!(found.span, span(1, 14, 15));
+    }
+
+    #[test]
+    fn the_line_ends_with_a_colon() {
+        let found = error("function f()\n    b()");
+        assert_eq!(found.kind, E::ExpectedColon);
+        assert_eq!(found.span, span(1, 13, 13));
+        let found = error("function f() b:\n    b()");
+        assert_eq!(found.kind, E::ExpectedColon);
+        assert_eq!(found.span, span(1, 14, 15));
+        // A learner who knows another language: the lexer knows no brace.
+        assert!(matches!(parse("function f() {"), Err(SyntaxError::Lex(_))));
+    }
+
+    #[test]
+    fn the_errors_of_a_block_are_those_of_the_others() {
+        let found = error("function f(): forward()");
+        assert_eq!(found.kind, E::AfterColon);
+        assert_eq!(found.span, span(1, 15, 24));
+        let found = error("function f(a):\nb()");
+        assert_eq!(found.kind, E::EmptyBlock);
+        assert_eq!(found.span, span(1, 1, 15));
+        let found = error("function f(a):\n    # later\nb()");
+        assert_eq!(found.kind, E::CommentOnlyBlock);
+        assert_eq!(found.span, span(2, 5, 12));
+        assert_eq!(
+            error_kind("function f():\n    b()\nelse:\n    b()"),
+            E::ElseWithoutIf
+        );
+    }
+
+    #[test]
+    fn an_error_inside_a_function_comes_through() {
+        let found = error("function f(a):\n    return a +\n");
+        assert_eq!(found.kind, E::ExpectedValue);
+        assert_eq!(found.span.start, Position::new(2, 15));
+    }
+}
+
 mod depth {
     use super::*;
 
@@ -1469,6 +1741,7 @@ mod depth {
                 .unwrap_or(0),
             StatementKind::While { condition, body } => height(condition).max(block(body)),
             StatementKind::Repeat { count, body } => height(count).max(block(body)),
+            StatementKind::Function { body, .. } => block(body),
         }
     }
 
@@ -1528,7 +1801,7 @@ mod depth {
     fn every_kind_of_block_counts() {
         let nested = |count: usize| {
             let opening = |level: usize, indent: &str| {
-                let line = ["if a:", "while a:", "repeat 3:"][level % 3];
+                let line = ["if a:", "while a:", "repeat 3:", "function f(a):"][level % 4];
                 format!("{indent}{line}\n")
             };
             blocks_with(count, opening, "b()")
@@ -1611,7 +1884,7 @@ mod robustness {
 
     #[test]
     fn any_pieces_give_a_tree_or_an_error() {
-        const PIECES: [&str; 32] = [
+        const PIECES: [&str; 34] = [
             "if a:\n",
             "if ",
             "else:\n",
@@ -1620,6 +1893,8 @@ mod robustness {
             "while a:\n",
             "repeat 3:\n",
             "function",
+            "function f(a):\n",
+            "f(",
             "    ",
             "        ",
             " ",
@@ -1657,7 +1932,7 @@ mod robustness {
 
     #[test]
     fn any_lines_at_any_indentation_give_a_tree_or_an_error() {
-        const LINES: [&str; 12] = [
+        const LINES: [&str; 13] = [
             "if a:",
             "else if b:",
             "else:",
@@ -1670,6 +1945,7 @@ mod robustness {
             "# c",
             "",
             "if a: b()",
+            "function f(a, b):",
         ];
         let mut random = Random(2);
         let mut read = 0;
@@ -1701,7 +1977,7 @@ mod robustness {
         let mut refused = 0;
         for _ in 0..300 {
             let kinds: Vec<&str> = (0..random.next() % (BLOCKS + 20))
-                .map(|_| random.pick(&["if a:", "while a:", "repeat 3:"]))
+                .map(|_| random.pick(&["if a:", "while a:", "repeat 3:", "function f(a):"]))
                 .collect();
             let count = random.next() % (MAX + 20);
             let expression = match random.next() % 3 {

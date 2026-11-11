@@ -184,7 +184,7 @@ impl Parser {
     /// The error of the `(` at `open` when the line ends right where a value is expected
     /// inside it: the `)` is missing, more surely than a value (`forward(`). The `:` that
     /// ends a line which opens a block ends it as well (`if front_is_clear(:`).
-    fn unclosed_at_end_of_line(&mut self, open: Span) -> Result<(), ParseError> {
+    pub(super) fn unclosed_at_end_of_line(&mut self, open: Span) -> Result<(), ParseError> {
         if self.at_end_of_line() {
             return Err(ParseError {
                 kind: ParseErrorKind::UnclosedParen,
