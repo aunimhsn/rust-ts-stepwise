@@ -8,8 +8,8 @@
 //! outside a loop, an expression alone on its line that isn't a call.
 //!
 //! The words of other languages (`elif`, `def`…) are names for the lexer. The parser refuses
-//! them wherever it meets one, in [`Parser::name`] where a name is right and in
-//! [`Parser::error`] where it isn't: whatever the error would have been, the word explains it
+//! them wherever it meets one, in `Parser::name` where a name is right and in
+//! `Parser::error` where it isn't: whatever the error would have been, the word explains it
 //! better.
 
 mod block;

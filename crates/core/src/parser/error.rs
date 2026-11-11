@@ -3,6 +3,7 @@
 
 use crate::lexer::{Keyword, LexError};
 use crate::span::Span;
+use crate::word_enum::word_enum;
 
 /// The first syntax error of a program, found by the lexer or by the parser.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -128,65 +129,27 @@ pub enum ParseErrorKind {
     TooDeep,
 }
 
-/// The words a learner may write from another language, reserved so that each gets a message
-/// that shows the Stepwise way.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum ForeignWord {
-    /// `elif`, written `else if`.
-    Elif,
-    /// `def`, written `function`.
-    Def,
-    /// `var`, written `let`.
-    Var,
-    /// `const`, written `let`.
-    Const,
-    /// `for`
-    For,
-    /// `continue`
-    Continue,
-    /// `pass`
-    Pass,
-    /// `none`
-    NoneWord,
-    /// `null`
-    Null,
-}
-
-impl ForeignWord {
-    /// Every word, in the order of the specifications.
-    pub const ALL: [Self; 9] = [
-        Self::Elif,
-        Self::Def,
-        Self::Var,
-        Self::Const,
-        Self::For,
-        Self::Continue,
-        Self::Pass,
-        Self::NoneWord,
-        Self::Null,
-    ];
-
-    /// The word written `word`, if it is one of them.
-    #[must_use]
-    pub fn from_word(word: &str) -> Option<Self> {
-        Self::ALL
-            .into_iter()
-            .find(|foreign| foreign.as_str() == word)
-    }
-
-    /// The word as it is written.
-    #[must_use]
-    pub const fn as_str(self) -> &'static str {
-        match self {
-            Self::Elif => "elif",
-            Self::Def => "def",
-            Self::Var => "var",
-            Self::Const => "const",
-            Self::For => "for",
-            Self::Continue => "continue",
-            Self::Pass => "pass",
-            Self::NoneWord => "none",
-            Self::Null => "null",
-        }
+word_enum! {
+    /// The words a learner may write from another language, reserved so that each gets a
+    /// message that shows the Stepwise way.
+    pub enum ForeignWord {
+        /// `elif`, written `else if`.
+        Elif => "elif",
+        /// `def`, written `function`.
+        Def => "def",
+        /// `var`, written `let`.
+        Var => "var",
+        /// `const`, written `let`.
+        Const => "const",
+        /// `for`
+        For => "for",
+        /// `continue`
+        Continue => "continue",
+        /// `pass`
+        Pass => "pass",
+        /// `none`
+        NoneWord => "none",
+        /// `null`
+        Null => "null",
     }
 }

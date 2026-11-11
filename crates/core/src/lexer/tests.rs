@@ -2,6 +2,7 @@
 
 use super::{Keyword as K, LexError, LexErrorKind as E, Token, TokenKind as T, tokenize};
 use crate::span::{Position, Span};
+use crate::test_support::span;
 
 /// The kinds of the tokens of `source`, which must have no error.
 fn kinds(source: &str) -> Vec<T> {
@@ -57,11 +58,6 @@ fn name(word: &str) -> T {
 
 fn text(content: &str) -> T {
     T::Text(content.to_owned())
-}
-
-/// The stretch of `line` from column `start` included to `end` excluded.
-fn span(line: u32, start: u32, end: u32) -> Span {
-    Span::new(Position::new(line, start), Position::new(line, end))
 }
 
 /// The empty stretch at `line` and `column`.

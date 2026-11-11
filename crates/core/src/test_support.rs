@@ -1,5 +1,12 @@
 //! What the tests of several modules share.
 
+use crate::span::{Position, Span};
+
+/// The stretch of `line` from the column `start` included to the column `end` excluded.
+pub fn span(line: u32, start: u32, end: u32) -> Span {
+    Span::new(Position::new(line, start), Position::new(line, end))
+}
+
 /// A small generator of numbers, the same at every run, without a dependency.
 pub struct Random(pub u64);
 

@@ -8,6 +8,7 @@ use crate::ast::{
 };
 use crate::lexer::{Keyword, LexErrorKind};
 use crate::span::{Position, Span};
+use crate::test_support::span;
 
 /// The statements of `source`, which must have no error.
 fn statements(source: &str) -> Vec<Statement> {
@@ -48,11 +49,6 @@ fn error(source: &str) -> ParseError {
 /// The kind of the error of the parser for `source`, which must have one.
 fn error_kind(source: &str) -> E {
     error(source).kind
-}
-
-/// The span on `line` from the column `start` included to the column `end` excluded.
-fn span(line: u32, start: u32, end: u32) -> Span {
-    Span::new(Position::new(line, start), Position::new(line, end))
 }
 
 fn show_statement(statement: &Statement) -> String {

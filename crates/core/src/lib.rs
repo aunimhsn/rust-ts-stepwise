@@ -26,6 +26,8 @@ pub mod parser;
 pub mod probe;
 pub mod span;
 
+mod word_enum;
+
 #[cfg(test)]
 mod test_support;
 
