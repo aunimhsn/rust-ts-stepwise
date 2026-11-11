@@ -72,6 +72,16 @@ pub enum StatementKind {
         /// The block.
         body: Vec<Statement>,
     },
+    /// `function name(parameter, …):`, which defines a function. The parser takes it wherever
+    /// it is written: the checker refuses the ones that aren't at the top level.
+    Function {
+        /// The function defined.
+        name: Name,
+        /// Its parameters, in order. The checker refuses two of the same name.
+        parameters: Vec<Name>,
+        /// The block.
+        body: Vec<Statement>,
+    },
     /// An expression alone on its line. Only a call does something: the checker refuses
     /// the others, since it alone knows whether a name is a function or a variable.
     Expression(Expression),
@@ -88,7 +98,8 @@ pub struct Branch {
     pub span: Span,
 }
 
-/// A name where the language expects one (the variable of a `let`, the function of a call),
+/// A name where the language expects one (the variable of a `let`, the function of a call or
+/// of a definition, a parameter),
 /// as written: the checker refuses the names that aren't in `snake_case` or are reserved.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Name {

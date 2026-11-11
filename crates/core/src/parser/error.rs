@@ -53,7 +53,8 @@ pub enum ParseErrorKind {
     /// (`sides +`, `print(, 1)`, `let sides =`). The span is what stands there instead, or
     /// the end of the line.
     ExpectedValue,
-    /// A `,` after the last value of a call (`paint_side(3,)`). The span is the `,`.
+    /// A `,` after the last value of a call (`paint_side(3,)`) or after the last parameter of
+    /// a function (`function paint_side(length,):`). The span is the `,`.
     TrailingComma,
     /// A `not` right after an operator stronger than it (`a == not b`, `-not a`): it is
     /// written at the start of an expression, after `and` or `or`, or between parentheses.
@@ -62,7 +63,8 @@ pub enum ParseErrorKind {
     /// (`forward() forward()`, `print("a" "b")`, `break 3`).
     UnexpectedToken,
     /// A `(` whose `)` is missing on its line, the line or the `:` at its end coming where a
-    /// value or the `)` is expected (`forward(`, `if front_is_clear(:`). The span is the `(`.
+    /// value, a parameter or the `)` is expected (`forward(`, `if front_is_clear(:`,
+    /// `function paint_side(length:`). The span is the `(`.
     UnclosedParen,
     /// A `)` that closes no `(`.
     UnmatchedParen,
@@ -78,8 +80,9 @@ pub enum ParseErrorKind {
     },
     /// No name after `let`.
     ExpectedName,
-    /// A keyword where a name is expected (`let repeat = 3`, `repeat = 3`, `else = 3`):
-    /// keywords are reserved. The span is the keyword.
+    /// A keyword where a name is expected (`let repeat = 3`, `repeat = 3`, `else = 3`,
+    /// `function repeat():`, `function f(repeat):`): keywords are reserved. The span is the
+    /// keyword.
     KeywordAsName {
         /// The keyword.
         keyword: Keyword,
@@ -107,6 +110,17 @@ pub enum ParseErrorKind {
     /// An `else` or an `else if` after the `else` of an `if`: the `else` comes last, once.
     /// The span is the `else` too many.
     ElseAfterElse,
+    /// No name after `function` (`function (length):`, `function:`). The span is what stands
+    /// there instead, or the end of the line.
+    ExpectedFunctionName,
+    /// No `(` after the name of a function (`function paint_side:`): a function is written
+    /// with its parentheses, even when it has no parameter. The span is what stands there
+    /// instead, or the end of the line.
+    ExpectedParentheses,
+    /// Something else than names separated by `,` between the parentheses of a function
+    /// (`function f(3):`, `function f(a + b):`, `function f(a = 3):`, `function f(, a):`).
+    /// The span is the first token that can't be there.
+    InvalidParameter,
     /// Parentheses, operators, calls and blocks nested deeper than
     /// [`MAX_DEPTH`](super::MAX_DEPTH), or blocks alone deeper than
     /// [`MAX_BLOCK_DEPTH`](super::MAX_BLOCK_DEPTH). For a block, the span is the line that

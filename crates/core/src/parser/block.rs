@@ -1,5 +1,5 @@
-//! The statements that open a block: `if` with its `else if` and its `else`, `while` and
-//! `repeat`.
+//! The statements that open a block: `if` with its `else if` and its `else`, `while`,
+//! `repeat` and `function`.
 //!
 //! The line of such a statement ends with a `:` ([`Parser::colon`]), and its block is the
 //! lines under it, between the [`TokenKind::Indent`] and the [`TokenKind::Dedent`] of the
@@ -8,7 +8,7 @@
 //! themselves nest up to [`MAX_BLOCK_DEPTH`].
 
 use super::{MAX_BLOCK_DEPTH, ParseError, ParseErrorKind, Parser};
-use crate::ast::{Branch, Statement, StatementKind};
+use crate::ast::{Branch, Name, Statement, StatementKind};
 use crate::lexer::{Keyword, TokenKind};
 use crate::span::{Position, Span};
 
@@ -62,6 +62,48 @@ impl Parser {
         } = self.opening(self.current.span.start)?;
         let kind = StatementKind::Repeat { count, body };
         Ok(Statement { kind, span })
+    }
+
+    /// `function name(parameter, …):` with its block, from the `function`.
+    ///
+    /// Wherever it is written: a function in a block is refused by the checker, which gives
+    /// every error of the program.
+    pub(super) fn function_definition(&mut self) -> Result<Statement, ParseError> {
+        let start = self.current.span.start;
+        self.advance();
+        let Some(name) = self.name()? else {
+            return Err(self.not_a_name(ParseErrorKind::ExpectedFunctionName));
+        };
+        let parameters = self.parameters()?;
+        let span = self.colon(start)?;
+        let body = self.block(span)?;
+        let kind = StatementKind::Function {
+            name,
+            parameters,
+            body,
+        };
+        Ok(Statement { kind, span })
+    }
+
+    /// The parameters of a function between their parentheses, from the `(`: names separated
+    /// by `,`, with no `,` after the last one.
+    ///
+    /// A keyword is refused as wherever a name is expected, even one that is a value or an
+    /// operator (`function f(true):`, `function f(not a):`), as after a `let`: it is reserved
+    /// before it is misplaced.
+    fn parameters(&mut self) -> Result<Vec<Name>, ParseError> {
+        if self.current.kind != TokenKind::LeftParen {
+            return Err(self.error(ParseErrorKind::ExpectedParentheses));
+        }
+        let open = self.current.span;
+        self.advance();
+        let parameters = self.comma_separated(open, |parser| {
+            parser
+                .name()?
+                .ok_or_else(|| parser.not_a_name(ParseErrorKind::InvalidParameter))
+        })?;
+        self.close(open, ParseErrorKind::InvalidParameter)?;
+        Ok(parameters)
     }
 
     /// A keyword, the current token, then an expression, a `:` and a block: what `if`,
