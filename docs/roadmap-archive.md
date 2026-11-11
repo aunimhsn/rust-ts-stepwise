@@ -95,3 +95,9 @@ The syntax tree and `parse(source)`; the expressions with their priorities and t
 ### 6c. Functions (#27)
 
 `function` with its parameters and the errors of its line (a missing name, missing parentheses, a parameter that isn't a name alone, a comma after the last parameter); the stack the parser needs at the maximum depth, measured again in WebAssembly with 50 blocks around the deepest expression, the worst case (see [Technical choices](technical-choices.md), Parser).
+
+## 7. Checker
+
+### 7a. Structure and form of the names (#29)
+
+`check(&Program)` and its errors as codes; `break` and `return` in place, functions at the top level, `snake_case` names, the names reserved by the built-in functions and the colors (their lists, shared with the interpreter), two parameters of the same name.

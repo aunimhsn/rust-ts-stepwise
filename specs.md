@@ -16,7 +16,7 @@ Stepwise teaches the first steps of programming. The learner writes a small prog
 - **Identity**: our own robot, friendly and simple, whose smiling head is the logo of Stepwise. Its look comes from the sheet of the world elements (see [Look of the world](#look-of-the-world)).
 - **The robot shows what the program does**: every action is animated, the line being run is highlighted, and nothing happens without the learner seeing it.
 - **Three fonts, each with one role**: **Fredoka**, the personality, the familiarity with the robot, kept rare so that it keeps its effect: the name, what the robot says, **Let's go**, the great moments such as *"Level 18 done!"*. **Manrope**, the interface: everything read or clicked. **Source Code Pro** in semi-bold, the code: the editor, the console, the variables panel, the examples of the manual.
-- **Tone of the messages**: short, friendly, in the second person, never blaming. An error says what happened, where (its line), and the rule to follow, with the words of the language: *"Expected ':' at the end of the `if` line."* It never rewrites the learner's code for them: finding the fix by reading the line again is part of learning.
+- **Tone of the messages**: short, friendly, in the second person, never blaming. An error says what happened, where (its line), and the rule to follow, with the words of the language: *"Expected ':' at the end of the `if` line."* It states what is wrong and recalls the rule, and stops there: it never suggests a fix, nor rewrites the learner's code for them. Applying the rule is the learner's part: trying, getting an error, trying again is how the game teaches. The checks know the fact, not the intention (a name that isn't declared may be a forgotten `let` or a typo), so a suggestion would often be the wrong one. The one exception is the words of other languages (see [Names](#names)).
 - **Strict where it builds a habit**: indentation of exactly four spaces, `snake_case` names, a function defined before it is called, a variable declared before it is used. Each rule has its own clear message.
 
 ## The language
@@ -61,7 +61,7 @@ else:
 - The keywords, the built-in functions and the colors are reserved: a variable, a function or a parameter can't take their names.
 - A name is one thing in the whole program: two functions can't have the same name, and a variable or a parameter can't take the name of a function of the program, wherever that function is defined. So `paint_side` and `paint_side()` never are two different things.
 - Keywords: `let`, `if`, `else`, `while`, `repeat`, `break`, `function`, `return`, `and`, `or`, `not`, `true`, `false`.
-- The words a learner may write from another language are reserved too, each with a message that shows the Stepwise way: `elif` (→ `else if`), `def` (→ `function`), `var` and `const` (→ `let`), `for`, `continue`, `pass`, `none`, `null`. Wherever one of them is written, it is a syntax error.
+- The words a learner may write from another language are reserved too, each with a message that shows the Stepwise way: `elif` (→ `else if`), `def` (→ `function`), `var` and `const` (→ `let`), `for`, `continue`, `pass`, `none`, `null`. Wherever one of them is written, it is a syntax error. These messages are the one exception to the rule that a message suggests nothing (see [Design principles](#design-principles)): such a word has one meaning, so the message translates a word from another language and guesses no intention, and no amount of trying would lead the learner to `else if`.
 
 ### Values
 
@@ -76,9 +76,9 @@ Lists and decimal numbers come later (see the [backlog](docs/backlog.md)).
 
 ### Variables
 
-- `let name = value` declares a variable; `name = value` changes it afterwards. Changing a variable that was never declared is an error that suggests `let`, which catches the typos (`sides = sidse + 1`).
-- A variable exists from its `let` to the end of the block where it is declared. Using it after the end of that block is an error of its own, which recalls this rule and gives the line of its `let`. Declaring a name already declared in that block or in a block around it is an error, which recalls that `let` declares once and that `=` alone changes the value.
-- A function sees only its parameters and its own variables, never the variables of the main program. Using a variable of the main program in a function is an error of its own, which recalls this rule. A function may declare a variable that has the name of a variable of the main program: they are two distinct variables, and neither changes the other.
+- `let name = value` declares a variable; `name = value` changes it afterwards. Reading a name that is no variable is an error, which catches the typos (`sides = sidse + 1`); changing one is an error of its own, which recalls that a variable is declared with `let`, without saying whether a `let` is missing or the name is mistyped (`sidse = sides + 1`). Changing a name declares nothing: every line that uses a name that is no variable has its error, so that each place where the name doesn't exist is underlined, and they all go away with the one `let` that was missing.
+- A variable exists from its `let` to the end of the block where it is declared. Using it above its `let` (the value of its own `let` included: `let sides = sides + 1`), or after the end of that block, are two errors of their own, which recall this rule and give the line of its `let`: the closest above, when several blocks that have ended declared the name. Reading the variable or changing it gives the same error. When both hold, the `let` further down comes first: it is the variable of that place. Declaring a name already declared in that block or in a block around it, a parameter of the function included, is an error, which recalls that `let` declares once and that `=` alone changes the value, and gives the line of the first declaration.
+- A function sees only its parameters and its own variables, never the variables of the main program. Using a variable of the main program in a function, to read it or to change it, is an error of its own, which recalls this rule, wherever the `let` of that variable is: above the function, under it, or in a block. The body of a function is a block: a variable of a function used in the main program under it has the error of a variable used after the end of its block; a parameter used there, which has no `let`, is a name that is no variable. A function may declare a variable that has the name of a variable of the main program: they are two distinct variables, and neither changes the other.
 - A parameter is a variable of its function: it can be changed (`length = length - 1`).
 
 ### Expressions
@@ -89,7 +89,7 @@ Lists and decimal numbers come later (see the [backlog](docs/backlog.md)).
 - Logic: `and`, `or`, `not`, on booleans, evaluated from left to right and stopping as soon as the result is known. `not` and `-` can be repeated (`not not done`, `- -3`).
 - Parentheses group as usual and are never required: `if front_is_clear():` and `if (front_is_clear()):` both work.
 - Priority, from the strongest: parentheses and calls; `-` in front of a value; `*`, `/`, `%`; `+`, `-`; comparisons; `not`; `and`; `or`. As in Python, `not` comes after the comparisons: `not sides == 4` is `not (sides == 4)`. So `not` is written at the start of an expression or after `and` or `or`; right after another operator (`a == not b`), it is an error that asks for parentheses (`a == (not b)`).
-- `=` where `==` is expected is an error that suggests `==`, anywhere in an expression (`if x = 3:`, `let a = b = 3`, `print(x = 3)`).
+- `=` where `==` is expected is an error that recalls that `=` gives a value and `==` compares, anywhere in an expression (`if x = 3:`, `let a = b = 3`, `print(x = 3)`).
 - Expressions nest up to 200 deep, with the blocks around them (themselves up to 50, see [Lines and indentation](#lines-and-indentation)) and the long chains of operators (`1 + 1 + 1 + …`); beyond, an error. Nobody reaches it by hand.
 
 ### Statements
@@ -108,14 +108,14 @@ Lists and decimal numbers come later (see the [backlog](docs/backlog.md)).
 
 ### Functions
 
-- **A function is defined before it is called**, in the reading order of the program: calling it on a line above its definition is an error found before the program runs (*"`paint_side` is called on line 3 but defined on line 12. Move its definition above."*). There is no hoisting.
+- **A function is defined before it is called**, in the reading order of the program: calling it on a line above its definition is an error found before the program runs (*"`paint_side` is called on line 3 but defined on line 12. A function is defined above the lines that call it."*). There is no hoisting.
 - A function can call itself (recursion), since it is defined when its body runs. Two functions can't call each other.
 - A call gives exactly as many values as the function has parameters, the built-in functions included (`forward(3)`); another number is an error found before the program runs. No comma after the last value or the last parameter (`paint_side(3,)` is an error of its own).
 - A function is written with its parentheses, even when it has no parameter: `function square:` is an error of its own.
 - The parameters are names separated by commas, and nothing else: a value, an operator or a `=` between the parentheses (`function f(3):`, `function f(a = 3):`) is an error that recalls it. Two parameters of a function can't have the same name.
 - A function that ends without `return expression` gives back no value: using its result in an expression stops the program with an error.
 - Calls nest up to 200 deep; beyond, the program stops with an error (a recursion that never ends).
-- A function named without parentheses (`forward`), or a variable called like a function (`sides()`), is an error that shows the right way.
+- A function named without parentheses (`forward`), or a variable called like a function (`sides()`), is an error of its own, which recalls that a function is written with its parentheses, or that a variable isn't called.
 
 ### Built-in functions
 

@@ -40,6 +40,50 @@ pub enum CheckErrorKind {
         /// The name.
         name: String,
     },
+    /// A name read that is no variable of the program (`sides = sidse + 1`). The span is the
+    /// name.
+    UnknownName {
+        /// The name.
+        name: String,
+    },
+    /// A name given a value by `=` alone that is no variable of the program: a variable is
+    /// declared with `let` (`sidse = sides + 1`). The span is the name.
+    UndeclaredVariableChanged {
+        /// The name.
+        name: String,
+    },
+    /// A variable read or changed above its `let`, which is further down in the block or in
+    /// a block around it: a variable exists from its `let`. The span is the name.
+    VariableBeforeLet {
+        /// The name.
+        name: String,
+        /// The name in its `let`.
+        declared: Span,
+    },
+    /// A variable read or changed after the end of the block where it is declared, the body
+    /// of a function being a block: a variable exists until the end of its block. The span is
+    /// the name.
+    VariableAfterBlock {
+        /// The name.
+        name: String,
+        /// The name in its `let`: the closest above, when several blocks declared it.
+        declared: Span,
+    },
+    /// A variable of the main program read or changed in a function, wherever its `let` is:
+    /// a function sees only its parameters and its own variables. The span is the name.
+    MainVariableInFunction {
+        /// The name.
+        name: String,
+    },
+    /// A `let` of a name that is already a variable there, declared in the block or in a
+    /// block around it, or a parameter of the function: `let` declares once, `=` alone
+    /// changes the value. The span is the name.
+    AlreadyDeclared {
+        /// The name.
+        name: String,
+        /// The name where it was declared first.
+        first: Span,
+    },
 }
 
 /// A word that belongs to the language and that isn't a keyword: the keywords are refused by

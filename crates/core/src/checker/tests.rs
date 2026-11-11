@@ -4,6 +4,7 @@ use super::{CheckError, CheckErrorKind as E, ReservedWord, check, is_snake_case}
 use crate::builtin::Builtin;
 use crate::color::Color;
 use crate::parser::parse;
+use crate::span::Span;
 use crate::test_support::span;
 
 /// The errors of the checker for `source`, whose syntax must be right.
@@ -40,6 +41,36 @@ fn reserved(word: &str) -> E {
 fn duplicate(name: &str) -> E {
     let name = name.to_owned();
     E::DuplicateParameter { name }
+}
+
+fn unknown(name: &str) -> E {
+    let name = name.to_owned();
+    E::UnknownName { name }
+}
+
+fn undeclared(name: &str) -> E {
+    let name = name.to_owned();
+    E::UndeclaredVariableChanged { name }
+}
+
+fn before_let(name: &str, declared: Span) -> E {
+    let name = name.to_owned();
+    E::VariableBeforeLet { name, declared }
+}
+
+fn after_block(name: &str, declared: Span) -> E {
+    let name = name.to_owned();
+    E::VariableAfterBlock { name, declared }
+}
+
+fn main_variable(name: &str) -> E {
+    let name = name.to_owned();
+    E::MainVariableInFunction { name }
+}
+
+fn already_declared(name: &str, first: Span) -> E {
+    let name = name.to_owned();
+    E::AlreadyDeclared { name, first }
 }
 
 mod programs {
@@ -87,6 +118,14 @@ if true:
     function red(side, side):
         break
 return
+print(total)
+let total = 0
+let total = 1
+if true:
+    let step = 1
+step = 2
+function walk():
+    total = sidse
 ";
         assert_eq!(
             errors(source),
@@ -118,6 +157,26 @@ return
                 CheckError {
                     kind: E::ReturnOutsideFunction,
                     span: span(6, 1, 7),
+                },
+                CheckError {
+                    kind: before_let("total", span(8, 5, 10)),
+                    span: span(7, 7, 12),
+                },
+                CheckError {
+                    kind: already_declared("total", span(8, 5, 10)),
+                    span: span(9, 5, 10),
+                },
+                CheckError {
+                    kind: after_block("step", span(11, 9, 13)),
+                    span: span(12, 1, 5),
+                },
+                CheckError {
+                    kind: main_variable("total"),
+                    span: span(14, 5, 10),
+                },
+                CheckError {
+                    kind: unknown("sidse"),
+                    span: span(14, 13, 18),
                 },
             ]
         );
@@ -537,11 +596,653 @@ function erase(side):
     }
 
     #[test]
+    fn a_reserved_name_written_twice_keeps_its_one_error_each_time() {
+        let source = "function paint(red, red):\n    forward()\n";
+        assert_eq!(kinds(source), [reserved("red"), reserved("red")]);
+    }
+
+    #[test]
     fn a_duplicate_that_is_not_in_snake_case_has_both_errors() {
         let source = "function paint(Side, Side):\n    forward()\n";
         assert_eq!(
             kinds(source),
             [E::NotSnakeCase, E::NotSnakeCase, duplicate("Side")]
+        );
+    }
+}
+
+mod variables {
+    use super::*;
+
+    #[test]
+    fn a_variable_is_read_and_changed_after_its_let() {
+        assert_valid("let sides = 0\nsides = sides + 1\nprint(sides)\n");
+    }
+
+    #[test]
+    fn a_variable_is_seen_in_the_blocks_under_its_let() {
+        assert_valid(
+            "\
+let sides = 0
+while sides < 4:
+    if sides == 2:
+        sides = sides + 2
+    else:
+        repeat sides:
+            print(sides)
+",
+        );
+    }
+
+    #[test]
+    fn a_color_is_a_value() {
+        assert_valid("let paint = red\nif here_is(blue):\n    start_painting(paint)\n");
+    }
+
+    #[test]
+    fn the_names_of_every_expression_are_checked() {
+        let source = "\
+if a:
+    forward()
+else if b:
+    forward()
+while not c:
+    forward()
+repeat d:
+    forward()
+print(e, -f)
+function walk():
+    return g + 1
+h
+";
+        let names = ["a", "b", "c", "d", "e", "f", "g", "h"];
+        assert_eq!(kinds(source), names.map(unknown));
+    }
+
+    #[test]
+    fn a_name_that_is_refused_is_still_declared() {
+        assert_eq!(kinds("let Sides = 0\nprint(Sides)\n"), [E::NotSnakeCase]);
+    }
+}
+
+mod unknown_names {
+    use super::*;
+
+    #[test]
+    fn a_name_read_that_is_no_variable_is_an_error() {
+        assert_eq!(
+            error("let sides = 0\nsides = sidse + 1\n"),
+            CheckError {
+                kind: unknown("sidse"),
+                span: span(2, 9, 14),
+            }
+        );
+    }
+
+    #[test]
+    fn a_name_changed_that_is_no_variable_is_an_error_of_its_own() {
+        assert_eq!(
+            error("let sides = 0\nsidse = sides + 1\n"),
+            CheckError {
+                kind: undeclared("sidse"),
+                span: span(2, 1, 6),
+            }
+        );
+    }
+
+    #[test]
+    fn every_use_of_a_name_that_is_no_variable_has_its_error() {
+        // Changing a name declares nothing: each line where the name doesn't exist says so.
+        let source = "\
+count = 0
+while count < 3:
+    count = count + 1
+print(count)
+";
+        assert_eq!(
+            kinds(source),
+            [
+                undeclared("count"),
+                unknown("count"),
+                undeclared("count"),
+                unknown("count"),
+                unknown("count")
+            ]
+        );
+    }
+
+    #[test]
+    fn the_errors_of_a_line_are_in_its_order() {
+        assert_eq!(
+            errors("return sidse\n"),
+            [
+                CheckError {
+                    kind: E::ReturnOutsideFunction,
+                    span: span(1, 1, 13),
+                },
+                CheckError {
+                    kind: unknown("sidse"),
+                    span: span(1, 8, 13),
+                },
+            ]
+        );
+        assert_eq!(
+            kinds("sidse = sidsa\n"),
+            [undeclared("sidse"), unknown("sidsa")]
+        );
+    }
+
+    #[test]
+    fn both_sides_of_an_operator_are_checked() {
+        assert_eq!(
+            errors("print(1 + sidse)\n"),
+            [CheckError {
+                kind: unknown("sidse"),
+                span: span(1, 11, 16),
+            }]
+        );
+        assert_eq!(
+            kinds("print(sidse * 2 - sidsa)\n"),
+            [unknown("sidse"), unknown("sidsa")]
+        );
+    }
+
+    #[test]
+    fn the_value_given_to_a_name_that_is_refused_is_still_checked() {
+        assert_eq!(
+            kinds("let red = sidse\n"),
+            [reserved("red"), unknown("sidse")]
+        );
+        assert_eq!(
+            kinds("forward = sidse\n"),
+            [reserved("forward"), unknown("sidse")]
+        );
+        assert_eq!(
+            kinds("let Sides = sidse\n"),
+            [E::NotSnakeCase, unknown("sidse")]
+        );
+    }
+
+    #[test]
+    fn a_condition_is_checked_before_its_block() {
+        let source = "\
+if sidse:
+    let Sides = 0
+else if sidsa:
+    forward()
+";
+        assert_eq!(
+            kinds(source),
+            [unknown("sidse"), E::NotSnakeCase, unknown("sidsa")]
+        );
+    }
+
+    #[test]
+    fn the_values_of_a_call_are_checked_but_not_its_function() {
+        // Whether the function exists is checked with the functions.
+        assert_eq!(kinds("paint_side(sidse)\n"), [unknown("sidse")]);
+    }
+
+    #[test]
+    fn a_built_in_function_without_parentheses_is_left_to_the_check_of_the_functions() {
+        assert_valid("let go = forward\n");
+    }
+}
+
+mod variables_before_their_let {
+    use super::*;
+
+    #[test]
+    fn a_variable_read_above_its_let_is_an_error_that_gives_its_let() {
+        assert_eq!(
+            error("print(sides)\nlet sides = 0\n"),
+            CheckError {
+                kind: before_let("sides", span(2, 5, 10)),
+                span: span(1, 7, 12),
+            }
+        );
+    }
+
+    #[test]
+    fn a_variable_changed_above_its_let_has_the_same_error() {
+        assert_eq!(
+            error("sides = 1\nlet sides = 0\n"),
+            CheckError {
+                kind: before_let("sides", span(2, 5, 10)),
+                span: span(1, 1, 6),
+            }
+        );
+    }
+
+    #[test]
+    fn the_value_of_a_let_is_read_before_the_variable_exists() {
+        assert_eq!(
+            error("let sides = sides + 1\n"),
+            CheckError {
+                kind: before_let("sides", span(1, 5, 10)),
+                span: span(1, 13, 18),
+            }
+        );
+    }
+
+    #[test]
+    fn the_let_may_be_in_a_block_around() {
+        let source = "\
+while true:
+    if true:
+        print(sides)
+    let sides = 0
+";
+        assert_eq!(
+            error(source),
+            CheckError {
+                kind: before_let("sides", span(4, 9, 14)),
+                span: span(3, 15, 20),
+            }
+        );
+    }
+
+    #[test]
+    fn the_let_of_the_innermost_block_comes_first() {
+        let source = "\
+while true:
+    if true:
+        print(sides)
+        let sides = 1
+    let sides = 2
+";
+        assert_eq!(kinds(source), [before_let("sides", span(4, 13, 18))]);
+    }
+
+    #[test]
+    fn a_let_in_a_block_further_down_is_another_variable() {
+        let source = "print(sides)\nif true:\n    let sides = 0\n";
+        assert_eq!(kinds(source), [unknown("sides")]);
+    }
+
+    #[test]
+    fn a_function_has_the_same_rule() {
+        let source = "function count():\n    print(total)\n    let total = 0\n";
+        assert_eq!(kinds(source), [before_let("total", span(3, 9, 14))]);
+    }
+}
+
+mod variables_after_their_block {
+    use super::*;
+
+    #[test]
+    fn a_variable_read_after_its_block_is_an_error_that_gives_its_let() {
+        assert_eq!(
+            error("if true:\n    let sides = 0\nprint(sides)\n"),
+            CheckError {
+                kind: after_block("sides", span(2, 9, 14)),
+                span: span(3, 7, 12),
+            }
+        );
+    }
+
+    #[test]
+    fn a_variable_changed_after_its_block_has_the_same_error() {
+        assert_eq!(
+            error("while true:\n    let sides = 0\nsides = 1\n"),
+            CheckError {
+                kind: after_block("sides", span(2, 9, 14)),
+                span: span(3, 1, 6),
+            }
+        );
+    }
+
+    #[test]
+    fn the_let_given_is_the_closest_above() {
+        let source = "\
+if true:
+    let sides = 0
+else:
+    let sides = 1
+print(sides)
+";
+        assert_eq!(kinds(source), [after_block("sides", span(4, 9, 14))]);
+    }
+
+    #[test]
+    fn a_variable_of_a_branch_is_not_seen_by_the_branches_after_it() {
+        let source = "\
+if true:
+    let side = 1
+else if side == 1:
+    forward()
+else:
+    side = 2
+";
+        let declared = span(2, 9, 13);
+        assert_eq!(
+            errors(source),
+            [
+                CheckError {
+                    kind: after_block("side", declared),
+                    span: span(3, 9, 13),
+                },
+                CheckError {
+                    kind: after_block("side", declared),
+                    span: span(6, 5, 9),
+                },
+            ]
+        );
+    }
+
+    #[test]
+    fn a_name_is_free_again_after_a_function() {
+        assert_valid("function count():\n    let total = 0\nlet total = 1\nprint(total)\n");
+    }
+
+    #[test]
+    fn a_variable_declared_further_down_comes_before_one_of_a_function() {
+        let source = "function count():\n    let total = 0\nprint(total)\nlet total = 1\n";
+        assert_eq!(kinds(source), [before_let("total", span(4, 5, 10))]);
+    }
+
+    #[test]
+    fn a_name_is_free_again_after_its_block() {
+        assert_valid(
+            "\
+if true:
+    let sides = 0
+else:
+    let sides = 1
+let sides = 2
+print(sides)
+",
+        );
+    }
+
+    #[test]
+    fn a_variable_of_a_loop_is_declared_once() {
+        assert_valid("repeat 3:\n    let step = 1\n    print(step)\n");
+    }
+
+    #[test]
+    fn a_variable_declared_further_down_comes_before_one_whose_block_ended() {
+        let source = "\
+if true:
+    let sides = 1
+print(sides)
+let sides = 2
+";
+        assert_eq!(kinds(source), [before_let("sides", span(4, 5, 10))]);
+    }
+
+    #[test]
+    fn the_body_of_a_function_is_a_block() {
+        let source = "function count():\n    let total = 0\nprint(total)\n";
+        assert_eq!(kinds(source), [after_block("total", span(2, 9, 14))]);
+    }
+
+    #[test]
+    fn a_parameter_is_unknown_in_the_main_program() {
+        let source = "function walk(length):\n    forward()\nprint(length)\n";
+        assert_eq!(kinds(source), [unknown("length")]);
+    }
+}
+
+mod variables_of_the_main_program {
+    use super::*;
+
+    #[test]
+    fn a_function_does_not_see_them() {
+        assert_eq!(
+            error("let sides = 0\nfunction walk():\n    print(sides)\n"),
+            CheckError {
+                kind: main_variable("sides"),
+                span: span(3, 11, 16),
+            }
+        );
+    }
+
+    #[test]
+    fn wherever_their_let_is() {
+        let source = "\
+function walk():
+    sides = sides + 1
+while true:
+    let sides = 0
+";
+        assert_eq!(
+            kinds(source),
+            [main_variable("sides"), main_variable("sides")]
+        );
+    }
+
+    #[test]
+    fn in_every_branch_of_an_if() {
+        let source = "\
+function walk():
+    print(first, second, third)
+if true:
+    let first = 1
+else if true:
+    let second = 2
+else:
+    let third = 3
+";
+        let names = ["first", "second", "third"];
+        assert_eq!(kinds(source), names.map(main_variable));
+    }
+
+    #[test]
+    fn even_when_their_block_has_ended() {
+        let source = "\
+if true:
+    let sides = 0
+function walk():
+    print(sides)
+";
+        assert_eq!(kinds(source), [main_variable("sides")]);
+    }
+
+    #[test]
+    fn a_variable_of_the_function_whose_block_ended_comes_first() {
+        let source = "\
+let total = 0
+function count():
+    if true:
+        let total = 1
+    print(total)
+";
+        assert_eq!(kinds(source), [after_block("total", span(4, 13, 18))]);
+    }
+
+    #[test]
+    fn a_parameter_written_twice_is_one_variable() {
+        let source = "function walk(side, side):\n    print(side)\n";
+        assert_eq!(kinds(source), [duplicate("side")]);
+    }
+
+    #[test]
+    fn a_parameter_with_a_reserved_name_is_no_variable() {
+        // The name read in the body is the color.
+        let source = "function walk(red):\n    print(red)\n";
+        assert_eq!(kinds(source), [reserved("red")]);
+    }
+
+    #[test]
+    fn a_function_in_a_function_does_not_know_the_variables_around_it() {
+        // Accepted: they are unknown names rather than variables the function doesn't see,
+        // since the function is refused where it is, and its errors go away with it (see
+        // the backlog).
+        let source = "\
+function walk(length):
+    let step = 0
+    function turn():
+        print(length, step)
+";
+        assert_eq!(
+            kinds(source),
+            [E::NestedFunction, unknown("length"), unknown("step")]
+        );
+    }
+
+    #[test]
+    fn a_function_may_declare_a_variable_of_the_same_name() {
+        assert_valid(
+            "\
+let sides = 0
+function walk():
+    let sides = 1
+    print(sides)
+print(sides)
+",
+        );
+    }
+
+    #[test]
+    fn the_variables_of_the_function_come_first() {
+        let source = "\
+let total = 0
+function count():
+    print(total)
+    let total = 1
+";
+        assert_eq!(kinds(source), [before_let("total", span(4, 9, 14))]);
+    }
+
+    #[test]
+    fn a_parameter_is_a_variable_of_its_function() {
+        assert_valid(
+            "\
+function walk(length):
+    length = length - 1
+    if length > 0:
+        return length
+",
+        );
+    }
+
+    #[test]
+    fn a_function_does_not_see_the_variables_of_another() {
+        let source = "\
+function count():
+    let total = 0
+function walk(length):
+    print(total, length)
+function turn():
+    print(length)
+";
+        assert_eq!(kinds(source), [unknown("total"), unknown("length")]);
+    }
+
+    #[test]
+    fn a_function_in_a_block_does_not_see_the_block() {
+        let source = "\
+if true:
+    let sides = 0
+    function walk():
+        print(sides)
+    print(sides)
+";
+        assert_eq!(kinds(source), [E::NestedFunction, main_variable("sides")]);
+    }
+}
+
+mod variables_declared_twice {
+    use super::*;
+
+    #[test]
+    fn a_second_let_in_the_block_is_an_error_that_gives_the_first() {
+        assert_eq!(
+            error("let sides = 0\nlet sides = 1\n"),
+            CheckError {
+                kind: already_declared("sides", span(1, 5, 10)),
+                span: span(2, 5, 10),
+            }
+        );
+    }
+
+    #[test]
+    fn a_let_of_a_variable_of_a_block_around_is_an_error() {
+        let source = "let sides = 0\nwhile true:\n    if true:\n        let sides = 1\n";
+        assert_eq!(kinds(source), [already_declared("sides", span(1, 5, 10))]);
+    }
+
+    #[test]
+    fn every_let_after_the_first_gives_the_first() {
+        let source = "let sides = 0\nlet sides = 1\nlet sides = 2\n";
+        let first = span(1, 5, 10);
+        assert_eq!(
+            kinds(source),
+            [
+                already_declared("sides", first),
+                already_declared("sides", first)
+            ]
+        );
+    }
+
+    #[test]
+    fn a_let_of_a_parameter_is_an_error() {
+        let source = "\
+function walk(length):
+    let length = 1
+    if true:
+        let length = 2
+";
+        let first = span(1, 15, 21);
+        assert_eq!(
+            kinds(source),
+            [
+                already_declared("length", first),
+                already_declared("length", first)
+            ]
+        );
+    }
+
+    #[test]
+    fn the_first_of_a_parameter_written_twice_is_the_first_one() {
+        let source = "function walk(side, side):\n    let side = 1\n";
+        assert_eq!(
+            kinds(source),
+            [duplicate("side"), already_declared("side", span(1, 15, 19))]
+        );
+    }
+
+    #[test]
+    fn the_error_of_the_second_let_comes_before_those_of_its_value() {
+        assert_eq!(
+            errors("let sides = 0\nlet sides = sidse\n"),
+            [
+                CheckError {
+                    kind: already_declared("sides", span(1, 5, 10)),
+                    span: span(2, 5, 10),
+                },
+                CheckError {
+                    kind: unknown("sidse"),
+                    span: span(2, 13, 18),
+                },
+            ]
+        );
+    }
+
+    #[test]
+    fn the_value_of_the_second_let_reads_the_first_variable() {
+        let source = "let sides = 0\nif true:\n    let sides = sides + 1\n";
+        assert_eq!(kinds(source), [already_declared("sides", span(1, 5, 10))]);
+    }
+
+    #[test]
+    fn a_name_that_is_not_in_snake_case_is_declared_once_too() {
+        assert_eq!(
+            kinds("let Sides = 0\nlet Sides = 1\n"),
+            [
+                E::NotSnakeCase,
+                E::NotSnakeCase,
+                already_declared("Sides", span(1, 5, 10))
+            ]
+        );
+    }
+
+    #[test]
+    fn a_reserved_name_keeps_its_one_error() {
+        assert_eq!(
+            kinds("let red = 1\nlet red = 2\nforward = 3\nprint(red)\n"),
+            [reserved("red"), reserved("red"), reserved("forward")]
         );
     }
 }
@@ -578,38 +1279,67 @@ mod robustness {
     }
 
     #[test]
-    fn random_programs_never_panic() {
+    fn random_programs_never_panic_and_give_their_errors_in_the_order_of_the_source() {
         let lines = [
             "break",
             "return",
             "return 3",
+            "return sidse",
             "let Sides = 0",
             "let red = 1",
             "forward = 2",
             "sides = sides + 1",
+            "let sides = 0",
+            "let sides = sides + 1",
+            "let sides = sidse",
+            "print(sides, total)",
+            "let total = 0",
+            "total = step",
+            "let step = total",
             "forward()",
             "if true:",
+            "if total == 0:",
             "else:",
-            "else if false:",
-            "while true:",
-            "repeat 3:",
+            "else if sides == step:",
+            "while sides < 3:",
+            "repeat step:",
             "function walk(side, side):",
+            "function run(total):",
             "function Run():",
         ];
         let mut random = Random(7);
-        let mut checked = 0;
+        let mut with_several_errors = 0;
         for _ in 0..2000 {
+            // The indentation follows the blocks, so that most programs have a right syntax.
             let mut source = String::new();
-            for _ in 0..(random.next() % 12) {
-                source.push_str(&" ".repeat((random.next() % 4) * 4));
-                source.push_str(random.pick(&lines));
+            let mut level = 0;
+            let mut opens = false;
+            for _ in 0..=(random.next() % 12) {
+                if opens {
+                    level += 1;
+                } else {
+                    level -= random.next() % (level + 1);
+                }
+                let line = random.pick(&lines);
+                source.push_str(&" ".repeat(level * 4));
+                source.push_str(line);
                 source.push('\n');
+                opens = line.ends_with(':');
             }
             if let Ok(program) = parse(&source) {
-                let _ = check(&program);
-                checked += 1;
+                let errors = check(&program);
+                assert!(
+                    errors.is_sorted_by_key(|error| error.span.start),
+                    "errors out of order in {source:?}"
+                );
+                if errors.len() >= 2 {
+                    with_several_errors += 1;
+                }
             }
         }
-        assert!(checked > 100, "only {checked} programs had a right syntax");
+        assert!(
+            with_several_errors > 200,
+            "only {with_several_errors} programs had several errors"
+        );
     }
 }
