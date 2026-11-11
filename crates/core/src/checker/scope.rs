@@ -103,7 +103,8 @@ impl<'a> Variables<'a> {
 }
 
 /// The name of every `let` written in `statements` themselves, not in their blocks, with its
-/// place. The reserved names are left out: they never become variables.
+/// place. The reserved names are left out: they never become variables. A precaution: the
+/// walk never asks for a reserved name, and the lists stay right if it ever does.
 fn declared_names(statements: &[Statement]) -> impl Iterator<Item = (&str, Span)> {
     statements
         .iter()

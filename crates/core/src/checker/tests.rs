@@ -596,6 +596,12 @@ function erase(side):
     }
 
     #[test]
+    fn a_reserved_name_written_twice_keeps_its_one_error_each_time() {
+        let source = "function paint(red, red):\n    forward()\n";
+        assert_eq!(kinds(source), [reserved("red"), reserved("red")]);
+    }
+
+    #[test]
     fn a_duplicate_that_is_not_in_snake_case_has_both_errors() {
         let source = "function paint(Side, Side):\n    forward()\n";
         assert_eq!(
@@ -727,6 +733,51 @@ print(count)
     }
 
     #[test]
+    fn both_sides_of_an_operator_are_checked() {
+        assert_eq!(
+            errors("print(1 + sidse)\n"),
+            [CheckError {
+                kind: unknown("sidse"),
+                span: span(1, 11, 16),
+            }]
+        );
+        assert_eq!(
+            kinds("print(sidse * 2 - sidsa)\n"),
+            [unknown("sidse"), unknown("sidsa")]
+        );
+    }
+
+    #[test]
+    fn the_value_given_to_a_name_that_is_refused_is_still_checked() {
+        assert_eq!(
+            kinds("let red = sidse\n"),
+            [reserved("red"), unknown("sidse")]
+        );
+        assert_eq!(
+            kinds("forward = sidse\n"),
+            [reserved("forward"), unknown("sidse")]
+        );
+        assert_eq!(
+            kinds("let Sides = sidse\n"),
+            [E::NotSnakeCase, unknown("sidse")]
+        );
+    }
+
+    #[test]
+    fn a_condition_is_checked_before_its_block() {
+        let source = "\
+if sidse:
+    let Sides = 0
+else if sidsa:
+    forward()
+";
+        assert_eq!(
+            kinds(source),
+            [unknown("sidse"), E::NotSnakeCase, unknown("sidsa")]
+        );
+    }
+
+    #[test]
     fn the_values_of_a_call_are_checked_but_not_its_function() {
         // Whether the function exists is checked with the functions.
         assert_eq!(kinds("paint_side(sidse)\n"), [unknown("sidse")]);
@@ -789,6 +840,18 @@ while true:
                 span: span(3, 15, 20),
             }
         );
+    }
+
+    #[test]
+    fn the_let_of_the_innermost_block_comes_first() {
+        let source = "\
+while true:
+    if true:
+        print(sides)
+        let sides = 1
+    let sides = 2
+";
+        assert_eq!(kinds(source), [before_let("sides", span(4, 13, 18))]);
     }
 
     #[test]
@@ -947,6 +1010,22 @@ while true:
             kinds(source),
             [main_variable("sides"), main_variable("sides")]
         );
+    }
+
+    #[test]
+    fn in_every_branch_of_an_if() {
+        let source = "\
+function walk():
+    print(first, second, third)
+if true:
+    let first = 1
+else if true:
+    let second = 2
+else:
+    let third = 3
+";
+        let names = ["first", "second", "third"];
+        assert_eq!(kinds(source), names.map(main_variable));
     }
 
     #[test]
@@ -1116,6 +1195,32 @@ function walk(length):
     }
 
     #[test]
+    fn the_first_of_a_parameter_written_twice_is_the_first_one() {
+        let source = "function walk(side, side):\n    let side = 1\n";
+        assert_eq!(
+            kinds(source),
+            [duplicate("side"), already_declared("side", span(1, 15, 19))]
+        );
+    }
+
+    #[test]
+    fn the_error_of_the_second_let_comes_before_those_of_its_value() {
+        assert_eq!(
+            errors("let sides = 0\nlet sides = sidse\n"),
+            [
+                CheckError {
+                    kind: already_declared("sides", span(1, 5, 10)),
+                    span: span(2, 5, 10),
+                },
+                CheckError {
+                    kind: unknown("sidse"),
+                    span: span(2, 13, 18),
+                },
+            ]
+        );
+    }
+
+    #[test]
     fn the_value_of_the_second_let_reads_the_first_variable() {
         let source = "let sides = 0\nif true:\n    let sides = sides + 1\n";
         assert_eq!(kinds(source), [already_declared("sides", span(1, 5, 10))]);
@@ -1174,40 +1279,52 @@ mod robustness {
     }
 
     #[test]
-    fn random_programs_never_panic() {
+    fn random_programs_never_panic_and_give_their_errors_in_the_order_of_the_source() {
         let lines = [
             "break",
             "return",
             "return 3",
+            "return sidse",
             "let Sides = 0",
             "let red = 1",
             "forward = 2",
             "sides = sides + 1",
             "let sides = 0",
             "let sides = sides + 1",
+            "let sides = sidse",
             "print(sides, total)",
             "let total = 0",
-            "while sides < 3:",
-            "if total == 0:",
-            "function run(total):",
-            "return sidse",
+            "total = step",
+            "let step = total",
             "forward()",
             "if true:",
+            "if total == 0:",
             "else:",
-            "else if false:",
-            "while true:",
-            "repeat 3:",
+            "else if sides == step:",
+            "while sides < 3:",
+            "repeat step:",
             "function walk(side, side):",
+            "function run(total):",
             "function Run():",
         ];
         let mut random = Random(7);
-        let mut checked = 0;
+        let mut with_several_errors = 0;
         for _ in 0..2000 {
+            // The indentation follows the blocks, so that most programs have a right syntax.
             let mut source = String::new();
-            for _ in 0..(random.next() % 12) {
-                source.push_str(&" ".repeat((random.next() % 4) * 4));
-                source.push_str(random.pick(&lines));
+            let mut level = 0;
+            let mut opens = false;
+            for _ in 0..(1 + random.next() % 12) {
+                if opens {
+                    level += 1;
+                } else {
+                    level -= random.next() % (level + 1);
+                }
+                let line = random.pick(&lines);
+                source.push_str(&" ".repeat(level * 4));
+                source.push_str(line);
                 source.push('\n');
+                opens = line.ends_with(':');
             }
             if let Ok(program) = parse(&source) {
                 let errors = check(&program);
@@ -1215,9 +1332,14 @@ mod robustness {
                     errors.is_sorted_by_key(|error| error.span.start),
                     "errors out of order in {source:?}"
                 );
-                checked += 1;
+                if errors.len() >= 2 {
+                    with_several_errors += 1;
+                }
             }
         }
-        assert!(checked > 100, "only {checked} programs had a right syntax");
+        assert!(
+            with_several_errors > 200,
+            "only {with_several_errors} programs had several errors"
+        );
     }
 }

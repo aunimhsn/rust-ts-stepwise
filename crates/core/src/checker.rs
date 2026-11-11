@@ -203,16 +203,19 @@ impl<'a> Checker<'a> {
         self.variables.absorb(function);
     }
 
-    /// The parameters of a function: each a new name, none twice.
+    /// The parameters of a function: each a new name, none twice. A reserved name keeps its
+    /// one error, even written twice: it is no parameter.
     fn parameters(&mut self, parameters: &'a [Name]) {
         let mut seen = HashSet::new();
         for parameter in parameters {
-            let free = self.check_new_name(parameter);
-            if !seen.insert(parameter.text.as_str()) {
+            if !self.check_new_name(parameter) {
+                continue;
+            }
+            if seen.insert(parameter.text.as_str()) {
+                self.variables.declare(&parameter.text, parameter.span);
+            } else {
                 let name = parameter.text.clone();
                 self.report(CheckErrorKind::DuplicateParameter { name }, parameter.span);
-            } else if free {
-                self.variables.declare(&parameter.text, parameter.span);
             }
         }
     }
