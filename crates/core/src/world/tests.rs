@@ -13,8 +13,8 @@ use crate::test_support::Random;
 /// on a floor cell.
 #[track_caller]
 fn world(rows: &[&str]) -> World {
-    let width = u8::try_from(rows[0].chars().count()).unwrap();
-    let height = u8::try_from(rows.len()).unwrap();
+    let width = rows[0].chars().count();
+    let height = rows.len();
     let mut map = Map::new(width, height).unwrap();
     let mut robot = None;
     for (y, row) in (0..).zip(rows) {
@@ -26,10 +26,10 @@ fn world(rows: &[&str]) -> World {
                 'r' => map.set_paint(point, Color::Red).unwrap(),
                 'y' => map.set_paint(point, Color::Yellow).unwrap(),
                 'b' => map.set_paint(point, Color::Blue).unwrap(),
-                '^' => robot = Some(Robot::new(point, Direction::North, false)),
-                '>' => robot = Some(Robot::new(point, Direction::East, false)),
-                'v' => robot = Some(Robot::new(point, Direction::South, false)),
-                '<' => robot = Some(Robot::new(point, Direction::West, false)),
+                '^' => robot = Some(Robot::new(point, Direction::North)),
+                '>' => robot = Some(Robot::new(point, Direction::East)),
+                'v' => robot = Some(Robot::new(point, Direction::South)),
+                '<' => robot = Some(Robot::new(point, Direction::West)),
                 '.' => {}
                 other => panic!("unknown character {other:?}"),
             }
@@ -89,8 +89,8 @@ mod map {
     #[test]
     fn a_map_has_one_to_sixteen_columns_and_one_to_twelve_rows() {
         assert!(Map::new(1, 1).is_ok());
-        assert!(Map::new(MAX_COLUMNS, MAX_ROWS).is_ok());
-        for (width, height) in [(0, 1), (1, 0), (17, 1), (1, 13)] {
+        assert!(Map::new(MAX_COLUMNS.into(), MAX_ROWS.into()).is_ok());
+        for (width, height) in [(0, 1), (1, 0), (17, 1), (1, 13), (300, 1), (1, 300)] {
             assert_eq!(
                 Map::new(width, height),
                 Err(BuildError::Size { width, height })
@@ -142,36 +142,38 @@ mod map {
             map.set_passage(c, outside),
             Err(BuildError::OutsideMap(outside))
         );
+        assert_eq!(map.set_passage(c, c), Err(BuildError::NotNeighbors(c, c)));
+        let wall = Point::new(2, 1);
+        map.set_wall(wall).unwrap();
+        assert_eq!(map.set_passage(c, wall), Err(BuildError::OnWall(wall)));
     }
 
     #[test]
-    fn a_wall_takes_away_the_paint_the_item_and_the_passages_of_its_cell() {
+    fn a_wall_is_set_on_a_cell_without_paint_nor_item() {
         let mut map = Map::new(3, 1).unwrap();
-        let points = [Point::new(0, 0), Point::new(1, 0), Point::new(2, 0)];
-        for point in points {
-            map.set_paint(point, Color::Yellow).unwrap();
-        }
-        map.set_item(points[1]).unwrap();
-        map.set_passage(points[0], points[1]).unwrap();
-        map.set_passage(points[1], points[2]).unwrap();
-        map.set_wall(points[1]).unwrap();
-        assert_eq!(map.cell(points[1]), Some(Cell::Wall));
-        assert!(!map.passage(points[0], Direction::East));
-        assert!(!map.passage(points[2], Direction::West));
-        assert_eq!(map.paint(points[0]), Some(Color::Yellow));
+        let [painted, item, empty] = [Point::new(0, 0), Point::new(1, 0), Point::new(2, 0)];
+        map.set_paint(painted, Color::Yellow).unwrap();
+        map.set_item(item).unwrap();
+        assert_eq!(map.set_wall(painted), Err(BuildError::NotEmpty(painted)));
+        assert_eq!(map.set_wall(item), Err(BuildError::NotEmpty(item)));
+        assert_eq!(map.paint(painted), Some(Color::Yellow));
+        assert!(map.has_item(item));
+        map.set_wall(empty).unwrap();
+        map.set_wall(empty).unwrap();
+        assert_eq!(map.cell(empty), Some(Cell::Wall));
     }
 
     #[test]
     fn the_robot_stands_on_a_floor_cell_of_the_map() {
         let map = world(&["#>"]).map().clone();
         let wall = Point::new(0, 0);
-        let robot = Robot::new(wall, Direction::East, false);
+        let robot = Robot::new(wall, Direction::East);
         assert_eq!(
             World::new(map.clone(), robot),
             Err(BuildError::OnWall(wall))
         );
         let outside = Point::new(2, 0);
-        let robot = Robot::new(outside, Direction::East, false);
+        let robot = Robot::new(outside, Direction::East);
         assert_eq!(World::new(map, robot), Err(BuildError::OutsideMap(outside)));
     }
 
@@ -374,6 +376,16 @@ mod erasing {
     }
 
     #[test]
+    fn the_eraser_bumps_into_a_wall_and_erases_nothing_more() {
+        let mut world = world(&["r>#"]);
+        world.start_erasing();
+        assert_eq!(world.forward(), Err(RobotError::Bump));
+        assert_eq!(world.robot().position(), Point::new(1, 0));
+        assert!(world.is_erasing());
+        assert_eq!(paints(&world), ["r.#"]);
+    }
+
+    #[test]
     fn an_unpainted_cell_stays_unpainted() {
         let mut world = world(&[">."]);
         world.start_erasing();
@@ -426,7 +438,7 @@ mod carrying {
     #[test]
     fn pick_up_while_carrying_is_an_error_and_leaves_the_item() {
         let map = world(&[">o"]).map().clone();
-        let robot = Robot::new(Point::new(1, 0), Direction::East, true);
+        let robot = Robot::new(Point::new(1, 0), Direction::East).carrying();
         let mut world = World::new(map, robot).unwrap();
         assert_eq!(world.pick_up(), Err(RobotError::AlreadyCarrying));
         assert!(world.item_here());
@@ -466,7 +478,7 @@ mod carrying {
     #[test]
     fn drop_on_an_item_is_an_error_and_keeps_the_item_carried() {
         let map = world(&[">o"]).map().clone();
-        let robot = Robot::new(Point::new(1, 0), Direction::East, true);
+        let robot = Robot::new(Point::new(1, 0), Direction::East).carrying();
         let mut world = World::new(map, robot).unwrap();
         assert_eq!(world.drop_item(), Err(RobotError::ItemAlreadyHere));
         assert!(world.is_carrying());
@@ -475,8 +487,11 @@ mod carrying {
     #[test]
     fn drop_called_twice_says_the_robot_carries_nothing() {
         let map = world(&[">"]).map().clone();
-        let mut world =
-            World::new(map, Robot::new(Point::new(0, 0), Direction::East, true)).unwrap();
+        let mut world = World::new(
+            map,
+            Robot::new(Point::new(0, 0), Direction::East).carrying(),
+        )
+        .unwrap();
         world.drop_item().unwrap();
         assert_eq!(world.drop_item(), Err(RobotError::NotCarrying));
     }
@@ -487,14 +502,20 @@ mod sensing {
 
     #[test]
     fn a_side_is_clear_when_its_cell_is_a_floor_cell_of_the_map() {
-        let world = world(&[".#", ">."]);
+        let world = world(&[".#.", ".^#", "..."]);
+        assert!(!world.is_clear(Side::Front), "a wall in front");
+        assert!(world.is_clear(Side::Left));
+        assert!(!world.is_clear(Side::Right), "a wall on the right");
+        let world = super::world(&["...", "#>.", "..."]);
         assert!(world.is_clear(Side::Front));
         assert!(world.is_clear(Side::Left));
-        assert!(!world.is_clear(Side::Right), "past the edge");
-        let world = super::world(&[".#", "^."]);
+        assert!(world.is_clear(Side::Right));
+        let world = super::world(&["...", "#<.", "..."]);
+        assert!(!world.is_clear(Side::Front), "a wall in front");
+        let world = super::world(&["^.", ".."]);
+        assert!(!world.is_clear(Side::Front), "past the edge");
         assert!(!world.is_clear(Side::Left), "past the edge");
         assert!(world.is_clear(Side::Right));
-        assert!(world.is_clear(Side::Front));
     }
 
     #[test]
@@ -525,14 +546,18 @@ mod sensing {
     }
 }
 
-/// Random actions on a map with walls and items keep the rule of the passages: a painted
-/// passage always joins two painted floor cells.
+/// Random actions on a map with walls, items, paints and passages keep the rule of the
+/// passages: a painted passage always joins two painted floor cells.
 #[test]
 fn a_painted_passage_always_joins_two_painted_floor_cells() {
     let mut random = Random(7);
-    for _ in 0..50 {
-        let mut world = world(&["..#..", ".o..o", "#.>..", "...#."]);
-        for _ in 0..200 {
+    for round in 0..50 {
+        let start = world(&["..#..", ".orbo", "#.>y.", "..b#."]);
+        let mut map = start.map().clone();
+        map.set_passage(Point::new(2, 1), Point::new(3, 1)).unwrap();
+        map.set_passage(Point::new(3, 1), Point::new(3, 2)).unwrap();
+        let mut world = World::new(map, start.robot()).unwrap();
+        for action in 0..200 {
             match random.next() % 9 {
                 0..=2 => {
                     let _ = world.forward();
@@ -552,9 +577,17 @@ fn a_painted_passage_always_joins_two_painted_floor_cells() {
             let map = world.map();
             for (point, direction) in passages(&world) {
                 let other = point.toward(direction).unwrap();
-                assert!(map.paint(point).is_some() && map.paint(other).is_some());
+                assert!(
+                    map.paint(point).is_some() && map.paint(other).is_some(),
+                    "round {round}, action {action}: the passage {direction:?} of {point:?} \
+                     joins an unpainted cell"
+                );
             }
-            assert!(map.is_floor(world.robot().position()));
+            let position = world.robot().position();
+            assert!(
+                map.is_floor(position),
+                "round {round}, action {action}: the robot on {position:?}"
+            );
         }
     }
 }

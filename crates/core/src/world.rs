@@ -30,15 +30,24 @@ pub struct Robot {
 }
 
 impl Robot {
-    /// A robot at `position`, facing `direction`, carrying an item or not, with its brush and
-    /// its eraser up.
+    /// A robot at `position`, facing `direction`, carrying nothing, with its brush and its
+    /// eraser up.
     #[must_use]
-    pub const fn new(position: Point, direction: Direction, carrying: bool) -> Self {
+    pub const fn new(position: Point, direction: Direction) -> Self {
         Self {
             position,
             direction,
-            carrying,
+            carrying: false,
             tool: None,
+        }
+    }
+
+    /// The same robot, carrying an item.
+    #[must_use]
+    pub const fn carrying(self) -> Self {
+        Self {
+            carrying: true,
+            ..self
         }
     }
 

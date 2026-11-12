@@ -124,14 +124,16 @@ pub enum BuildError {
     /// A map without cells, or larger than [`MAX_COLUMNS`] × [`MAX_ROWS`].
     Size {
         /// The columns asked.
-        width: u8,
+        width: usize,
         /// The rows asked.
-        height: u8,
+        height: usize,
     },
     /// A cell outside the map.
     OutsideMap(Point),
     /// A paint, an item, a passage or the robot on a wall.
     OnWall(Point),
+    /// A wall on a cell that has a paint or an item: the walls are set first.
+    NotEmpty(Point),
     /// A passage between two cells that aren't next to each other.
     NotNeighbors(Point, Point),
     /// A passage painted from a cell that has no paint: a painted passage always joins two
@@ -157,10 +159,15 @@ impl Map {
     /// # Errors
     ///
     /// [`BuildError::Size`] when the map has no cell or is larger than the most allowed.
-    pub fn new(width: u8, height: u8) -> Result<Self, BuildError> {
-        if !(1..=MAX_COLUMNS).contains(&width) || !(1..=MAX_ROWS).contains(&height) {
-            return Err(BuildError::Size { width, height });
+    pub fn new(width: usize, height: usize) -> Result<Self, BuildError> {
+        let size = BuildError::Size { width, height };
+        let (Ok(columns), Ok(rows)) = (u8::try_from(width), u8::try_from(height)) else {
+            return Err(size);
+        };
+        if !(1..=MAX_COLUMNS).contains(&columns) || !(1..=MAX_ROWS).contains(&rows) {
+            return Err(size);
         }
+        let (width, height) = (columns, rows);
         let count = usize::from(width).saturating_mul(usize::from(height));
         let cells = vec![Cell::Floor(Floor::default()); count];
         Ok(Self {
@@ -225,15 +232,21 @@ impl Map {
             .is_some_and(|floor| if eastward { floor.east } else { floor.south })
     }
 
-    /// Turns the cell at `point` into a wall, which loses its paint, its item and its
-    /// passages.
+    /// Turns the cell at `point` into a wall (nothing changes when it is one already).
     ///
     /// # Errors
     ///
-    /// [`BuildError::OutsideMap`] when `point` is outside the map.
+    /// [`BuildError::OutsideMap`] when `point` is outside the map, [`BuildError::NotEmpty`]
+    /// when its cell has a paint or an item: the walls are set first, so that a level never
+    /// loses one in silence. An unpainted cell has no painted passage.
     pub fn set_wall(&mut self, point: Point) -> Result<(), BuildError> {
-        self.erase(point);
-        *self.cell_mut(point).ok_or(BuildError::OutsideMap(point))? = Cell::Wall;
+        let cell = self.cell_mut(point).ok_or(BuildError::OutsideMap(point))?;
+        if let Cell::Floor(floor) = cell
+            && (floor.paint.is_some() || floor.item)
+        {
+            return Err(BuildError::NotEmpty(point));
+        }
+        *cell = Cell::Wall;
         Ok(())
     }
 
@@ -269,7 +282,12 @@ impl Map {
             .direction_to(to)
             .ok_or(BuildError::NotNeighbors(from, to))?;
         for point in [from, to] {
-            if self.floor_mut(point)?.paint.is_none() {
+            let floor = match self.cell(point) {
+                Some(Cell::Floor(floor)) => floor,
+                Some(Cell::Wall) => return Err(BuildError::OnWall(point)),
+                None => return Err(BuildError::OutsideMap(point)),
+            };
+            if floor.paint.is_none() {
                 return Err(BuildError::Unpainted(point));
             }
         }
@@ -295,9 +313,13 @@ impl Map {
     }
 
     /// Paints `to` with `color` and the passage from `from`, which the robot just crossed with
-    /// its brush down; `from` is already painted.
+    /// its brush down. The passage is painted only when `from` is painted, as it always is with
+    /// the brush down, so that the map keeps its rule on its own.
     pub(super) fn paint_step(&mut self, from: Point, to: Point, color: Color) {
         self.paint_cell(to, color);
+        if self.paint(from).is_none() || self.paint(to).is_none() {
+            return;
+        }
         if let Some(direction) = from.direction_to(to) {
             self.set_passage_paint(from, direction, true);
         }
