@@ -69,7 +69,9 @@ const pathLinks = (...points) => points.slice(1).map((point, index) => `${points
 // `extras` adds the goal marks, the items and the robot, keyed by "x,y".
 // `links`, when given, lists the passages painted by the robot ("x,y x,y"): the stroke joins two
 // cells only there. Without it, the stroke joins every neighbor of the same color.
-function appMap(rows, extras = {}, size = 48, links) {
+// `meeting` is how a passage between two colors is drawn: "halves", decided at step 8, each cell
+// drawing its half in its own color, or "cut", only between two cells of the same color.
+function appMap(rows, extras = {}, size = 48, links, meeting = "halves") {
   const paints = { r: "red", y: "yellow", b: "blue" };
   const offsets = { n: [0, -1], e: [1, 0], s: [0, 1], w: [-1, 0] };
   const paintAt = (x, y) => paints[rows[y]?.[x]];
@@ -85,8 +87,10 @@ function appMap(rows, extras = {}, size = 48, links) {
       wallEdge: floorAt(x, y + 1),
       wallRim: floorAt(x, y - 1),
       paint,
-      around: paint ? sides(x, y, (nx, ny) => paintAt(nx, ny) === paint
-        && (!links || links.includes(`${x},${y} ${nx},${ny}`) || links.includes(`${nx},${ny} ${x},${y}`))) : [],
+      around: paint ? sides(x, y, (nx, ny) => links
+        ? paintAt(nx, ny) !== undefined && (meeting === "halves" || paintAt(nx, ny) === paint)
+          && (links.includes(`${x},${y} ${nx},${ny}`) || links.includes(`${nx},${ny} ${x},${y}`))
+        : paintAt(nx, ny) === paint) : [],
       // The goal stroke goes on to the goals and to the paints of its color, as the finished drawing would.
       goalAround: goal ? sides(x, y, (nx, ny) => goalAt(nx, ny) === goal || paintAt(nx, ny) === goal) : [],
       ...extras[`${x},${y}`],

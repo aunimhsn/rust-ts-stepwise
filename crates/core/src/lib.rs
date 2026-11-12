@@ -28,6 +28,7 @@ pub mod lexer;
 pub mod parser;
 pub mod probe;
 pub mod span;
+pub mod world;
 
 mod word_enum;
 
