@@ -69,9 +69,9 @@ const pathLinks = (...points) => points.slice(1).map((point, index) => `${points
 // `extras` adds the goal marks, the items and the robot, keyed by "x,y".
 // `links`, when given, lists the passages painted by the robot ("x,y x,y"): the stroke joins two
 // cells only there. Without it, the stroke joins every neighbor of the same color.
-// `meeting` is how a passage between two colors is drawn (open decision of step 8): "cut", only
-// between two cells of the same color, or "halves", each cell drawing its half in its own color.
-function appMap(rows, extras = {}, size = 48, links, meeting = "cut") {
+// `meeting` is how a passage between two colors is drawn: "halves", decided at step 8, each cell
+// drawing its half in its own color, or "cut", only between two cells of the same color.
+function appMap(rows, extras = {}, size = 48, links, meeting = "halves") {
   const paints = { r: "red", y: "yellow", b: "blue" };
   const offsets = { n: [0, -1], e: [1, 0], s: [0, 1], w: [-1, 0] };
   const paintAt = (x, y) => paints[rows[y]?.[x]];

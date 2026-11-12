@@ -1,5 +1,5 @@
 // Section: two colors meeting along a path, when the robot changes the color of its brush or
-// paints over a stroke of another color (open decision of step 8: A or B, side by side).
+// paints over a stroke of another color: A or B side by side, A decided at step 8 (2026-11-12).
 
 const MEETING_WAYS = {
   halves: "A · Half in each color",
@@ -59,11 +59,11 @@ stop_painting()`,
 const meetingBoth = ({ rows, robot, links }) => Object.entries(MEETING_WAYS).map(([way, label]) =>
   `<div class="page-slot"><span>${label}</span>${appMap(rows, robot, 40, links, way)}</div>`).join("");
 
-SECTIONS.push(["Two colors meeting on a path: A or B?", () => `
+SECTIONS.push(["Two colors meeting on a path: A, half in each color", () => `
   <p>The robot paints a cell in red, then the same cell in blue: what becomes of the red passage that led to it?
   Nothing changes for the sensors and the goals, which only look at the cells: this is a matter of drawing.
   <b>A</b>: each cell draws its half of a passage in its own color. <b>B</b>: a passage is drawn only between two
-  cells of the same color.</p>
+  cells of the same color. <b>A</b> was chosen (step 8): the stroke follows the whole path of the robot.</p>
   <h3>The color changed on the way, step by step</h3>
   ${MEETING_FRAMES.map(({ code, note, ...frame }, index) => `
   <div class="page-row">

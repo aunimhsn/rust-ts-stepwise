@@ -129,8 +129,8 @@ The robot stands on one cell and faces one of the four directions. It can carry 
 | Paint | `stop_painting()` | Lifts the brush: the robot moves on without painting. | Never (nothing happens when the brush is already up). |
 | Paint | `start_erasing()` | Puts the eraser down: removes the paint of its cell at once, then of every cell it moves into, with the painted passages of these cells. | Never (an unpainted cell stays unpainted). |
 | Paint | `stop_erasing()` | Lifts the eraser. | Never (nothing happens when the eraser is already up). |
-| Carry | `pick_up()` | Picks up the item of its cell. | No item on the cell, or the robot already carries one. |
-| Carry | `drop()` | Drops the item it carries on its cell. | The robot carries nothing, or the cell already has an item. |
+| Carry | `pick_up()` | Picks up the item of its cell. | The robot already carries an item, or there is no item on the cell; when both are true, the error says the first, which explains a `pick_up()` called twice. |
+| Carry | `drop()` | Drops the item it carries on its cell. | The robot carries nothing, or the cell already has an item; when both are true, the error says the first, which explains a `drop()` called twice. |
 | Sense | `front_is_clear()`, `left_is_clear()`, `right_is_clear()` | `true` when the cell in that direction is a floor cell of the map. | Never. |
 | Sense | `here_is(color)` | `true` when its cell has that paint. | Never. |
 | Sense | `front_is(color)`, `left_is(color)`, `right_is(color)` | `true` when the cell in that direction has that paint (`false` for a wall). | Never. |
@@ -350,7 +350,7 @@ The interface is in English. Every text of the interface, the error messages and
 
 - A grid of cells, at most 16 columns and 12 rows. The coordinates start at the top left cell, `x` growing to the right and `y` downward.
 - A cell is a **wall** or a **floor**. A floor cell may hold one paint (one of the three colors) and one item.
-- The paint also lies on the **passages** between two cells: a passage is painted when the robot moves from one cell to the other with its brush down, and loses its paint when the eraser passes on one of its cells. The map draws the paint as a stroke through the centers of the cells, joining two cells only along a painted passage, so that the stroke follows the path of the robot; it stops, rounded, in the middle of the cells at its ends. The sensors and the goals only look at the cells.
+- The paint also lies on the **passages** between two cells: a passage is painted when the robot moves from one cell to the other with its brush down, and loses its paint when the eraser passes on one of its cells. The map draws the paint as a stroke through the centers of the cells, joining two cells only along a painted passage, so that the stroke follows the path of the robot; it stops, rounded, in the middle of the cells at its ends. A passage has no color of its own: each cell draws its half of it in its own color, so that a stroke whose cell was painted over with another color goes on and changes color at the border of that cell (decided on 2026-11-12, see the section *Two colors meeting on a path* of [`docs/mockups/world-elements.html`](docs/mockups/world-elements.html)). The sensors and the goals only look at the cells.
 - One kind of item in version 1 (its look comes from the sheet of the world elements).
 - The goal cells of a level are marked on the map (where to stand, which color where, where to put the items), so that the learner sees the target before writing code.
 - Outside the grid counts as a wall.
