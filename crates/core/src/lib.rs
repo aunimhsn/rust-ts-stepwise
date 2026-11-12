@@ -24,6 +24,7 @@ pub mod ast;
 pub mod builtin;
 pub mod checker;
 pub mod color;
+pub mod interpreter;
 pub mod level;
 pub mod lexer;
 pub mod parser;
