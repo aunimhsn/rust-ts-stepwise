@@ -115,3 +115,7 @@ A function called above its definition, two functions of the same name, a variab
 ### 8a. Map (#32)
 
 The world in Rust alone, without `serde`: its cells (floor or wall, at most 16 × 12), paints, painted passages (a passage has no color: each cell draws its half in its own), items, and the robot with its direction, the item it carries, and its brush or its eraser; every action of a built-in function and every sensor as a method of the world, returning its error (the bump, the item missing or already carried, the robot's state checked before the cell), so that step 9 only calls them. Decided on 2026-11-12: [Map](../specs.md#map), [Built-in functions](../specs.md#built-in-functions).
+
+### 8b. Levels (#33)
+
+The TOML format with its version (decided on 2026-11-12 rather than JSON, see [Technical choices](technical-choices.md), Levels), one file per level in `web/levels/` named after its stable name, its validation (a map of a level has goals, not all met at the start, and enough items), the goals checked on a world with the cell of each goal not met, the file of the sandbox, and a test that reads every level file of the repository and checks its starting code.
