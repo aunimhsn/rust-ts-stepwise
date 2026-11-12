@@ -101,3 +101,7 @@ The syntax tree and `parse(source)`; the expressions with their priorities and t
 ### 7a. Structure and form of the names (#29)
 
 `check(&Program)` and its errors as codes; `break` and `return` in place, functions at the top level, `snake_case` names, the names reserved by the built-in functions and the colors (their lists, shared with the interpreter), two parameters of the same name.
+
+### 7b. Variables (#30)
+
+The scopes of the blocks and of the functions; a variable used before its `let`, after the end of its block, or from a function that doesn't see it (three errors of their own, for a variable read or changed); a name declared twice; a variable changed without `let`; unknown names; the colors as values. The checker then walks the expressions, and checks the form of a new name apart from declaring it, since `let x = x + 1` reads its value in between; a reserved name that is given a value keeps its one error. The messages state the error and recall the rule, without suggesting a fix (decided on 2026-11-11, see [Design principles](../specs.md#design-principles)). Until 7c, a function of the program named without parentheses is an unknown name, and a built-in one no error.

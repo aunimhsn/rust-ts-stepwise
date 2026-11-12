@@ -5,6 +5,7 @@
 //! first: unlike a syntax error, none of them prevents reading what follows.
 
 mod error;
+mod functions;
 mod scope;
 
 #[cfg(test)]
@@ -15,14 +16,19 @@ pub use error::{CheckError, CheckErrorKind, ReservedWord};
 use std::collections::HashSet;
 
 use crate::ast::{Branch, Expression, ExpressionKind, Name, Program, Statement, StatementKind};
+use crate::color::Color;
 use crate::span::Span;
+use functions::{Callee, Function, Functions};
 use scope::{Missing, Variables, main_program_variables};
 
 /// Every error of names and of structure of `program`, in the order of the source.
 #[must_use]
 pub fn check(program: &Program) -> Vec<CheckError> {
-    let mut checker = Checker::default();
-    main_program_variables(&program.statements, &mut checker.main_variables);
+    let mut checker = Checker {
+        main_variables: main_program_variables(&program.statements),
+        functions: Functions::of(&program.statements),
+        ..Checker::default()
+    };
     checker.block(&program.statements, Place::TOP_LEVEL);
     checker.errors
 }
@@ -88,6 +94,8 @@ struct Checker<'a> {
     variables: Variables<'a>,
     /// Every variable of the main program, wherever its `let` is: what a function doesn't see.
     main_variables: HashSet<&'a str>,
+    /// Every function of the program, wherever it is defined.
+    functions: Functions<'a>,
 }
 
 impl<'a> Checker<'a> {
@@ -108,7 +116,7 @@ impl<'a> Checker<'a> {
         match &statement.kind {
             StatementKind::Let { name, value } => self.declaration(name, value, place),
             StatementKind::Assign { name, value } => {
-                if self.check_not_reserved(name) {
+                if self.check_variable_name(name) {
                     self.variable(&name.text, name.span, Access::Change, place);
                 }
                 self.expression(value, place);
@@ -162,17 +170,22 @@ impl<'a> Checker<'a> {
                 if !place.top_level {
                     self.report(CheckErrorKind::NestedFunction, statement.span);
                 }
-                self.check_new_name(name);
+                self.check_function_name(name);
                 self.function(parameters, body);
             }
-            StatementKind::Expression(expression) => self.expression(expression, place),
+            StatementKind::Expression(expression) => {
+                if !self.is_call_or_function(expression) {
+                    self.report(CheckErrorKind::ExpressionAlone, statement.span);
+                }
+                self.expression(expression, place);
+            }
         }
     }
 
     /// A `let`. Its value is read before the variable exists (`let x = x + 1`), so the name
     /// is checked first, in the order of the source, and declared last.
     fn declaration(&mut self, name: &'a Name, value: &'a Expression, place: Place) {
-        let free = self.check_new_name(name);
+        let free = self.check_new_variable(name);
         let first = self.variables.declared(&name.text);
         if let (true, Some(first)) = (free, first) {
             let name_text = name.text.clone();
@@ -203,12 +216,12 @@ impl<'a> Checker<'a> {
         self.variables.absorb(function);
     }
 
-    /// The parameters of a function: each a new name, none twice. A reserved name keeps its
-    /// one error, even written twice: it is no parameter.
+    /// The parameters of a function: each a new name, none twice. A name that is reserved or
+    /// that a function has keeps its one error, even written twice: it is no parameter.
     fn parameters(&mut self, parameters: &'a [Name]) {
         let mut seen = HashSet::new();
         for parameter in parameters {
-            if !self.check_new_name(parameter) {
+            if !self.check_new_variable(parameter) {
                 continue;
             }
             if seen.insert(parameter.text.as_str()) {
@@ -220,22 +233,43 @@ impl<'a> Checker<'a> {
         }
     }
 
-    /// The names an expression reads.
+    /// Whether an expression alone on its line is a call, the one expression that does
+    /// something, or a function named without its parentheses, whose own error says enough:
+    /// the line does something once they are written.
+    fn is_call_or_function(&self, expression: &Expression) -> bool {
+        match &expression.kind {
+            ExpressionKind::Call { .. } => true,
+            ExpressionKind::Name(name) => self.functions.callee(name).is_some(),
+            ExpressionKind::Number(_)
+            | ExpressionKind::Boolean(_)
+            | ExpressionKind::Text(_)
+            | ExpressionKind::Unary { .. }
+            | ExpressionKind::Binary { .. } => false,
+        }
+    }
+
+    /// The names an expression reads and the functions it calls.
     fn expression(&mut self, expression: &'a Expression, place: Place) {
         match &expression.kind {
             ExpressionKind::Number(_) | ExpressionKind::Boolean(_) | ExpressionKind::Text(_) => {}
             ExpressionKind::Name(name) => {
-                // A color is a value. A built-in function written without its parentheses
-                // is left to the check of the functions.
-                if ReservedWord::from_word(name).is_none() {
+                if Color::from_word(name).is_some() {
+                    // A color is a value.
+                } else if self.functions.callee(name).is_some() {
+                    let name = name.clone();
+                    self.report(
+                        CheckErrorKind::FunctionWithoutParentheses { name },
+                        expression.span,
+                    );
+                } else {
                     self.variable(name, expression.span, Access::Read, place);
                 }
             }
-            // Whether the function exists is left to the check of the functions.
             ExpressionKind::Call {
-                function: _,
+                function,
                 arguments,
             } => {
+                self.call(function, arguments.len());
                 for argument in arguments {
                     self.expression(argument, place);
                 }
@@ -275,26 +309,95 @@ impl<'a> Checker<'a> {
         self.report(kind, span);
     }
 
-    /// A name that a `let`, a function or a parameter brings into the program: in
-    /// `snake_case`, and not reserved. Whether the name is free, that is, not reserved.
-    fn check_new_name(&mut self, name: &Name) -> bool {
+    /// A call of `function` with `given` values: the name is a function, defined above the
+    /// call when it is one of the program, that has as many parameters. Every error of a
+    /// call is on its name.
+    fn call(&mut self, function: &Name, given: usize) {
+        // The name is copied only when there is an error to hold it.
+        let name = || function.text.clone();
+        let Some(callee) = self.functions.callee(&function.text) else {
+            // Only a variable that exists here is known to be one: any other name is no
+            // function, whatever it is elsewhere.
+            let kind = if self.variables.declared(&function.text).is_some() {
+                CheckErrorKind::VariableCalled { name: name() }
+            } else {
+                CheckErrorKind::UnknownFunction { name: name() }
+            };
+            self.report(kind, function.span);
+            return;
+        };
+        // The order of the source is enough: a call in the body of the function itself
+        // (a recursion) is under its name.
+        if let Callee::Defined(Function { defined, .. }) = callee
+            && function.span.start < defined.start
+        {
+            let name = name();
+            self.report(
+                CheckErrorKind::CalledBeforeDefinition { name, defined },
+                function.span,
+            );
+        }
+        if let Some(expected) = callee.parameter_count()
+            && expected != given
+        {
+            let name = name();
+            self.report(
+                CheckErrorKind::WrongArgumentCount {
+                    name,
+                    expected,
+                    given,
+                },
+                function.span,
+            );
+        }
+    }
+
+    /// The name of a function in its definition: in `snake_case`, not reserved, and not the
+    /// one of a function defined above.
+    fn check_function_name(&mut self, name: &Name) {
+        self.check_snake_case(name);
+        let kind = match ReservedWord::from_word(&name.text) {
+            Some(word) => CheckErrorKind::ReservedName { word },
+            None => match self.functions.get(&name.text) {
+                Some(Function { defined: first, .. }) if first != name.span => {
+                    let name = name.text.clone();
+                    CheckErrorKind::DuplicateFunction { name, first }
+                }
+                _ => return,
+            },
+        };
+        self.report(kind, name.span);
+    }
+
+    /// A name that a `let` or a parameter brings into the program: in `snake_case`, and
+    /// free for a variable. Whether the name is free.
+    fn check_new_variable(&mut self, name: &Name) -> bool {
+        self.check_snake_case(name);
+        self.check_variable_name(name)
+    }
+
+    /// A name that a `let`, a function or a parameter brings into the program: written as
+    /// the names of the language.
+    fn check_snake_case(&mut self, name: &Name) {
         if !is_snake_case(&name.text) {
             self.report(CheckErrorKind::NotSnakeCase, name.span);
         }
-        self.check_not_reserved(name)
     }
 
-    /// A name that is given a value: not the one of a built-in function nor of a color.
-    /// Whether the name is free. A reserved name has this one error: it is no variable, so
-    /// nothing more is said of it.
-    fn check_not_reserved(&mut self, name: &Name) -> bool {
-        match ReservedWord::from_word(&name.text) {
-            Some(word) => {
-                self.report(CheckErrorKind::ReservedName { word }, name.span);
-                false
-            }
-            None => true,
-        }
+    /// A name that is given a value: not the one of a built-in function, of a color nor of
+    /// a function of the program. Whether the name is free. A name that isn't has this one
+    /// error: it is no variable, so nothing more is said of it.
+    fn check_variable_name(&mut self, name: &Name) -> bool {
+        let kind = if let Some(word) = ReservedWord::from_word(&name.text) {
+            CheckErrorKind::ReservedName { word }
+        } else if let Some(Function { defined, .. }) = self.functions.get(&name.text) {
+            let name = name.text.clone();
+            CheckErrorKind::NameOfFunction { name, defined }
+        } else {
+            return true;
+        };
+        self.report(kind, name.span);
+        false
     }
 }
 
