@@ -2373,22 +2373,7 @@ mod robustness {
         let mut random = Random(7);
         let mut with_several_errors = 0;
         for _ in 0..2000 {
-            // The indentation follows the blocks, so that most programs have a right syntax.
-            let mut source = String::new();
-            let mut level = 0;
-            let mut opens = false;
-            for _ in 0..=(random.next() % 12) {
-                if opens {
-                    level += 1;
-                } else {
-                    level -= random.next() % (level + 1);
-                }
-                let line = random.pick(&lines);
-                source.push_str(&" ".repeat(level * 4));
-                source.push_str(line);
-                source.push('\n');
-                opens = line.ends_with(':');
-            }
+            let source = random.program(&lines);
             if let Ok(program) = parse(&source) {
                 let errors = check(&program);
                 assert!(

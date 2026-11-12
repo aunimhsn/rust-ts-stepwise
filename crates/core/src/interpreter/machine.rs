@@ -18,7 +18,7 @@ pub enum State {
     /// The program runs: the next step runs `line`, the one to highlight.
     Running {
         /// The line of the next step: a statement, or the line of an `if`, of an `else if` or
-        /// of a loop, up to its `:`.
+        /// of a loop, with its `:`.
         line: Span,
     },
     /// The program has run to its end.
@@ -36,72 +36,47 @@ pub enum Event {
     Printed(String),
 }
 
-/// A variable alive at the place the program has reached.
-#[derive(Debug, Clone)]
-struct Variable {
-    /// Its name, which the machine doesn't use: it reads a variable by its slot.
-    #[expect(dead_code, reason = "read by the variables panel, from step 9b")]
-    name: Rc<str>,
-    value: Value,
-}
-
-/// The place of the program in its instructions, and its variables.
-#[derive(Debug, Clone, Default)]
-struct Frame {
-    /// The index of the next instruction.
-    next: usize,
-    /// The variables alive, each at the index of its slot.
-    variables: Vec<Variable>,
-}
-
-/// What the machine does after an instruction.
-enum Flow {
-    /// It runs the next one.
-    Continue,
-    /// It pauses: the step is over.
-    Pause,
-    /// The program has ended.
-    End,
-}
-
 /// A program being run, one step at a time (see *Running a program* in `specs.md`).
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Machine {
-    code: Rc<Code>,
-    frame: Frame,
-    /// The values the expression being evaluated has left for its operators, above the turns
-    /// left of the `repeat`s around it.
-    operands: Vec<Value>,
+    /// The instructions of the program, which never change.
+    code: Code,
+    /// What the program has changed so far.
+    memory: Memory,
     state: State,
 }
 
 impl Machine {
     /// A machine about to run `program`, paused before its first line.
     ///
-    /// The checker must have found `program` without error. Otherwise the machine doesn't
-    /// run it: it starts stopped on [`RuntimeErrorKind::Internal`], at the first place the
-    /// checks refuse.
+    /// The checker must have found `program` without error. A program the compiler can't
+    /// translate (a name that is no variable, a `break` outside a loop…) starts stopped on
+    /// [`RuntimeErrorKind::Internal`], at the place that stops the compiler. Any other
+    /// program the checks refuse may run: it never panics, but what it does isn't specified.
     #[must_use]
     pub fn new(program: &Program) -> Self {
-        let start = Span::at(Position::new(1, 1));
-        let (code, state) = match compile(program) {
-            Ok(code) => (code, State::Running { line: start }),
+        match compile(program) {
+            Ok(code) => Self::start(code),
             Err(NotChecked(span)) => {
                 let kind = RuntimeErrorKind::Internal;
-                let refused = State::Failed(RuntimeError { kind, span });
-                (Code::default(), refused)
+                Self {
+                    code: Code::default(),
+                    memory: Memory::default(),
+                    state: State::Failed(RuntimeError { kind, span }),
+                }
             }
-        };
+        }
+    }
+
+    /// A machine about to run `code`, paused before its first line.
+    fn start(code: Code) -> Self {
         let mut machine = Self {
-            code: Rc::new(code),
-            frame: Frame::default(),
-            operands: Vec::new(),
-            state,
+            code,
+            memory: Memory::default(),
+            state: State::Ended,
         };
         // Up to the first line, where the first step starts: nothing runs before it.
-        if let State::Running { line } = machine.state {
-            machine.state = machine.advance(line, &mut None);
-        }
+        machine.state = machine.advance(Span::at(Position::new(1, 1)), &mut None);
         machine
     }
 
@@ -124,17 +99,25 @@ impl Machine {
 
     /// Runs the instructions up to the next pause, the end or an error. `line` is where the
     /// machine is, the place of an error that has no instruction.
+    ///
+    /// It always comes back: the compiler writes a [`Instruction::Line`], which pauses, on
+    /// the way of every jump back, so no instruction runs twice between two pauses. The
+    /// machine counts them all the same, and stops on [`RuntimeErrorKind::Internal`] rather
+    /// than freeze the page if instructions ever broke that rule.
     fn advance(&mut self, line: Span, event: &mut Option<Event>) -> State {
-        // The instructions are read while the rest of the machine changes.
-        let code = Rc::clone(&self.code);
         let mut place = line;
+        let mut instructions_left = self.code.here();
         let kind = loop {
-            let Some((instruction, span)) = code.get(self.frame.next) else {
+            let Some((instruction, span)) = self.code.get(self.memory.frame.next) else {
                 break RuntimeErrorKind::Internal;
             };
             place = *span;
-            self.frame.next = self.frame.next.saturating_add(1);
-            match self.execute(instruction, event) {
+            let Some(left) = instructions_left.checked_sub(1) else {
+                break RuntimeErrorKind::Internal;
+            };
+            instructions_left = left;
+            self.memory.frame.next = self.memory.frame.next.saturating_add(1);
+            match self.memory.execute(instruction, event) {
                 Ok(Flow::Continue) => {}
                 Ok(Flow::Pause) => return State::Running { line: place },
                 Ok(Flow::End) => return State::Ended,
@@ -143,7 +126,47 @@ impl Machine {
         };
         State::Failed(RuntimeError { kind, span: place })
     }
+}
 
+/// A variable alive at the place the program has reached.
+#[derive(Debug)]
+struct Variable {
+    /// Its name, which the machine doesn't use: it reads a variable by its slot.
+    #[expect(dead_code, reason = "read by the variables panel, from step 9b")]
+    name: Rc<str>,
+    value: Value,
+}
+
+/// The place of the program in its instructions, and its variables.
+#[derive(Debug, Default)]
+struct Frame {
+    /// The index of the next instruction.
+    next: usize,
+    /// The variables alive, each at the index of its slot.
+    variables: Vec<Variable>,
+}
+
+/// What the machine does after an instruction.
+enum Flow {
+    /// It runs the next one.
+    Continue,
+    /// It pauses: the step is over.
+    Pause,
+    /// The program has ended.
+    End,
+}
+
+/// What changes while a program runs: where it is, its variables, and the values of the
+/// expression being evaluated. Apart from the instructions, which it only reads.
+#[derive(Debug, Default)]
+struct Memory {
+    frame: Frame,
+    /// The values the expression being evaluated has left for its operators, above the turns
+    /// left of the `repeat`s around it.
+    operands: Vec<Value>,
+}
+
+impl Memory {
     fn execute(
         &mut self,
         instruction: &Instruction,
@@ -283,7 +306,12 @@ fn printed_line(values: &[Value]) -> String {
 #[cfg(test)]
 mod tests {
     use super::{Machine, State};
+    use crate::ast::BinaryOperator;
+    use crate::builtin::Builtin;
+    use crate::interpreter::code::{Code, Instruction};
+    use crate::interpreter::{RuntimeError, RuntimeErrorKind, Value};
     use crate::parser::parse;
+    use crate::test_support::span;
 
     #[test]
     fn a_loop_that_never_ends_keeps_no_more_values_at_each_turn() {
@@ -304,10 +332,72 @@ while true:
             // Before line 3, the first of the block: only `turns` is alive, and no operand
             // is left from the turn before.
             if matches!(machine.state(), State::Running { line } if line.start.line == 3) {
-                sizes.push((machine.operands.len(), machine.frame.variables.len()));
+                let memory = &machine.memory;
+                sizes.push((memory.operands.len(), memory.frame.variables.len()));
             }
         }
         assert!(sizes.len() > 100, "{sizes:?}");
         assert!(sizes.iter().all(|&size| size == (0, 1)), "{sizes:?}");
+    }
+
+    /// What no program gives the machine: instructions that the compiler never writes.
+    #[test]
+    fn wrong_instructions_stop_the_machine_without_a_panic() {
+        let print_two_values = Instruction::CallBuiltin {
+            builtin: Builtin::Print,
+            arguments: 2,
+            value_needed: false,
+        };
+        let short_circuit = Instruction::ShortCircuit {
+            operator: BinaryOperator::And,
+            decisive: false,
+            end: 0,
+        };
+        let number = || Instruction::Push(Value::Number(1));
+        let boolean = || Instruction::Push(Value::Boolean(true));
+        for wrong in [
+            // Nothing to run, not even the end of the program.
+            vec![],
+            vec![number()],
+            // No operand to take.
+            vec![Instruction::Pop],
+            vec![Instruction::Store(0)],
+            vec![Instruction::Declare("side".into())],
+            vec![Instruction::Unary(crate::ast::UnaryOperator::Negate)],
+            vec![number(), Instruction::Binary(BinaryOperator::Add)],
+            vec![Instruction::JumpUnless(0)],
+            vec![short_circuit],
+            vec![Instruction::RequireBoolean(BinaryOperator::Or)],
+            vec![Instruction::RepeatStart],
+            vec![Instruction::RepeatNext(0)],
+            vec![number(), print_two_values],
+            // No variable in this slot.
+            vec![Instruction::Load(3)],
+            vec![number(), Instruction::Store(3)],
+            // The turns left of a `repeat` that are no number.
+            vec![boolean(), Instruction::RepeatNext(0)],
+            // A jump that never landed, and jumps back that meet no line.
+            vec![Instruction::Jump(usize::MAX)],
+            vec![Instruction::Jump(0)],
+            vec![number(), Instruction::Pop, Instruction::Jump(0)],
+        ] {
+            let place = span(1, 1, 2);
+            let mut code = Code::default();
+            for instruction in &wrong {
+                code.push(instruction.clone(), place);
+            }
+            let mut machine = Machine::start(code);
+            let kind = RuntimeErrorKind::Internal;
+            // An empty list has no instruction to give its place: the start of the program.
+            let span = if wrong.is_empty() {
+                span(1, 1, 1)
+            } else {
+                place
+            };
+            let failed = State::Failed(RuntimeError { kind, span });
+            assert_eq!(*machine.state(), failed, "{wrong:?}");
+            assert_eq!(machine.step(), None, "{wrong:?}");
+            assert_eq!(*machine.state(), failed, "{wrong:?}");
+        }
     }
 }

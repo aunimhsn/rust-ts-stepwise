@@ -6,11 +6,12 @@ use std::rc::Rc;
 
 use crate::color::Color;
 
-/// The most characters a text holds: joining two texts into a longer one stops the program.
+/// The most characters of two texts joined by `+`: a longer result stops the program.
 ///
 /// Without it, a loop that doubles a text (`line = line + line`) would fill the memory of the
 /// page in a few dozen turns, which aborts the WebAssembly module as a panic does. The numbers
-/// and the calls have their own limits.
+/// and the calls have their own limits. A text written in a program may be longer: the size
+/// of the program bounds it.
 pub const MAX_TEXT_LENGTH: usize = 10_000;
 
 /// A value of a program.

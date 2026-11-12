@@ -7,7 +7,7 @@
 
 use std::rc::Rc;
 
-use super::code::{Code, Instruction, Jump};
+use super::code::{Code, Instruction, PendingJump};
 use super::value::Value;
 use crate::ast::{
     BinaryOperator, Branch, Expression, ExpressionKind, Name, Program, Statement, StatementKind,
@@ -43,7 +43,7 @@ struct Loop {
     /// drops them.
     counted: bool,
     /// The jumps of its `break`s, which land after the loop.
-    breaks: Vec<Jump>,
+    breaks: Vec<PendingJump>,
 }
 
 /// The instructions written so far, and what the compiler knows of the place it has reached.
@@ -162,6 +162,7 @@ impl<'a> Compiler<'a> {
         let exit = self.code.jump(Instruction::JumpUnless, condition.span);
         self.enter_loop(false);
         self.block(body, span)?;
+        // Back to the line of the loop: a jump back always meets a line, where the step ends.
         self.code.push(Instruction::Jump(start), span);
         self.code.land(exit);
         self.land_breaks();
@@ -183,6 +184,8 @@ impl<'a> Compiler<'a> {
         let exit = self.code.jump(Instruction::RepeatNext, span);
         self.enter_loop(true);
         self.block(body, span)?;
+        // The line of the loop again, then back to its turns: a jump back always meets a
+        // line, where the step ends.
         self.code.push(Instruction::Line, span);
         self.code.push(Instruction::Jump(turn), span);
         self.code.land(exit);

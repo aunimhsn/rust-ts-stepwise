@@ -2,12 +2,14 @@
 //! what they print and how they end, grouped by the rules of *Running a program*, *Values*,
 //! *Expressions* and *Statements* in `specs.md`.
 
+use super::code::Instruction;
+use super::compiler::compile;
 use super::{Event, Machine, RuntimeError, RuntimeErrorKind as E, State, ValueType};
 use crate::ast::{BinaryOperator, Program, Statement, StatementKind, UnaryOperator};
 use crate::checker::check;
-use crate::parser::parse;
+use crate::parser::{MAX_BLOCK_DEPTH, MAX_DEPTH, parse};
 use crate::span::Span;
-use crate::test_support::span;
+use crate::test_support::{Random, span};
 
 /// The most steps a test runs: a program that never ends is still running after them.
 const MAX_STEPS: usize = 1000;
@@ -40,9 +42,11 @@ fn run_unchecked(source: &str) -> Run {
 }
 
 /// Runs `program`, and checks at each step that the line highlighted is one the program
-/// runs: a wrong place is caught even by a test that looks at something else.
+/// runs, and first that its instructions follow the rule that ends a step: a mistake of the
+/// compiler is caught even by a test that looks at something else.
 #[track_caller]
 fn run_program(program: &Program) -> Run {
+    assert_jumps_back_meet_a_line(program);
     let mut steps = Vec::new();
     lines_run(&program.statements, &mut steps);
     let mut machine = Machine::new(program);
@@ -64,6 +68,36 @@ fn run_program(program: &Program) -> Run {
         lines,
         printed,
         state,
+    }
+}
+
+/// Checks the instructions of `program`: every jump has landed, and a jump back lands on a
+/// line or comes right after one, so that no step runs an instruction twice.
+#[track_caller]
+fn assert_jumps_back_meet_a_line(program: &Program) {
+    let Ok(code) = compile(program) else {
+        return;
+    };
+    let is_line = |index: usize| matches!(code.get(index), Some((Instruction::Line, _)));
+    for index in 0..code.here() {
+        let target = match code.get(index) {
+            Some((
+                Instruction::Jump(target)
+                | Instruction::JumpUnless(target)
+                | Instruction::RepeatNext(target)
+                | Instruction::ShortCircuit { end: target, .. },
+                _,
+            )) => *target,
+            _ => continue,
+        };
+        assert!(target < code.here(), "the jump {index} never landed");
+        if target <= index {
+            let after_a_line = index.checked_sub(1).is_some_and(is_line);
+            assert!(
+                is_line(target) || after_a_line,
+                "the jump {index} goes back to {target} without a line on its way"
+            );
+        }
     }
 }
 
@@ -474,6 +508,20 @@ while turns < 2:
 }
 
 #[test]
+fn a_break_in_a_while_leaves_the_turns_of_the_repeat_around_it() {
+    let source = "\
+repeat 2:
+    while true:
+        break
+    print(\"outer\")
+";
+    let run = run(source);
+    assert_eq!(run.lines, [1, 2, 3, 4, 1, 2, 3, 4, 1]);
+    assert_eq!(run.printed, ["outer", "outer"]);
+    assert_eq!(run.state, State::Ended);
+}
+
+#[test]
 fn a_break_ends_the_variables_of_its_loop() {
     let source = "\
 let total = 0
@@ -563,6 +611,28 @@ if last == 6:
 print(total, last)
 ";
     assert_eq!(printed(source), ["three", "3", "4", "3 6"]);
+}
+
+#[test]
+fn a_name_is_declared_again_once_its_block_has_ended() {
+    let source = "\
+let total = 0
+if true:
+    let side = 1
+    total = total + side
+    print(side)
+if true:
+    let other = 10
+    let side = 2
+    total = total + side
+    print(side, other)
+repeat 2:
+    let side = total
+    print(side)
+let side = 3
+print(side, total)
+";
+    assert_eq!(printed(source), ["1", "2 10", "3", "3", "3 3"]);
 }
 
 // `print`, and the values as it writes them.
@@ -960,26 +1030,71 @@ while going:
 
 // The depth of a program.
 
-#[test]
-fn the_deepest_expressions_and_blocks_run() {
-    let sum = vec!["1"; 150].join(" + ");
-    assert_eq!(value(&sum), "150");
-    let nested = format!("{}1{}", "(".repeat(150), ")".repeat(150));
-    assert_eq!(value(&nested), "1");
-    let negated = format!("{}true", "not ".repeat(150));
-    assert_eq!(value(&negated), "true");
-    let mut blocks = String::new();
-    for depth in 0..40 {
-        blocks.push_str(&"    ".repeat(depth));
-        blocks.push_str(if depth % 2 == 0 {
+/// Runs `source`, the deepest program of its kind: `deeper`, one level more, is refused by
+/// the parser.
+#[track_caller]
+fn printed_at_the_limit(source: &str, deeper: &str) -> Vec<String> {
+    assert!(parse(deeper).is_err(), "the parser accepts one level more");
+    printed(source)
+}
+
+/// `depth` blocks, one inside the other, around `line`.
+fn nested_blocks(depth: usize, line: &str) -> String {
+    let mut source = String::new();
+    for level in 0..depth {
+        source.push_str(&"    ".repeat(level));
+        source.push_str(if level % 2 == 0 {
             "if true:\n"
         } else {
             "repeat 1:\n"
         });
     }
-    blocks.push_str(&"    ".repeat(40));
-    blocks.push_str("print(\"deep\")\n");
-    assert_eq!(printed(&blocks), ["deep"]);
+    source.push_str(&"    ".repeat(depth));
+    source.push_str(line);
+    source.push('\n');
+    source
+}
+
+#[test]
+fn the_deepest_expressions_run() {
+    // In `print(…)`, the call and the value each take one level of the tree.
+    let depth = usize::try_from(MAX_DEPTH).unwrap() - 2;
+    let nested = |depth: usize| format!("print({}1{})", "(".repeat(depth), ")".repeat(depth));
+    assert_eq!(
+        printed_at_the_limit(&nested(depth), &nested(depth + 1)),
+        ["1"]
+    );
+    let negated = |depth: usize| format!("print({}true)", "not ".repeat(depth));
+    assert_eq!(
+        printed_at_the_limit(&negated(depth), &negated(depth + 1)),
+        ["true"]
+    );
+    // A chain of operators is as deep as it is long.
+    let sum = |terms: usize| format!("print({})", vec!["1"; terms].join(" + "));
+    assert_eq!(
+        printed_at_the_limit(&sum(depth + 1), &sum(depth + 2)),
+        [(depth + 1).to_string()]
+    );
+}
+
+#[test]
+fn the_deepest_blocks_run() {
+    let blocks = usize::try_from(MAX_BLOCK_DEPTH).unwrap();
+    let deep = |depth: usize| nested_blocks(depth, "print(\"deep\")");
+    assert_eq!(
+        printed_at_the_limit(&deep(blocks), &deep(blocks + 1)),
+        ["deep"]
+    );
+    // The worst case: the deepest expression the parser takes inside the deepest blocks.
+    let depth = usize::try_from(MAX_DEPTH).unwrap() - blocks - 2;
+    let nested = |depth: usize| {
+        let line = format!("print({}1{})", "(".repeat(depth), ")".repeat(depth));
+        nested_blocks(blocks, &line)
+    };
+    assert_eq!(
+        printed_at_the_limit(&nested(depth), &nested(depth + 1)),
+        ["1"]
+    );
 }
 
 // A program the checks before running refuse.
@@ -1009,6 +1124,56 @@ fn an_expression_alone_on_its_line_leaves_no_value() {
     assert_eq!(run.lines, [1, 2, 1, 2, 1, 3]);
     assert_eq!(run.printed, ["after"]);
     assert_eq!(run.state, State::Ended);
+}
+
+// Random programs.
+
+#[test]
+fn random_checked_programs_never_stop_on_a_mistake_of_the_core() {
+    let lines = [
+        "let side = sides + 1",
+        "let turns = 2",
+        "sides = sides + 1",
+        "sides = sides - 2",
+        "turns = turns - 1",
+        "print(sides)",
+        "print(side, turns)",
+        "if sides < 2:",
+        "if side == 1 and turns > 0:",
+        "else if sides == 2:",
+        "else:",
+        "while sides < 3:",
+        "while turns > 0 or side < sides:",
+        "repeat 2:",
+        "repeat sides:",
+        "repeat turns - sides:",
+        "print(10 / sides)",
+        "break",
+    ];
+    let mut random = Random(9);
+    let (mut ended, mut failed, mut running) = (0, 0, 0);
+    for _ in 0..20_000 {
+        let source = format!("let sides = 0\n{}", random.program(&lines));
+        let Ok(program) = parse(&source) else {
+            continue;
+        };
+        if !check(&program).is_empty() {
+            continue;
+        }
+        match run_program(&program).state {
+            State::Ended => ended += 1,
+            State::Running { .. } => running += 1,
+            State::Failed(error) => {
+                assert_ne!(error.kind, E::Internal, "in {source:?}");
+                failed += 1;
+            }
+        }
+    }
+    // Enough programs of each kind: the ones that end, that stop on an error of their own
+    // (a count below zero, a division by zero), and that never end.
+    assert!(ended > 500, "only {ended} programs ended");
+    assert!(failed > 100, "only {failed} programs stopped on an error");
+    assert!(running > 50, "only {running} programs kept running");
 }
 
 // Until the next sub-steps.

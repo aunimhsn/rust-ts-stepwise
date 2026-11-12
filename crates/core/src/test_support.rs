@@ -24,4 +24,26 @@ impl Random {
     pub fn pick<'a>(&mut self, pieces: &[&'a str]) -> &'a str {
         pieces[self.next() % pieces.len()]
     }
+
+    /// A program of one to twelve lines picked among `lines`, which must not be empty. The
+    /// indentation follows the blocks (a line that ends with `:` opens one), so that most
+    /// programs have a right syntax.
+    pub fn program(&mut self, lines: &[&str]) -> String {
+        let mut source = String::new();
+        let mut level = 0;
+        let mut opens = false;
+        for _ in 0..=(self.next() % 12) {
+            if opens {
+                level += 1;
+            } else {
+                level -= self.next() % (level + 1);
+            }
+            let line = self.pick(lines);
+            source.push_str(&" ".repeat(level * 4));
+            source.push_str(line);
+            source.push('\n');
+            opens = line.ends_with(':');
+        }
+        source
+    }
 }

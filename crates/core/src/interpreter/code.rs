@@ -83,7 +83,20 @@ impl Instruction {
             | Self::JumpUnless(to)
             | Self::RepeatNext(to)
             | Self::ShortCircuit { end: to, .. } => *to = target,
-            _ => {}
+            // Every instruction is listed, so that a new one that jumps can't be forgotten.
+            Self::Line
+            | Self::End
+            | Self::Push(_)
+            | Self::Load(_)
+            | Self::Store(_)
+            | Self::Declare(_)
+            | Self::Truncate(_)
+            | Self::Pop
+            | Self::Unary(_)
+            | Self::Binary(_)
+            | Self::RequireBoolean(_)
+            | Self::RepeatStart
+            | Self::CallBuiltin { .. } => {}
         }
     }
 }
@@ -91,7 +104,7 @@ impl Instruction {
 /// A jump whose target isn't written yet: [`Code::land`] gives it the place reached then.
 #[derive(Debug)]
 #[must_use = "a jump that never lands stops the program"]
-pub(super) struct Jump {
+pub(super) struct PendingJump {
     /// The index of its instruction.
     index: usize,
 }
@@ -121,10 +134,14 @@ impl Code {
 
     /// Writes a jump forward, built by `jump` from its target, which [`Code::land`] gives
     /// later.
-    pub(super) fn jump(&mut self, jump: impl FnOnce(usize) -> Instruction, span: Span) -> Jump {
+    pub(super) fn jump(
+        &mut self,
+        jump: impl FnOnce(usize) -> Instruction,
+        span: Span,
+    ) -> PendingJump {
         let index = self.here();
         self.push(jump(NOWHERE), span);
-        Jump { index }
+        PendingJump { index }
     }
 
     /// Makes `jump` land here, on the next instruction written.
@@ -132,7 +149,7 @@ impl Code {
         clippy::needless_pass_by_value,
         reason = "a jump lands once: landing takes it away"
     )]
-    pub(super) fn land(&mut self, jump: Jump) {
+    pub(super) fn land(&mut self, jump: PendingJump) {
         let here = self.here();
         if let Some((instruction, _)) = self.instructions.get_mut(jump.index) {
             instruction.set_target(here);

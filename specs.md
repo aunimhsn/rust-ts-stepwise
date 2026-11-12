@@ -69,7 +69,7 @@ else:
 |---|---|---|
 | Whole number | `0`, `42`, `-7` | 64-bit; a result beyond that range stops the program with an error. A number is written up to 9223372036854775807, with or without `-`: the smallest value, -9223372036854775808, can only be computed. No decimal numbers in version 1. |
 | Boolean | `true`, `false` | The only values a condition accepts: `if 3:` is an error, there is no "truthy" value. |
-| Text | `"I am stuck"` | Double quotes, on one line; `\"`, `\\` and `\n` inside. Used by `print`. A text holds at most 10 000 characters: joining two texts into a longer one stops the program with an error, so that a loop that doubles a text never fills the memory of the page. |
+| Text | `"I am stuck"` | Double quotes, on one line; `\"`, `\\` and `\n` inside. Used by `print`. Two texts joined by `+` give at most 10 000 characters: a longer result stops the program with an error, so that a loop that doubles a text never fills the memory of the page. A text written in the program has no such limit: the size of the program bounds it. |
 | Color | `red`, `yellow`, `blue` | The three paints of the world: enough for the sensors to tell three cases apart (four with an unpainted cell), few enough to read at a glance and to stay distinct with a red-green color blindness. Their shades are in [Look of the world](#look-of-the-world). |
 
 Lists and decimal numbers come later (see the [backlog](docs/backlog.md)).
