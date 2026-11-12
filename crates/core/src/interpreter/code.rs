@@ -122,9 +122,14 @@ impl Code {
         self.instructions.get(index)
     }
 
+    /// The number of instructions.
+    pub(super) const fn len(&self) -> usize {
+        self.instructions.len()
+    }
+
     /// The index of the next instruction written: the target of a jump back to here.
     pub(super) const fn here(&self) -> usize {
-        self.instructions.len()
+        self.len()
     }
 
     /// Writes an instruction, which comes from `span`.

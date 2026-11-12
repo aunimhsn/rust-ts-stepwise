@@ -25,10 +25,12 @@ impl Random {
         pieces[self.next() % pieces.len()]
     }
 
-    /// A program of one to twelve lines picked among `lines`, which must not be empty. The
-    /// indentation follows the blocks (a line that ends with `:` opens one), so that most
-    /// programs have a right syntax.
-    pub fn program(&mut self, lines: &[&str]) -> String {
+    /// A program of one to twelve pieces picked among `pieces`, which must not be empty. The
+    /// indentation follows the blocks (a piece that ends with `:` opens one), so that most
+    /// programs have a right syntax. A piece is a line, or several lines that only make sense
+    /// together, such as an `if` with its block and its `else`, written from the level of
+    /// their first line.
+    pub fn program(&mut self, pieces: &[&str]) -> String {
         let mut source = String::new();
         let mut level = 0;
         let mut opens = false;
@@ -38,11 +40,13 @@ impl Random {
             } else {
                 level -= self.next() % (level + 1);
             }
-            let line = self.pick(lines);
-            source.push_str(&" ".repeat(level * 4));
-            source.push_str(line);
-            source.push('\n');
-            opens = line.ends_with(':');
+            let piece = self.pick(pieces);
+            for line in piece.split('\n') {
+                source.push_str(&" ".repeat(level * 4));
+                source.push_str(line);
+                source.push('\n');
+            }
+            opens = piece.ends_with(':');
         }
         source
     }

@@ -7,7 +7,7 @@ use super::compiler::compile;
 use super::{Event, Machine, RuntimeError, RuntimeErrorKind as E, State, ValueType};
 use crate::ast::{BinaryOperator, Program, Statement, StatementKind, UnaryOperator};
 use crate::checker::check;
-use crate::parser::{MAX_BLOCK_DEPTH, MAX_DEPTH, parse};
+use crate::parser::{MAX_BLOCK_DEPTH, MAX_DEPTH, ParseErrorKind, SyntaxError, parse};
 use crate::span::Span;
 use crate::test_support::{Random, span};
 
@@ -72,32 +72,51 @@ fn run_program(program: &Program) -> Run {
 }
 
 /// Checks the instructions of `program`: every jump has landed, and a jump back lands on a
-/// line or comes right after one, so that no step runs an instruction twice.
+/// line, or comes right after a line that is the only way to it. So every way back holds a
+/// line, where the step ends.
 #[track_caller]
 fn assert_jumps_back_meet_a_line(program: &Program) {
     let Ok(code) = compile(program) else {
         return;
     };
+    let jumps: Vec<(usize, usize)> = (0..code.len())
+        .filter_map(|index| Some((index, target(&code.get(index)?.0)?)))
+        .collect();
     let is_line = |index: usize| matches!(code.get(index), Some((Instruction::Line, _)));
-    for index in 0..code.here() {
-        let target = match code.get(index) {
-            Some((
-                Instruction::Jump(target)
-                | Instruction::JumpUnless(target)
-                | Instruction::RepeatNext(target)
-                | Instruction::ShortCircuit { end: target, .. },
-                _,
-            )) => *target,
-            _ => continue,
-        };
-        assert!(target < code.here(), "the jump {index} never landed");
+    for &(index, target) in &jumps {
+        assert!(target < code.len(), "the jump {index} never landed");
         if target <= index {
             let after_a_line = index.checked_sub(1).is_some_and(is_line);
+            let reached_by_a_jump = jumps.iter().any(|&(_, other)| other == index);
             assert!(
-                is_line(target) || after_a_line,
+                is_line(target) || (after_a_line && !reached_by_a_jump),
                 "the jump {index} goes back to {target} without a line on its way"
             );
         }
+    }
+}
+
+/// The target of an instruction that jumps. Every instruction is listed, so that a new one
+/// that jumps can't be forgotten.
+fn target(instruction: &Instruction) -> Option<usize> {
+    match instruction {
+        Instruction::Jump(target)
+        | Instruction::JumpUnless(target)
+        | Instruction::RepeatNext(target)
+        | Instruction::ShortCircuit { end: target, .. } => Some(*target),
+        Instruction::Line
+        | Instruction::End
+        | Instruction::Push(_)
+        | Instruction::Load(_)
+        | Instruction::Store(_)
+        | Instruction::Declare(_)
+        | Instruction::Truncate(_)
+        | Instruction::Pop
+        | Instruction::Unary(_)
+        | Instruction::Binary(_)
+        | Instruction::RequireBoolean(_)
+        | Instruction::RepeatStart
+        | Instruction::CallBuiltin { .. } => None,
     }
 }
 
@@ -629,10 +648,10 @@ if true:
 repeat 2:
     let side = total
     print(side)
-let side = 3
+let side = 7
 print(side, total)
 ";
-    assert_eq!(printed(source), ["1", "2 10", "3", "3", "3 3"]);
+    assert_eq!(printed(source), ["1", "2 10", "3", "3", "7 3"]);
 }
 
 // `print`, and the values as it writes them.
@@ -1031,10 +1050,14 @@ while going:
 // The depth of a program.
 
 /// Runs `source`, the deepest program of its kind: `deeper`, one level more, is refused by
-/// the parser.
+/// the parser for its depth.
 #[track_caller]
 fn printed_at_the_limit(source: &str, deeper: &str) -> Vec<String> {
-    assert!(parse(deeper).is_err(), "the parser accepts one level more");
+    let too_deep = matches!(
+        parse(deeper),
+        Err(SyntaxError::Parse(error)) if error.kind == ParseErrorKind::TooDeep
+    );
+    assert!(too_deep, "one level more isn't refused for its depth");
     printed(source)
 }
 
@@ -1130,7 +1153,9 @@ fn an_expression_alone_on_its_line_leaves_no_value() {
 
 #[test]
 fn random_checked_programs_never_stop_on_a_mistake_of_the_core() {
-    let lines = [
+    // An `else` only follows the block of its `if`: they are drawn together, or almost no
+    // program would have one.
+    let pieces = [
         "let side = sides + 1",
         "let turns = 2",
         "sides = sides + 1",
@@ -1138,28 +1163,35 @@ fn random_checked_programs_never_stop_on_a_mistake_of_the_core() {
         "turns = turns - 1",
         "print(sides)",
         "print(side, turns)",
+        "print(10 / (sides - 1))",
         "if sides < 2:",
+        "if sides > 0 and sides < 3:",
         "if side == 1 and turns > 0:",
-        "else if sides == 2:",
-        "else:",
+        "if sides < 1:\n    sides = sides + 1\nelse if sides == 2:",
+        "if sides == 1:\n    print(sides)\nelse if sides < 0 or sides > 4:\n    break\nelse:",
+        "if sides < 2:\n    let side = 5\n    print(side)\nelse:",
         "while sides < 3:",
+        "while sides < 2 or sides == 5:",
         "while turns > 0 or side < sides:",
         "repeat 2:",
         "repeat sides:",
-        "repeat turns - sides:",
-        "print(10 / sides)",
+        "repeat 3 - sides:",
         "break",
     ];
     let mut random = Random(9);
     let (mut ended, mut failed, mut running) = (0, 0, 0);
+    let (mut with_else, mut with_logic, mut with_break) = (0, 0, 0);
     for _ in 0..20_000 {
-        let source = format!("let sides = 0\n{}", random.program(&lines));
+        let source = format!("let sides = 0\n{}", random.program(&pieces));
         let Ok(program) = parse(&source) else {
             continue;
         };
         if !check(&program).is_empty() {
             continue;
         }
+        with_else += usize::from(source.contains("else"));
+        with_logic += usize::from(source.contains(" and ") || source.contains(" or "));
+        with_break += usize::from(source.contains("break"));
         match run_program(&program).state {
             State::Ended => ended += 1,
             State::Running { .. } => running += 1,
@@ -1172,8 +1204,15 @@ fn random_checked_programs_never_stop_on_a_mistake_of_the_core() {
     // Enough programs of each kind: the ones that end, that stop on an error of their own
     // (a count below zero, a division by zero), and that never end.
     assert!(ended > 500, "only {ended} programs ended");
-    assert!(failed > 100, "only {failed} programs stopped on an error");
+    assert!(failed > 30, "only {failed} programs stopped on an error");
     assert!(running > 50, "only {running} programs kept running");
+    // And enough of each shape whose jumps the compiler may get wrong.
+    assert!(with_else > 200, "only {with_else} programs had an else");
+    assert!(
+        with_logic > 200,
+        "only {with_logic} programs had an and or an or"
+    );
+    assert!(with_break > 100, "only {with_break} programs had a break");
 }
 
 // Until the next sub-steps.

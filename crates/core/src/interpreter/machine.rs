@@ -101,12 +101,14 @@ impl Machine {
     /// machine is, the place of an error that has no instruction.
     ///
     /// It always comes back: the compiler writes a [`Instruction::Line`], which pauses, on
-    /// the way of every jump back, so no instruction runs twice between two pauses. The
-    /// machine counts them all the same, and stops on [`RuntimeErrorKind::Internal`] rather
-    /// than freeze the page if instructions ever broke that rule.
+    /// the way of every jump back. So a step runs each instruction at most once, hence at
+    /// most as many as the code holds. The machine counts them all the same, up to exactly
+    /// that number, and stops on [`RuntimeErrorKind::Internal`] rather than freeze the page
+    /// if instructions ever broke that rule. What step 9b adds must keep it: entering a
+    /// function and coming back from it each end the step.
     fn advance(&mut self, line: Span, event: &mut Option<Event>) -> State {
         let mut place = line;
-        let mut instructions_left = self.code.here();
+        let mut instructions_left = self.code.len();
         let kind = loop {
             let Some((instruction, span)) = self.code.get(self.memory.frame.next) else {
                 break RuntimeErrorKind::Internal;
