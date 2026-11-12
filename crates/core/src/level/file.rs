@@ -26,6 +26,7 @@ struct Header {
 pub(super) struct LevelFile {
     version: u32,
     pub(super) starting_code: String,
+    #[serde(default)]
     pub(super) maps: Vec<MapFile>,
 }
 

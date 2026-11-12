@@ -311,18 +311,11 @@ mod refused {
 
     #[test]
     fn a_level_has_one_to_three_maps() {
-        assert!(matches!(
-            file_error(&source(&[])),
-            LevelErrorKind::Syntax(_)
-        ));
+        assert_eq!(file_error(&source(&[])), LevelErrorKind::MapCount(0));
         let one = small("");
         assert_eq!(
             file_error(&source(&[&one, &one, &one, &one])),
             LevelErrorKind::MapCount(4)
-        );
-        assert_eq!(
-            file_error("version = 1\nstarting_code = ''\nmaps = []\n"),
-            LevelErrorKind::MapCount(0)
         );
         assert!(Level::from_toml(&source(&[&one, &one, &one])).is_ok());
     }
@@ -463,7 +456,7 @@ mod goals_refused {
     }
 
     #[test]
-    fn goals_already_met_are_refused() {
+    fn goals_all_met_at_the_start_are_refused() {
         for goals in [
             "robot_at = [0, 0]",
             "carrying = false",
@@ -480,6 +473,12 @@ mod goals_refused {
              paints = [{{ color = \"red\", path = [[1, 1]] }}]\n"
         );
         assert_eq!(map_error(&painted), LevelErrorKind::GoalsMetAtStart);
+    }
+
+    #[test]
+    fn some_goals_may_be_met_at_the_start() {
+        let goals = "robot_at = [3, 0]\ncarrying = false\nnothing_else_painted = true";
+        assert!(Level::from_toml(&source(&[&small_with_goals(goals)])).is_ok());
     }
 
     #[test]
@@ -539,18 +538,12 @@ mod goals_refused {
     }
 
     #[test]
-    fn the_path_of_a_goal_is_made_of_cells_next_to_each_other() {
+    fn the_strokes_of_the_goals_are_checked_as_strokes() {
         assert_eq!(
             map_error(&small_with_goals(
                 "paints = [{ color = \"red\", path = [[0, 0], [1, 1]] }]"
             )),
             LevelErrorKind::NotNeighbors(Point::new(0, 0), Point::new(1, 1))
-        );
-        assert_eq!(
-            map_error(&small_with_goals(
-                "paints = [{ color = \"red\", path = [] }]"
-            )),
-            LevelErrorKind::EmptyPath
         );
     }
 

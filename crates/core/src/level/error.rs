@@ -67,7 +67,8 @@ pub enum LevelErrorKind {
     /// Two cells that follow each other in the path of a stroke, while they aren't next to
     /// each other.
     NotNeighbors(Point, Point),
-    /// A goal on a wall or outside the map.
+    /// A goal on a wall or outside the map: only [`BuildError::OnWall`] and
+    /// [`BuildError::OutsideMap`].
     Goal(BuildError),
     /// A cell that two strokes of the goals want in two different colors.
     ConflictingPaintGoal(Point),
@@ -88,6 +89,8 @@ pub enum LevelErrorKind {
     /// Goals in the map of the sandbox, which has none.
     GoalsInSandbox,
 }
+
+impl std::error::Error for LevelError {}
 
 impl fmt::Display for LevelError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -126,12 +129,9 @@ impl fmt::Display for LevelErrorKind {
             Self::Map(error) => write_build_error(f, *error),
             Self::DuplicateItem(at) => write!(f, "two items on {}", cell(*at)),
             Self::EmptyPath => write!(f, "a stroke has an empty path"),
-            Self::NotNeighbors(from, to) => write!(
-                f,
-                "{} and {} follow each other in a path, while they aren't next to each other",
-                cell(*from),
-                cell(*to)
-            ),
+            Self::NotNeighbors(from, to) => {
+                write_build_error(f, BuildError::NotNeighbors(*from, *to))
+            }
             Self::Goal(error) => {
                 write!(f, "a goal: ")?;
                 write_build_error(f, *error)

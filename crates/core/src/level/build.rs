@@ -69,6 +69,9 @@ fn terrain(terrain: &str) -> Result<Map, LevelErrorKind> {
     let rows: Vec<&str> = terrain.lines().collect();
     let width = rows.first().map_or(0, |row| row.chars().count());
     let mut map = Map::new(width, rows.len()).map_err(LevelErrorKind::Map)?;
+    // `Map::new` has refused more rows than `MAX_ROWS`, and each row is checked to be `width`
+    // long: zipping with the `u8` ranges gives each cell its coordinates without a cast, and
+    // drops nothing.
     for (y, row) in (0..map.height()).zip(&rows) {
         let length = row.chars().count();
         if length != width {
