@@ -69,7 +69,7 @@ else:
 |---|---|---|
 | Whole number | `0`, `42`, `-7` | 64-bit; a result beyond that range stops the program with an error. A number is written up to 9223372036854775807, with or without `-`: the smallest value, -9223372036854775808, can only be computed. No decimal numbers in version 1. |
 | Boolean | `true`, `false` | The only values a condition accepts: `if 3:` is an error, there is no "truthy" value. |
-| Text | `"I am stuck"` | Double quotes, on one line; `\"`, `\\` and `\n` inside. Used by `print`. |
+| Text | `"I am stuck"` | Double quotes, on one line; `\"`, `\\` and `\n` inside. Used by `print`. A text holds at most 10 000 characters: joining two texts into a longer one stops the program with an error, so that a loop that doubles a text never fills the memory of the page. |
 | Color | `red`, `yellow`, `blue` | The three paints of the world: enough for the sensors to tell three cases apart (four with an unpainted cell), few enough to read at a glance and to stay distinct with a red-green color blindness. Their shades are in [Look of the world](#look-of-the-world). |
 
 Lists and decimal numbers come later (see the [backlog](docs/backlog.md)).
@@ -83,7 +83,7 @@ Lists and decimal numbers come later (see the [backlog](docs/backlog.md)).
 
 ### Expressions
 
-- Arithmetic on whole numbers: `+`, `-`, `*`, `/` (whole division, `7 / 2` is `3`), `%` (remainder). Dividing by zero stops the program with an error.
+- Arithmetic on whole numbers: `+`, `-`, `*`, `/` (whole division, `7 / 2` is `3`), `%` (remainder). The division rounds down, as in Python, and the remainder follows it: `-7 / 2` is `-4` and `-7 % 2` is `1`, so that the remainder by a positive number is never negative (`(turns - 1) % 4` wraps around). Dividing by zero, with `/` or with `%`, stops the program with an error.
 - `+` also joins two texts. Adding a text and a number is an error: `print` takes several values instead (`print("Sides:", sides)`).
 - Comparisons: `==`, `!=` (two values of the same type), `<`, `<=`, `>`, `>=` (whole numbers). Comparisons don't chain, whichever they are (`1 < x < 5`, `a == b == c`): an error that says to join two comparisons with `and`, without rewriting them.
 - Logic: `and`, `or`, `not`, on booleans, evaluated from left to right and stopping as soon as the result is known. `not` and `-` can be repeated (`not not done`, `- -3`).
@@ -113,7 +113,7 @@ Lists and decimal numbers come later (see the [backlog](docs/backlog.md)).
 - A call gives exactly as many values as the function has parameters, the built-in functions included (`forward(3)`); another number is an error found before the program runs, on the name of the function, which gives both numbers; a call above the definition that gives a wrong number of values has both errors. No comma after the last value or the last parameter (`paint_side(3,)` is an error of its own).
 - A function is written with its parentheses, even when it has no parameter: `function square:` is an error of its own.
 - The parameters are names separated by commas, and nothing else: a value, an operator or a `=` between the parentheses (`function f(3):`, `function f(a = 3):`) is an error that recalls it. Two parameters of a function can't have the same name.
-- A function that ends without `return expression` gives back no value: using its result in an expression stops the program with an error.
+- A function that ends without `return expression` gives back no value: using its result in an expression stops the program with an error. The built-in functions that give back no value follow the same rule, once they have run: `if forward():` moves the robot, then stops the program with that error.
 - Calls nest up to 200 deep; beyond, the program stops with an error (a recursion that never ends).
 - A function named without parentheses (`forward`), or a variable called like a function (`sides()`), is an error of its own, which recalls that a function is written with its parentheses, or that a variable isn't called. The second is for a variable that exists at that place; calling any other name that is no function (`paint_sid()`, a variable above its `let`, a color) is an error of its own too, which says that no function has this name.
 
@@ -268,7 +268,11 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
 | **Reset** | Ends the program if it runs or is paused, and puts the map back to its starting state. The editor can be changed again. The code stays as it is: its hover says *"Puts the map back. Your code stays."* It is the only command named **Reset** near the code, so that it is never confused with **Restore starting code…**, which replaces the code. |
 | **Speed** | In the status bar. Five speeds, from one step per second to **Instant**, which runs as many steps as the browser allows without animation. Kept between sessions. |
 
-- A **step** is one line run: a statement, the condition of a loop checked again, a call entered. The line of the next step is highlighted in the editor.
+- A **step** is one line run: a statement, the condition of a loop checked again, a call entered. The line of the next step is highlighted in the editor. What counts as a line run (decided on 2026-11-12):
+  - The line of a loop is run again at each turn, and a last time when the loop ends: the one of a `while` to check its condition, the one of a `repeat` to count its turns. The highlight goes back up at each turn, even around a block of one line.
+  - The line of an `else if` is a step when its condition is evaluated; the line of an `else:` never is.
+  - The line that defines a function is no step: the highlight skips the definitions, since a function exists as soon as the program is checked, and it goes into the block of a function only when a call enters it.
+  - When a function ends, the line of its call is highlighted again, and the next step runs the rest of that line. Each return of a recursion is seen that way, at the price of one more step per call.
 - A program that never ends (an infinite loop) keeps running, visibly, until **Pause** or **Reset**: the robot keeps moving or turning, the highlighted line keeps changing, and the step counter of the status bar keeps rising, even for a loop that doesn't move the robot. The page never freezes, even at **Instant**.
 - A breakpoint pauses the program before it runs that line.
 - The robot's actions are animated at the chosen speed: moving, turning, painting, picking up, dropping, and a bump against a wall that stops the program.
