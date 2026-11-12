@@ -1,5 +1,5 @@
 // How many steps of the program run at each animation frame, at each speed (see
-// docs/technical-choices.md, Execution). Written for the probe of step 4c; the running of step 16
+// docs/technical-choices.md, Execution). Written for the probe of step 4c; the running of step 17
 // keeps it or rewrites it.
 
 /** The five speeds, in steps per second; the last one, **Instant**, runs without animation. */

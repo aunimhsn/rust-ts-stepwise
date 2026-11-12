@@ -1,5 +1,5 @@
 # The sandbox: an open map without goal (see Sandbox in specs.md). Its final map is drawn at
-# step 24.
+# step 25.
 version = 1
 
 starting_code = '''

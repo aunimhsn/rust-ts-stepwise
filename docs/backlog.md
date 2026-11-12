@@ -15,7 +15,7 @@ The ideas, polish and edge cases found along the way that the current step doesn
 ## Interface
 
 - The French translation of the interface, the levels and the manual; the comments of the starting code of the levels too, which stay in English in the level files for now (seen at step 8b).
-- The code normalized to NFC in the editor (step 15): a name pasted with its accents decomposed (`côté` written `co` + U+0302 + …) is cut before the accent by the lexer, which reads the combining mark as an unexpected character (seen in the review of step 5).
+- The code normalized to NFC in the editor (step 16): a name pasted with its accents decomposed (`côté` written `co` + U+0302 + …) is cut before the accent by the lexer, which reads the combining mark as an unexpected character (seen in the review of step 5).
 - The description of a built-in function on hover in the editor.
 - A phone or tablet layout.
 - The home screen in the mock-up (step 3): the path painted up to the level to play and drawn as a ghost after it, as the paint and the goal marks of the map.
@@ -28,7 +28,7 @@ The ideas, polish and edge cases found along the way that the current step doesn
 - A choice **Follow the system** for the theme of the settings: secondary for a website.
 - **Ctrl+K Ctrl+C** and **Ctrl+K Ctrl+U** to comment and uncomment, as in VS Code, if learners on a QWERTY keyboard miss a shortcut without punctuation. Set aside for now: two sequences to learn instead of one toggle, and a pause inside a sequence lets Ctrl+U reach the browser, which opens the source of the page.
 - Export and import of the progress in a file, so that a learner can go on from another computer without a teacher (the level codes are for the teacher alone). A file could circulate between classmates too, but far less easily than a word dictated.
-- The running of step 16: a `step()` that throws (an error of the bridge, not of the program) must stop the loop of the animation frames and say it, rather than leave the program shown as running; the speed kept as its value in steps per second rather than its place in the list, so that the speed saved between sessions survives a change of the list (seen in the review of the probe of step 4c).
+- The running of step 17: a `step()` that throws (an error of the bridge, not of the program) must stop the loop of the animation frames and say it, rather than leave the program shown as running; the speed kept as its value in steps per second rather than its place in the list, so that the speed saved between sessions survives a change of the list (seen in the review of the probe of step 4c).
 
 ## Content
 

@@ -1,4 +1,4 @@
-<!-- The probe of step 4c, thrown away by the map view of step 14 and the running of step 16:
+<!-- The probe of step 4c, thrown away by the map view of step 14 and the running of step 17:
      the fake program of the core, advanced by `step()` at each animation frame at the chosen
      speed, the robot moved by CSS transitions. Created once the core has loaded. -->
 <script lang="ts">
