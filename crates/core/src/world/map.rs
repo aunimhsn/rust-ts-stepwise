@@ -189,6 +189,12 @@ impl Map {
         self.height
     }
 
+    /// Every cell of the map, row by row from the top left.
+    pub fn points(&self) -> impl Iterator<Item = Point> {
+        let width = self.width;
+        (0..self.height).flat_map(move |y| (0..width).map(move |x| Point::new(x, y)))
+    }
+
     /// The cell at `point`, or `None` outside the map.
     #[must_use]
     pub fn cell(&self, point: Point) -> Option<Cell> {

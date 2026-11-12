@@ -109,3 +109,9 @@ The scopes of the blocks and of the functions; a variable used before its `let`,
 ### 7c. Functions (#31)
 
 A function called above its definition, two functions of the same name, a variable or a parameter named as a function, the number of values of a call (built-in functions included, `print` taking any number), a function named without parentheses, a variable called like a function, a call of a name that is no function, an expression alone on its line that isn't a call. A first pass collects the functions of the program: a name is refused as soon as a function has it, wherever it is defined. Eight gaps of the specifications decided on 2026-11-11, written in [Names](../specs.md#names), [Statements](../specs.md#statements) and [Functions](../specs.md#functions).
+
+## 8. Map and levels
+
+### 8a. Map (#32)
+
+The world in Rust alone, without `serde`: its cells (floor or wall, at most 16 × 12), paints, painted passages (a passage has no color: each cell draws its half in its own), items, and the robot with its direction, the item it carries, and its brush or its eraser; every action of a built-in function and every sensor as a method of the world, returning its error (the bump, the item missing or already carried, the robot's state checked before the cell), so that step 9 only calls them. Decided on 2026-11-12: [Map](../specs.md#map), [Built-in functions](../specs.md#built-in-functions).

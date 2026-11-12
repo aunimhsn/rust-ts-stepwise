@@ -14,8 +14,8 @@ The ideas, polish and edge cases found along the way that the current step doesn
 
 ## Interface
 
-- The French translation of the interface, the levels and the manual.
-- The code normalized to NFC in the editor (step 15): a name pasted with its accents decomposed (`côté` written `co` + U+0302 + …) is cut before the accent by the lexer, which reads the combining mark as an unexpected character (seen in the review of step 5).
+- The French translation of the interface, the levels and the manual; the comments of the starting code of the levels too, which stay in English in the level files for now (seen at step 8b).
+- The code normalized to NFC in the editor (step 16): a name pasted with its accents decomposed (`côté` written `co` + U+0302 + …) is cut before the accent by the lexer, which reads the combining mark as an unexpected character (seen in the review of step 5).
 - The description of a built-in function on hover in the editor.
 - A phone or tablet layout.
 - The home screen in the mock-up (step 3): the path painted up to the level to play and drawn as a ghost after it, as the paint and the goal marks of the map.
@@ -28,7 +28,7 @@ The ideas, polish and edge cases found along the way that the current step doesn
 - A choice **Follow the system** for the theme of the settings: secondary for a website.
 - **Ctrl+K Ctrl+C** and **Ctrl+K Ctrl+U** to comment and uncomment, as in VS Code, if learners on a QWERTY keyboard miss a shortcut without punctuation. Set aside for now: two sequences to learn instead of one toggle, and a pause inside a sequence lets Ctrl+U reach the browser, which opens the source of the page.
 - Export and import of the progress in a file, so that a learner can go on from another computer without a teacher (the level codes are for the teacher alone). A file could circulate between classmates too, but far less easily than a word dictated.
-- The running of step 16: a `step()` that throws (an error of the bridge, not of the program) must stop the loop of the animation frames and say it, rather than leave the program shown as running; the speed kept as its value in steps per second rather than its place in the list, so that the speed saved between sessions survives a change of the list (seen in the review of the probe of step 4c).
+- The running of step 17: a `step()` that throws (an error of the bridge, not of the program) must stop the loop of the animation frames and say it, rather than leave the program shown as running; the speed kept as its value in steps per second rather than its place in the list, so that the speed saved between sessions survives a change of the list (seen in the review of the probe of step 4c).
 
 ## Content
 
@@ -43,6 +43,8 @@ The ideas, polish and edge cases found along the way that the current step doesn
 - An `animation-reviewer` subagent, to decide at step 11 (animations and sounds): like `code-reviewer`, it recommends without changing anything, once per pull request that touches the animations. It checks what can be measured, the taste staying with the owner: the time an element is really visible for its size, a hover that never restarts by itself, the stacking order, the state at rest in both themes, a fallback for each animation when the learner asked for less motion, and the match with `specs.md`.
 - A recommendation of the model and effort for each kind of step, to discuss at the retrospective (and to write in `process.md` and the template if it holds). Every step so far ran on Opus 5.5 at high effort; the steps of architecture (the workspace, the interpreter, the bridge), the audits of quality and the refactorings could run on Fable 5.2, if it brings much in good practices and in quality for its cost. Tried from step 4: the model of each step is marked in `roadmap.md`, and step 4a is reviewed by `code-reviewer` on both models; see the lessons of `process.md`.
 - Measure the size and the speed of the WebAssembly module again once the interpreter exists (step 9 or 10): `opt-level` 3 was the smallest on the probe of step 4c, a code too small to be sure it stays so, and `wasm-opt` could matter for a larger module (see [Technical choices](technical-choices.md), WebAssembly size).
+- The level files read in TypeScript (`smol-toml`) and handed to the core through the bridge, if the weight of the reader in the WebAssembly module becomes a problem: `serde` and `toml` add about 100 kB gzipped to it (measured at step 8b, see [Technical choices](technical-choices.md), Levels). The files would not change; the cost is a second reader of the format.
+- A JSON Schema of the level files, so that VS Code (with Even Better TOML) completes and checks their fields while they are written.
 
 ## Distribution
 

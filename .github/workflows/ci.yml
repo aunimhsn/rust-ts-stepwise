@@ -40,6 +40,8 @@ jobs:
               - 'Cargo.lock'
               - 'clippy.toml'
               - 'rust-toolchain.toml'
+              # The level files, read and checked by `cargo test`.
+              - 'web/levels/**'
               - '.github/workflows/**'
               - '.github/actions/**'
             # The interface loads the core: a change of the Rust code checks it too.
