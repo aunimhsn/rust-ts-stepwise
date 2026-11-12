@@ -10,6 +10,8 @@ The ideas, polish and edge cases found along the way that the current step doesn
 - Messages of their own, rather than *unexpected character*, for `1.5` (no decimal numbers in version 1), `;` (one statement per line) and the typographic quotes `“ ”` pasted from a document (seen at step 5); the error already carries the character, so this may be done in the messages alone.
 
 - A function written in another function that uses a variable or a parameter of the function around it: today an unknown name, while the same mistake in a block of the main program is a variable the function doesn't see. And a variable used after a block that held a function declaring the same name: the `let` given is the one of the block, not the closest above. Both already have the error of a function defined in a block, and go away with it (seen in the review of step 7b).
+- A type `Checked` that only `check` gives and that `Machine::new` asks for, so that a program can't be run without its checks: to weigh at step 10, whose bridge is the one caller (seen in the review of step 9a).
+- The result of a built-in function that gives back no value, found by the checks before running rather than while the program runs (`if forward():`, `let steps = turn_left()`): the checker knows these functions, and a beginner may well write the first one to ask whether the robot can move. Today the function runs, then the program stops (seen at step 9).
 - The words of Python written with a capital, `True`, `False` and `None`: today names that aren't in `snake_case`, so the checker recalls the rule of the names instead of showing `true`, `false` or that there is no empty value (seen at step 6a).
 
 ## Interface
@@ -28,6 +30,7 @@ The ideas, polish and edge cases found along the way that the current step doesn
 - A choice **Follow the system** for the theme of the settings: secondary for a website.
 - **Ctrl+K Ctrl+C** and **Ctrl+K Ctrl+U** to comment and uncomment, as in VS Code, if learners on a QWERTY keyboard miss a shortcut without punctuation. Set aside for now: two sequences to learn instead of one toggle, and a pause inside a sequence lets Ctrl+U reach the browser, which opens the source of the page.
 - Export and import of the progress in a file, so that a learner can go on from another computer without a teacher (the level codes are for the teacher alone). A file could circulate between classmates too, but far less easily than a word dictated.
+- The console of step 17 keeping only its last lines (a few hundred): a `print` in a loop that never ends would otherwise fill the memory of the page, however fast the core is (seen at step 9).
 - The running of step 17: a `step()` that throws (an error of the bridge, not of the program) must stop the loop of the animation frames and say it, rather than leave the program shown as running; the speed kept as its value in steps per second rather than its place in the list, so that the speed saved between sessions survives a change of the list (seen in the review of the probe of step 4c).
 
 ## Content

@@ -1,4 +1,4 @@
-//! The probe of step 4c, thrown away by the interpreter of step 9: a fake program that walks
+//! The probe of step 4c, thrown away with the bridge of step 10: a fake program that walks
 //! the robot around a square forever, one action per [`Probe::step`], so that the interface
 //! tries driving the core at each animation frame, at every speed, before the language exists.
 
