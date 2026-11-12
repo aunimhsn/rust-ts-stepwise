@@ -1,0 +1,25 @@
+# The sandbox: an open map without goal (see Sandbox in specs.md). Its final map is drawn at
+# step 24.
+version = 1
+
+starting_code = '''
+# Try anything here.
+'''
+
+[map]
+terrain = '''
+............
+....#.......
+....#.......
+....####....
+............
+.........##.
+.##.........
+............
+'''
+robot = { at = [0, 0], facing = "east" }
+items = [[8, 2], [9, 6], [1, 4]]
+paints = [
+    { color = "blue", path = [[1, 2], [2, 2], [2, 3]] },
+    { color = "yellow", path = [[9, 0], [10, 0], [11, 0]] },
+]
