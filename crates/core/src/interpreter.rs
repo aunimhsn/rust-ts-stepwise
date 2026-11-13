@@ -7,12 +7,16 @@
 //!
 //! The parts depend on each other in one direction: the values (`value`), the errors that
 //! name their types (`error`), what the operators compute (`operators`), the instructions
-//! (`code`) and their translation (`compiler`), and the machine (`machine`) above them all.
+//! (`code`) and their translation (`compiler`), what a step reports (`event`), what each
+//! instruction changes (`memory`), and the machine (`machine`) above them all, which runs
+//! the instructions up to the end of a step.
 
 mod code;
 mod compiler;
 mod error;
+mod event;
 mod machine;
+mod memory;
 mod operators;
 mod value;
 
@@ -20,5 +24,6 @@ mod value;
 mod tests;
 
 pub use error::{RuntimeError, RuntimeErrorKind};
-pub use machine::{Event, Machine, State};
+pub use event::Event;
+pub use machine::{Machine, State};
 pub use value::{MAX_TEXT_LENGTH, Value, ValueType};
