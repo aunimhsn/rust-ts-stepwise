@@ -3,11 +3,14 @@
 //!
 //! It is the only recursion of the interpreter, on a tree whose depth the parser limits (see
 //! [`MAX_DEPTH`](crate::parser::MAX_DEPTH)). It decides here, once, what the machine would
-//! otherwise look up at each step: the slot of each variable, the target of each jump.
+//! otherwise look up at each step: the slot of each variable, the target of each jump, the
+//! function of each call.
 
+use std::collections::HashMap;
+use std::mem;
 use std::rc::Rc;
 
-use super::code::{Code, Instruction, PendingJump};
+use super::code::{Code, Function, Instruction, PendingJump};
 use super::value::Value;
 use crate::ast::{
     BinaryOperator, Branch, Expression, ExpressionKind, Name, Program, Statement, StatementKind,
@@ -26,7 +29,16 @@ pub(super) fn compile(program: &Program) -> Result<Code, NotChecked> {
     let mut compiler = Compiler::default();
     // The variables of the main program stay until its end: no block closes around them.
     for statement in &program.statements {
-        compiler.statement(statement)?;
+        if let StatementKind::Function {
+            name,
+            parameters,
+            body,
+        } = &statement.kind
+        {
+            compiler.function(name, parameters, body, statement.span)?;
+        } else {
+            compiler.statement(statement)?;
+        }
     }
     let start = Span::at(Position::new(1, 1));
     let last_line = program.statements.last().map_or(start, |last| last.span);
@@ -54,9 +66,54 @@ struct Compiler<'a> {
     variables: Vec<&'a str>,
     /// The loops around this place, the innermost last.
     loops: Vec<Loop>,
+    /// The functions a call may name at this place: the ones defined above it, and the one
+    /// this place is in.
+    functions: HashMap<&'a str, Rc<Function>>,
+    /// Whether this place is in a function, which a `return` leaves.
+    in_function: bool,
 }
 
 impl<'a> Compiler<'a> {
+    /// The definition of a function of the top level, whose line is `span`. Nothing runs
+    /// when the main program reaches it: its line is no step, and its block is run by the
+    /// calls only.
+    fn function(
+        &mut self,
+        name: &'a Name,
+        parameters: &'a [Name],
+        body: &'a [Statement],
+        span: Span,
+    ) -> Result<(), NotChecked> {
+        let after = self.code.jump(Instruction::Jump, span);
+        let function = Function {
+            name: Rc::from(name.text.as_str()),
+            parameters: parameters
+                .iter()
+                .map(|parameter| Rc::from(parameter.text.as_str()))
+                .collect(),
+            entry: self.code.here(),
+        };
+        // Known before its block is translated: a function may call itself.
+        let known = self.functions.insert(&name.text, Rc::new(function));
+        if known.is_some() {
+            return Err(NotChecked(name.span));
+        }
+        // A function sees only its parameters and its own variables. No loop is around it:
+        // it is at the top level.
+        let parameters = parameters.iter().map(|parameter| parameter.text.as_str());
+        let main_program = mem::replace(&mut self.variables, parameters.collect());
+        self.in_function = true;
+        for statement in body {
+            self.statement(statement)?;
+        }
+        self.in_function = false;
+        self.variables = main_program;
+        // The end of its block: the function gives back no value.
+        self.code.push(Instruction::Return { value: false }, span);
+        self.code.land(after);
+        Ok(())
+    }
+
     /// The statements of a block, whose line is `span`: the variables it declares end with
     /// it.
     fn block(&mut self, statements: &'a [Statement], span: Span) -> Result<(), NotChecked> {
@@ -111,11 +168,21 @@ impl<'a> Compiler<'a> {
                     self.code.push(Instruction::Pop, span);
                 }
             }
-            // The line of a definition is no step, and nothing runs when the program reaches
-            // it. Until step 9b, its block isn't translated: no call can enter it.
-            StatementKind::Function { .. } => {}
-            // Until step 9b: a `return` is in a function, whose block isn't translated.
-            StatementKind::Return { .. } => return Err(NotChecked(span)),
+            StatementKind::Return { value } => {
+                if !self.in_function {
+                    return Err(NotChecked(span));
+                }
+                self.code.push(Instruction::Line, span);
+                if let Some(value) = value {
+                    self.expression(value)?;
+                }
+                // What the function holds at this place, its variables and the turns left
+                // of its `repeat`s, ends with it: nothing to forget here.
+                let value = value.is_some();
+                self.code.push(Instruction::Return { value }, span);
+            }
+            // A function is defined at the top level only, where `compile` translates it.
+            StatementKind::Function { .. } => return Err(NotChecked(span)),
         }
         Ok(())
     }
@@ -293,8 +360,9 @@ impl<'a> Compiler<'a> {
         Ok(())
     }
 
-    /// A call, whose place is `span`: its values in order, then the function. Until step 9b,
-    /// only the built-in functions are known.
+    /// A call, whose place is `span`: its values in order, then the function, then its
+    /// result when the call is in an expression, which needs it. The name of a built-in
+    /// function is never the one of a function of the program.
     fn call(
         &mut self,
         function: &'a Name,
@@ -305,13 +373,19 @@ impl<'a> Compiler<'a> {
         for argument in arguments {
             self.expression(argument)?;
         }
-        let builtin = Builtin::from_word(&function.text).ok_or(NotChecked(function.span))?;
-        let call = Instruction::CallBuiltin {
-            builtin,
-            arguments: arguments.len(),
-            value_needed,
+        let arguments = arguments.len();
+        let call = if let Some(builtin) = Builtin::from_word(&function.text) {
+            Instruction::CallBuiltin { builtin, arguments }
+        } else {
+            let defined = self.functions.get(function.text.as_str());
+            let defined = defined.filter(|defined| defined.parameters.len() == arguments);
+            Instruction::Call(Rc::clone(defined.ok_or(NotChecked(function.span))?))
         };
         self.code.push(call, span);
+        if value_needed {
+            let function = Rc::from(function.text.as_str());
+            self.code.push(Instruction::TakeResult { function }, span);
+        }
         Ok(())
     }
 

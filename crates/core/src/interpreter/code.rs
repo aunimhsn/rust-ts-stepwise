@@ -1,8 +1,9 @@
 //! The instructions the machine runs: a program as one flat list, written by the compiler.
 //!
 //! The machine keeps its values in two places: the variables of the function being run, each
-//! in a slot numbered in the order of the `let`s, and the operands, a stack where an
-//! expression leaves its values until an operator or a statement takes them.
+//! in a slot numbered in the order of the `let`s, its parameters first, and the operands, a
+//! stack where an expression leaves its values until an operator or a statement takes them.
+//! A call leaves its result apart, where the expression around it takes it.
 
 use std::rc::Rc;
 
@@ -14,6 +15,17 @@ use crate::span::Span;
 /// The target of a jump written before the place it lands on is known: past the end of any
 /// program, so that a jump left that way stops the machine rather than land anywhere.
 const NOWHERE: usize = usize::MAX;
+
+/// A function of the program, as a call finds it.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(super) struct Function {
+    /// Its name.
+    pub(super) name: Rc<str>,
+    /// The names of its parameters, in order: its first variables.
+    pub(super) parameters: Vec<Rc<str>>,
+    /// The index of the first instruction of its block.
+    pub(super) entry: usize,
+}
 
 /// One thing the machine does. A target is the index of an instruction in the list.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -64,14 +76,30 @@ pub(super) enum Instruction {
     /// Starts a turn of a `repeat`, the turns left being the last operand: one less when
     /// some are left, otherwise drops them and goes on at the target, after the loop.
     RepeatNext(usize),
-    /// Calls a built-in function with the last operands as its values, in order.
+    /// Calls a built-in function with the last operands as its values, in order. What it
+    /// gives back, a value or none, is the result of the call.
     CallBuiltin {
         /// The function.
         builtin: Builtin,
         /// The number of values the call gives it.
         arguments: usize,
-        /// Whether the call is in an expression, which needs its result.
-        value_needed: bool,
+    },
+    /// Calls a function of the program with the last operands as the values of its
+    /// parameters, in order: the machine goes on at the first instruction of its block, a
+    /// line, where the step ends.
+    Call(Rc<Function>),
+    /// Leaves the function being run, with what it left on the operands: the machine goes on
+    /// after its call, and pauses first, on the line of that call. With `value`, the last
+    /// operand is the result of the call; without, the call has no result.
+    Return {
+        /// Whether the function gives back a value.
+        value: bool,
+    },
+    /// Takes the result of the call that has just ended as an operand, for the expression
+    /// the call is in. A function that gave back no value stops the program.
+    TakeResult {
+        /// The name of the function, for the error.
+        function: Rc<str>,
     },
 }
 
@@ -96,7 +124,11 @@ impl Instruction {
             | Self::Binary(_)
             | Self::RequireBoolean(_)
             | Self::RepeatStart
-            | Self::CallBuiltin { .. } => {}
+            | Self::CallBuiltin { .. }
+            // A call goes to a function written above it, or to its own: known at once.
+            | Self::Call(_)
+            | Self::Return { .. }
+            | Self::TakeResult { .. } => {}
         }
     }
 }
