@@ -81,7 +81,7 @@ pub(super) enum Flow {
     Pause {
         /// Whether a call of that line has just ended, the rest of the line being left to
         /// run, rather than the line starting.
-        resumed: bool,
+        after_call: bool,
     },
     /// The program has ended.
     End,
@@ -182,7 +182,7 @@ impl Memory {
         match instruction {
             Instruction::Line => {
                 self.frame.line = span;
-                return Ok(Flow::Pause { resumed: false });
+                return Ok(Flow::Pause { after_call: false });
             }
             Instruction::End => return Ok(Flow::End),
             Instruction::Push(value) => self.operands.push(value.clone()),
@@ -260,7 +260,7 @@ impl Memory {
             Instruction::Call(function) => self.enter(function, span)?,
             Instruction::Return { value } => {
                 self.leave(*value)?;
-                return Ok(Flow::Pause { resumed: true });
+                return Ok(Flow::Pause { after_call: true });
             }
             Instruction::TakeResult { function } => {
                 let Some(result) = self.result.take() else {

@@ -25,8 +25,9 @@ struct Run {
     lines: Vec<u32>,
     /// The lines written by `print`, in order.
     printed: Vec<String>,
-    /// The number of steps that ended a function: the line of its call was highlighted again.
-    returns: usize,
+    /// The line of each step that ended a function, in order: the line of its call was
+    /// highlighted again after it.
+    returned_from: Vec<u32>,
     /// Where the program is after its last step.
     state: State,
     /// The machine after its last step, with its calls in progress.
@@ -61,15 +62,18 @@ fn run_program(program: &Program) -> Run {
     let mut machine = Machine::new(program);
     let mut lines = Vec::new();
     let mut printed = Vec::new();
-    let mut returns = 0;
+    let mut returned_from = Vec::new();
     for _ in 0..MAX_STEPS {
-        let State::Running { line, resumed } = *machine.state() else {
+        let State::Running { line, after_call } = *machine.state() else {
             break;
         };
         assert!(steps.contains(&line), "{line:?} is no line of the program");
         assert_calls_in_progress(&machine, line);
+        if after_call {
+            // The step before ended a function: it started on the line highlighted before.
+            returned_from.extend(lines.last());
+        }
         lines.push(line.start.line);
-        returns += usize::from(resumed);
         match machine.step() {
             Some(Event::Printed(text)) => printed.push(text),
             None => {}
@@ -79,7 +83,7 @@ fn run_program(program: &Program) -> Run {
     Run {
         lines,
         printed,
-        returns,
+        returned_from,
         state,
         machine,
     }
@@ -288,8 +292,8 @@ fn each_statement_is_a_step() {
 fn a_program_starts_paused_before_its_first_line() {
     let program = parse("# Count the sides\n\nlet sides = 4\n").unwrap();
     let machine = Machine::new(&program);
-    let (line, resumed) = (span(3, 1, 14), false);
-    assert_eq!(*machine.state(), State::Running { line, resumed });
+    let (line, after_call) = (span(3, 1, 14), false);
+    assert_eq!(*machine.state(), State::Running { line, after_call });
 }
 
 #[test]
@@ -1162,8 +1166,8 @@ print(total)
     let program = parse(source).unwrap();
     let mut machine = Machine::new(&program);
     let mut states = Vec::new();
-    while let State::Running { line, resumed } = *machine.state() {
-        states.push((line, resumed));
+    while let State::Running { line, after_call } = *machine.state() {
+        states.push((line, after_call));
         machine.step();
     }
     let call = span(4, 1, 26);
@@ -1189,7 +1193,7 @@ print(double(1) + double(double(2)))
 ";
     let run = run(source);
     assert_eq!(run.lines, [4, 2, 4, 2, 4, 2, 4]);
-    assert_eq!(run.returns, 3);
+    assert_eq!(run.returned_from, [2, 2, 2]);
     assert_eq!(run.printed, ["10"]);
     assert_eq!(run.state, State::Ended);
 }
@@ -1418,6 +1422,16 @@ let steps = count(1)
 }
 
 #[test]
+fn a_value_dropped_is_not_the_result_of_a_built_in_function() {
+    let source = "function double(n):\n    return n * 2\n\ndouble(4)\nlet line = print(\"a\")\n";
+    let error = RuntimeError {
+        kind: no_value("print"),
+        span: span(5, 12, 22),
+    };
+    assert_eq!(run(source).state, State::Failed(error));
+}
+
+#[test]
 fn the_result_of_a_function_that_gives_back_no_value_stops_the_program() {
     let source = "\
 function walk():
@@ -1484,6 +1498,8 @@ print(factorial(10))
     let run = run(source);
     let first: [u32; 10] = [6, 2, 4, 2, 4, 2, 3, 4, 4, 6];
     assert_eq!(run.lines[..first.len()], first);
+    // The innermost call comes back first, from its `return 1`.
+    assert_eq!(run.returned_from[..3], [3, 4, 4]);
     assert_eq!(run.printed, ["6", "3628800"]);
     assert_eq!(run.state, State::Ended);
 }
@@ -1520,7 +1536,7 @@ print(\"back\")
 fn calls_nest_up_to_the_limit() {
     let run = run(&dive(MAX_CALL_DEPTH));
     assert_eq!(run.printed, ["back"]);
-    assert_eq!(run.returns, MAX_CALL_DEPTH);
+    assert_eq!(run.returned_from.len(), MAX_CALL_DEPTH);
     assert_eq!(run.state, State::Ended);
     assert_eq!(calls(&run.machine), ["main program · Ln 6:"]);
 }
@@ -1770,6 +1786,10 @@ fn a_program_that_is_not_checked_does_not_run() {
         ("print(1)\nprint(sidse)\n", span(2, 7, 12)),
         ("print(1)\nbreak\n", span(2, 1, 6)),
         ("print(1)\nreturn 3\n", span(2, 1, 9)),
+        (
+            "function walk():\n    print(1)\n\nreturn 3\n",
+            span(4, 1, 9),
+        ),
         ("print(1)\nif true:\n    print(walk())\n", span(3, 11, 15)),
         // A function defined in a block, or in another function.
         (
@@ -1849,7 +1869,7 @@ const MAIN_PIECES: [&str; 27] = [
 /// The lines of the function `walk(n)` of a random program, whose block is drawn too: a
 /// `return` goes back to a place only known while the program runs, from anywhere in the
 /// loops of the function.
-const FUNCTION_PIECES: [&str; 17] = [
+const FUNCTION_PIECES: [&str; 19] = [
     "let turn = n + 1",
     "n = n - 1",
     "turn = turn * 2",
@@ -1866,6 +1886,8 @@ const FUNCTION_PIECES: [&str; 17] = [
     "while n > 0:",
     "repeat 2:",
     "repeat n:",
+    "repeat 3:\n    n = n - 1\n    if n < 2:\n        return n",
+    "while n > 0:\n    repeat n:\n        return walk(n - 1) + 1\n    n = n - 1",
     "break",
 ];
 
@@ -1883,20 +1905,23 @@ fn random_program(random: &mut Random) -> String {
     format!("function walk(n):\n    {stop}{function}{value}\nlet sides = 0\n{main_program}")
 }
 
-/// Whether `source` has a `return` in the block of a loop: the turns left of that loop end
-/// with the function.
-fn returns_from_a_loop(source: &str) -> bool {
-    // The indentation of each loop around the line.
-    let mut loops = Vec::new();
-    for line in source.lines() {
-        let statement = line.trim_start();
-        let indentation = line.len() - statement.len();
-        loops.retain(|&around| around < indentation);
-        if statement.starts_with("return") && !loops.is_empty() {
-            return true;
+/// Whether the line `line` of `source` is a `return` in the block of a `repeat`: the turns
+/// left of that loop end with the function.
+fn returns_from_a_repeat(source: &str, line: u32) -> bool {
+    // The indentation of each `repeat` around the line reached.
+    let mut repeats = Vec::new();
+    for (number, text) in (1..).zip(source.lines()) {
+        let statement = text.trim_start();
+        if statement.is_empty() {
+            continue;
         }
-        if statement.starts_with("while") || statement.starts_with("repeat") {
-            loops.push(indentation);
+        let indentation = text.len() - statement.len();
+        repeats.retain(|&around| around < indentation);
+        if number == line {
+            return statement.starts_with("return") && !repeats.is_empty();
+        }
+        if statement.starts_with("repeat") {
+            repeats.push(indentation);
         }
     }
     false
@@ -1907,7 +1932,7 @@ fn random_checked_programs_never_stop_on_a_mistake_of_the_core() {
     let mut random = Random(9);
     let (mut ended, mut failed, mut running) = (0, 0, 0);
     let (mut with_else, mut with_logic, mut with_break) = (0, 0, 0);
-    let (mut with_return, mut with_loop_left) = (0, 0);
+    let (mut with_return, mut with_repeat_left) = (0, 0);
     for _ in 0..20_000 {
         let source = random_program(&mut random);
         let Ok(program) = parse(&source) else {
@@ -1920,8 +1945,10 @@ fn random_checked_programs_never_stop_on_a_mistake_of_the_core() {
         with_logic += usize::from(source.contains(" and ") || source.contains(" or "));
         with_break += usize::from(source.contains("break"));
         let run = run_program(&program);
-        with_return += usize::from(run.returns > 0);
-        with_loop_left += usize::from(run.returns > 0 && returns_from_a_loop(&source));
+        with_return += usize::from(!run.returned_from.is_empty());
+        let mut returned_from = run.returned_from.iter();
+        with_repeat_left +=
+            usize::from(returned_from.any(|&line| returns_from_a_repeat(&source, line)));
         match run.state {
             State::Ended => ended += 1,
             State::Running { .. } => running += 1,
@@ -1949,8 +1976,8 @@ fn random_checked_programs_never_stop_on_a_mistake_of_the_core() {
         "only {with_return} programs came back from a function"
     );
     assert!(
-        with_loop_left > 100,
-        "only {with_loop_left} programs had a return in a loop"
+        with_repeat_left > 100,
+        "only {with_repeat_left} programs came back from a function with turns of a repeat left"
     );
 }
 

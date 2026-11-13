@@ -20,7 +20,7 @@ pub enum State {
         /// Whether a call of that line has just ended: the line is highlighted again, and
         /// the next step runs the rest of it. A breakpoint pauses a program before a line
         /// starts, not when the line is resumed.
-        resumed: bool,
+        after_call: bool,
     },
     /// The program has run to its end.
     Ended,
@@ -124,9 +124,9 @@ impl Machine {
             instructions_left = left;
             match self.memory.execute(instruction, place, event) {
                 Ok(Flow::Continue) => {}
-                Ok(Flow::Pause { resumed }) => {
+                Ok(Flow::Pause { after_call }) => {
                     let line = self.memory.line();
-                    return State::Running { line, resumed };
+                    return State::Running { line, after_call };
                 }
                 Ok(Flow::End) => return State::Ended,
                 Err(kind) => break kind,
@@ -199,7 +199,7 @@ while true:
             // before left no operand, nor the turns of the loops they came back from.
             let line_starts = State::Running {
                 line: span(12, 5, 35),
-                resumed: false,
+                after_call: false,
             };
             if *machine.state() == line_starts {
                 sizes.push(machine.memory.sizes());
