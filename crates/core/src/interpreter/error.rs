@@ -77,6 +77,13 @@ pub enum RuntimeErrorKind {
         /// The function.
         function: String,
     },
+    /// A call when [`MAX_CALL_DEPTH`](super::MAX_CALL_DEPTH) calls are already in progress,
+    /// one inside the other: a recursion that never ends. The span is the call, which
+    /// isn't entered.
+    TooManyCalls {
+        /// The function called.
+        function: String,
+    },
     /// What the checks before running rule out (a name that is no variable, a `break` outside
     /// a loop…), or a mistake of the core: never for a checked program. The span is the
     /// closest place known.

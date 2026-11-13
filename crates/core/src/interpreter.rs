@@ -3,16 +3,21 @@
 //!
 //! The program is first translated into a flat list of instructions (`compiler`), which the
 //! [`Machine`] owns and runs: its whole state is data, never the stack of Rust, so that it
-//! pauses between two steps anywhere, even in the middle of an expression.
+//! pauses between two steps anywhere, even in the middle of an expression, and so that the
+//! calls in progress and their variables are read as they are ([`Machine::calls`]).
 //!
 //! The parts depend on each other in one direction: the values (`value`), the errors that
 //! name their types (`error`), what the operators compute (`operators`), the instructions
-//! (`code`) and their translation (`compiler`), and the machine (`machine`) above them all.
+//! (`code`) and their translation (`compiler`), what a step reports (`event`), what each
+//! instruction changes (`memory`), and the machine (`machine`) above them all, which runs
+//! the instructions up to the end of a step.
 
 mod code;
 mod compiler;
 mod error;
+mod event;
 mod machine;
+mod memory;
 mod operators;
 mod value;
 
@@ -20,5 +25,7 @@ mod value;
 mod tests;
 
 pub use error::{RuntimeError, RuntimeErrorKind};
-pub use machine::{Event, Machine, State};
+pub use event::Event;
+pub use machine::{Machine, State};
+pub use memory::{CallInProgress, MAX_CALL_DEPTH, Variable};
 pub use value::{MAX_TEXT_LENGTH, Value, ValueType};

@@ -1,16 +1,13 @@
 //! The machine: runs the instructions of a program one step at a time, and keeps the whole
 //! state of the program between two steps.
 
-use std::rc::Rc;
-
-use super::code::{Code, Instruction};
+use super::code::Code;
 use super::compiler::{NotChecked, compile};
 use super::error::{RuntimeError, RuntimeErrorKind};
-use super::operators;
-use super::value::Value;
-use crate::ast::{BinaryOperator, Program};
-use crate::builtin::Builtin;
-use crate::span::{Position, Span};
+use super::event::Event;
+use super::memory::{CallInProgress, Flow, Memory};
+use crate::ast::Program;
+use crate::span::Span;
 
 /// Where a program is, between two steps.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -20,20 +17,15 @@ pub enum State {
         /// The line of the next step: a statement, or the line of an `if`, of an `else if` or
         /// of a loop, with its `:`.
         line: Span,
+        /// Whether a call of that line has just ended: the line is highlighted again, and
+        /// the next step runs the rest of it. A breakpoint pauses a program before a line
+        /// starts, not when the line is resumed.
+        after_call: bool,
     },
     /// The program has run to its end.
     Ended,
     /// The program has stopped on an error: what it had done until then stays.
     Failed(RuntimeError),
-}
-
-/// What a step did that the learner sees outside the editor. A step does at most one such
-/// thing: a function that gives back no value is a statement alone on its line, or stops the
-/// program once it has run.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Event {
-    /// `print` wrote this line to the console.
-    Printed(String),
 }
 
 /// A program being run, one step at a time (see *Running a program* in `specs.md`).
@@ -61,7 +53,7 @@ impl Machine {
                 let kind = RuntimeErrorKind::Internal;
                 Self {
                     code: Code::default(),
-                    memory: Memory::default(),
+                    memory: Memory::new(),
                     state: State::Failed(RuntimeError { kind, span }),
                 }
             }
@@ -72,11 +64,11 @@ impl Machine {
     fn start(code: Code) -> Self {
         let mut machine = Self {
             code,
-            memory: Memory::default(),
+            memory: Memory::new(),
             state: State::Ended,
         };
         // Up to the first line, where the first step starts: nothing runs before it.
-        machine.state = machine.advance(Span::at(Position::new(1, 1)), &mut None);
+        machine.state = machine.advance(&mut None);
         machine
     }
 
@@ -86,31 +78,43 @@ impl Machine {
         &self.state
     }
 
-    /// Runs one step: the line of [`State::Running`], up to the next line. Once the program
-    /// has ended or stopped on an error, nothing happens anymore.
+    /// The calls in progress, from the main program to the function being run, each with
+    /// its line and its variables: what the variables panel shows. They stay as they were
+    /// once the program has ended or stopped on an error.
+    #[must_use]
+    pub fn calls(&self) -> Vec<CallInProgress<'_>> {
+        self.memory.calls()
+    }
+
+    /// Runs one step: the line of [`State::Running`], up to the next line, to the first
+    /// line of a function it calls, or to the end of the function it is in, which goes back
+    /// to the line of its call. Once the program has ended or stopped on an error, nothing
+    /// happens anymore.
     pub fn step(&mut self) -> Option<Event> {
-        let State::Running { line } = self.state else {
+        if !matches!(self.state, State::Running { .. }) {
             return None;
-        };
+        }
+        self.memory.start_step();
         let mut event = None;
-        self.state = self.advance(line, &mut event);
+        self.state = self.advance(&mut event);
         event
     }
 
-    /// Runs the instructions up to the next pause, the end or an error. `line` is where the
-    /// machine is, the place of an error that has no instruction.
+    /// Runs the instructions up to the next pause, the end or an error.
     ///
-    /// It always comes back: the compiler writes a [`Instruction::Line`], which pauses, on
-    /// the way of every jump back. So a step runs each instruction at most once, hence at
-    /// most as many as the code holds. The machine counts them all the same, up to exactly
-    /// that number, and stops on [`RuntimeErrorKind::Internal`] rather than freeze the page
-    /// if instructions ever broke that rule. What step 9b adds must keep it: entering a
-    /// function and coming back from it each end the step.
-    fn advance(&mut self, line: Span, event: &mut Option<Event>) -> State {
-        let mut place = line;
+    /// It always comes back: the compiler writes a line, which pauses, on the way of every
+    /// jump back. A call keeps that rule, since it goes to the first instruction of a
+    /// function, a line, and so does the end of a function, which pauses. So a step runs
+    /// each instruction at most once, hence at most as many as the code holds. The machine
+    /// counts them all the same, up to exactly that number, and stops on
+    /// [`RuntimeErrorKind::Internal`] rather than freeze the page if instructions ever broke
+    /// that rule.
+    fn advance(&mut self, event: &mut Option<Event>) -> State {
+        // Where the machine is: the place of an error that has no instruction.
+        let mut place = self.memory.line();
         let mut instructions_left = self.code.len();
         let kind = loop {
-            let Some((instruction, span)) = self.code.get(self.memory.frame.next) else {
+            let Some((instruction, span)) = self.code.get(self.memory.next()) else {
                 break RuntimeErrorKind::Internal;
             };
             place = *span;
@@ -118,10 +122,12 @@ impl Machine {
                 break RuntimeErrorKind::Internal;
             };
             instructions_left = left;
-            self.memory.frame.next = self.memory.frame.next.saturating_add(1);
-            match self.memory.execute(instruction, event) {
+            match self.memory.execute(instruction, place, event) {
                 Ok(Flow::Continue) => {}
-                Ok(Flow::Pause) => return State::Running { line: place },
+                Ok(Flow::Pause { after_call }) => {
+                    let line = self.memory.line();
+                    return State::Running { line, after_call };
+                }
                 Ok(Flow::End) => return State::Ended,
                 Err(kind) => break kind,
             }
@@ -130,187 +136,14 @@ impl Machine {
     }
 }
 
-/// A variable alive at the place the program has reached.
-#[derive(Debug)]
-struct Variable {
-    /// Its name, which the machine doesn't use: it reads a variable by its slot.
-    #[expect(dead_code, reason = "read by the variables panel, from step 9b")]
-    name: Rc<str>,
-    value: Value,
-}
-
-/// The place of the program in its instructions, and its variables.
-#[derive(Debug, Default)]
-struct Frame {
-    /// The index of the next instruction.
-    next: usize,
-    /// The variables alive, each at the index of its slot.
-    variables: Vec<Variable>,
-}
-
-/// What the machine does after an instruction.
-enum Flow {
-    /// It runs the next one.
-    Continue,
-    /// It pauses: the step is over.
-    Pause,
-    /// The program has ended.
-    End,
-}
-
-/// What changes while a program runs: where it is, its variables, and the values of the
-/// expression being evaluated. Apart from the instructions, which it only reads.
-#[derive(Debug, Default)]
-struct Memory {
-    frame: Frame,
-    /// The values the expression being evaluated has left for its operators, above the turns
-    /// left of the `repeat`s around it.
-    operands: Vec<Value>,
-}
-
-impl Memory {
-    fn execute(
-        &mut self,
-        instruction: &Instruction,
-        event: &mut Option<Event>,
-    ) -> Result<Flow, RuntimeErrorKind> {
-        match instruction {
-            Instruction::Line => return Ok(Flow::Pause),
-            Instruction::End => return Ok(Flow::End),
-            Instruction::Push(value) => self.operands.push(value.clone()),
-            Instruction::Load(slot) => {
-                let variable = self.frame.variables.get(*slot);
-                let value = variable.ok_or(RuntimeErrorKind::Internal)?.value.clone();
-                self.operands.push(value);
-            }
-            Instruction::Store(slot) => {
-                let value = self.pop()?;
-                let variable = self.frame.variables.get_mut(*slot);
-                variable.ok_or(RuntimeErrorKind::Internal)?.value = value;
-            }
-            Instruction::Declare(name) => {
-                let name = Rc::clone(name);
-                let value = self.pop()?;
-                self.frame.variables.push(Variable { name, value });
-            }
-            Instruction::Truncate(count) => self.frame.variables.truncate(*count),
-            Instruction::Pop => {
-                self.pop()?;
-            }
-            Instruction::Unary(operator) => {
-                let operand = self.pop()?;
-                self.operands.push(operators::unary(*operator, &operand)?);
-            }
-            Instruction::Binary(operator) => {
-                let right = self.pop()?;
-                let left = self.pop()?;
-                self.operands
-                    .push(operators::binary(*operator, &left, &right)?);
-            }
-            Instruction::ShortCircuit {
-                operator,
-                decisive,
-                end,
-            } => {
-                if self.logic_operand(*operator)? == *decisive {
-                    self.frame.next = *end;
-                } else {
-                    self.pop()?;
-                }
-            }
-            Instruction::RequireBoolean(operator) => {
-                self.logic_operand(*operator)?;
-            }
-            Instruction::Jump(target) => self.frame.next = *target,
-            Instruction::JumpUnless(target) => match self.pop()? {
-                Value::Boolean(true) => {}
-                Value::Boolean(false) => self.frame.next = *target,
-                other => {
-                    let found = other.value_type();
-                    return Err(RuntimeErrorKind::ConditionNotBoolean { found });
-                }
-            },
-            Instruction::RepeatStart => match self.operands.last() {
-                Some(&Value::Number(count)) if count >= 0 => {}
-                Some(&Value::Number(count)) => {
-                    return Err(RuntimeErrorKind::NegativeRepeatCount { count });
-                }
-                Some(other) => {
-                    let found = other.value_type();
-                    return Err(RuntimeErrorKind::RepeatCountNotNumber { found });
-                }
-                None => return Err(RuntimeErrorKind::Internal),
-            },
-            Instruction::RepeatNext(exit) => {
-                let Some(Value::Number(turns_left)) = self.operands.last_mut() else {
-                    return Err(RuntimeErrorKind::Internal);
-                };
-                if *turns_left > 0 {
-                    *turns_left = turns_left.saturating_sub(1);
-                } else {
-                    self.operands.pop();
-                    self.frame.next = *exit;
-                }
-            }
-            Instruction::CallBuiltin {
-                builtin,
-                arguments,
-                value_needed,
-            } => {
-                let values = self.take_arguments(*arguments)?;
-                match builtin {
-                    Builtin::Print => *event = Some(Event::Printed(printed_line(&values))),
-                    // Until step 9c, which gives the machine the world of the robot.
-                    _ => return Err(RuntimeErrorKind::Internal),
-                }
-                // `print` gives back no value.
-                if *value_needed {
-                    let function = builtin.as_str().to_owned();
-                    return Err(RuntimeErrorKind::NoValue { function });
-                }
-            }
-        }
-        Ok(Flow::Continue)
-    }
-
-    /// Takes the last operand.
-    fn pop(&mut self) -> Result<Value, RuntimeErrorKind> {
-        self.operands.pop().ok_or(RuntimeErrorKind::Internal)
-    }
-
-    /// The last operand, a side of `operator`, `and` or `or`, which must be a boolean. It
-    /// stays on the operands.
-    fn logic_operand(&self, operator: BinaryOperator) -> Result<bool, RuntimeErrorKind> {
-        match self.operands.last() {
-            Some(&Value::Boolean(side)) => Ok(side),
-            Some(other) => {
-                let found = other.value_type();
-                Err(RuntimeErrorKind::LogicOperand { operator, found })
-            }
-            None => Err(RuntimeErrorKind::Internal),
-        }
-    }
-
-    /// Takes the last `count` operands, the values of a call, in the order they were given.
-    fn take_arguments(&mut self, count: usize) -> Result<Vec<Value>, RuntimeErrorKind> {
-        let first = self.operands.len().checked_sub(count);
-        let first = first.ok_or(RuntimeErrorKind::Internal)?;
-        Ok(self.operands.drain(first..).collect())
-    }
-}
-
-/// The line `print` writes for `values`: each as it is written, separated by spaces.
-fn printed_line(values: &[Value]) -> String {
-    let written: Vec<String> = values.iter().map(Value::to_string).collect();
-    written.join(" ")
-}
-
 #[cfg(test)]
 mod tests {
+    use std::rc::Rc;
+
     use super::{Machine, State};
     use crate::ast::BinaryOperator;
     use crate::builtin::Builtin;
-    use crate::interpreter::code::{Code, Instruction};
+    use crate::interpreter::code::{Code, Function, Instruction};
     use crate::interpreter::{RuntimeError, RuntimeErrorKind, Value};
     use crate::parser::parse;
     use crate::test_support::span;
@@ -333,13 +166,47 @@ while true:
             machine.step();
             // Before line 3, the first of the block: only `turns` is alive, and no operand
             // is left from the turn before.
-            if matches!(machine.state(), State::Running { line } if line.start.line == 3) {
-                let memory = &machine.memory;
-                sizes.push((memory.operands.len(), memory.frame.variables.len()));
+            if matches!(machine.state(), State::Running { line, .. } if line.start.line == 3) {
+                sizes.push(machine.memory.sizes());
             }
         }
         assert!(sizes.len() > 100, "{sizes:?}");
-        assert!(sizes.iter().all(|&size| size == (0, 1)), "{sizes:?}");
+        assert!(sizes.iter().all(|&size| size == (0, 1, 0)), "{sizes:?}");
+    }
+
+    #[test]
+    fn a_loop_of_calls_keeps_no_more_values_at_each_turn() {
+        let source = "\
+function find(limit):
+    repeat 3:
+        let turn = 0
+        repeat limit:
+            turn = turn + 1
+            if turn == limit:
+                return turn * 10
+    return 0
+
+let total = 0
+while true:
+    total = find(2) + find(1) - 30
+";
+        let program = parse(source).unwrap();
+        let mut machine = Machine::new(&program);
+        let mut sizes = Vec::new();
+        for _ in 0..3000 {
+            machine.step();
+            // Before the line 12 starts: only `total` is alive, and the calls of the turn
+            // before left no operand, nor the turns of the loops they came back from.
+            let line_starts = State::Running {
+                line: span(12, 5, 35),
+                after_call: false,
+            };
+            if *machine.state() == line_starts {
+                sizes.push(machine.memory.sizes());
+            }
+        }
+        assert!(sizes.len() > 100, "{sizes:?}");
+        assert!(sizes.iter().all(|&size| size == (0, 1, 0)), "{sizes:?}");
     }
 
     /// What no program gives the machine: instructions that the compiler never writes.
@@ -348,7 +215,6 @@ while true:
         let print_two_values = Instruction::CallBuiltin {
             builtin: Builtin::Print,
             arguments: 2,
-            value_needed: false,
         };
         let short_circuit = Instruction::ShortCircuit {
             operator: BinaryOperator::And,
@@ -357,6 +223,13 @@ while true:
         };
         let number = || Instruction::Push(Value::Number(1));
         let boolean = || Instruction::Push(Value::Boolean(true));
+        let call = |parameters: &[&str], entry| {
+            Instruction::Call(Rc::new(Function {
+                name: "walk".into(),
+                parameters: parameters.iter().map(|&name| name.into()).collect(),
+                entry,
+            }))
+        };
         for wrong in [
             // Nothing to run, not even the end of the program.
             vec![],
@@ -382,6 +255,16 @@ while true:
             vec![Instruction::Jump(usize::MAX)],
             vec![Instruction::Jump(0)],
             vec![number(), Instruction::Pop, Instruction::Jump(0)],
+            // A function left by the main program, which no call entered, or without the
+            // value it gives back.
+            vec![Instruction::Return { value: false }],
+            vec![number(), Instruction::Return { value: true }],
+            vec![call(&[], 1), Instruction::Return { value: true }],
+            // A call without the values of its parameters, to a function that isn't
+            // written, or that goes back to itself without a line.
+            vec![call(&["length"], 1), Instruction::Line],
+            vec![call(&[], usize::MAX)],
+            vec![call(&[], 0)],
         ] {
             let place = span(1, 1, 2);
             let mut code = Code::default();

@@ -113,8 +113,8 @@ Lists and decimal numbers come later (see the [backlog](docs/backlog.md)).
 - A call gives exactly as many values as the function has parameters, the built-in functions included (`forward(3)`); another number is an error found before the program runs, on the name of the function, which gives both numbers; a call above the definition that gives a wrong number of values has both errors. No comma after the last value or the last parameter (`paint_side(3,)` is an error of its own).
 - A function is written with its parentheses, even when it has no parameter: `function square:` is an error of its own.
 - The parameters are names separated by commas, and nothing else: a value, an operator or a `=` between the parentheses (`function f(3):`, `function f(a = 3):`) is an error that recalls it. Two parameters of a function can't have the same name.
-- A function that ends without `return expression` gives back no value: using its result in an expression stops the program with an error. The built-in functions that give back no value follow the same rule, once they have run: `if forward():` moves the robot, then stops the program with that error.
-- Calls nest up to 200 deep; beyond, the program stops with an error (a recursion that never ends).
+- A function that ends without `return expression` gives back no value: using its result in an expression stops the program with an error. The function runs to its end first; the line of its call is highlighted again, and the step that runs the rest of that line stops the program, on the call. The built-in functions that give back no value follow the same rule, once they have run: `if forward():` moves the robot, then stops the program with that error. A value given back to a call alone on its line is dropped, without error.
+- Calls nest up to 200 deep: 200 calls may be in progress, one inside the other, the main program apart. One more stops the program with an error, on that call (a recursion that never ends).
 - A function named without parentheses (`forward`), or a variable called like a function (`sides()`), is an error of its own, which recalls that a function is written with its parentheses, or that a variable isn't called. The second is for a variable that exists at that place; calling any other name that is no function (`paint_sid()`, a variable above its `let`, a color) is an error of its own too, which says that no function has this name.
 
 ### Built-in functions
@@ -274,7 +274,7 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
   - The line that defines a function is no step: the highlight skips the definitions, since a function exists as soon as the program is checked, and it goes into the block of a function only when a call enters it.
   - When a function ends, the line of its call is highlighted again, and the next step runs the rest of that line. Each return of a recursion is seen that way, at the price of one more step per call.
 - A program that never ends (an infinite loop) keeps running, visibly, until **Pause** or **Reset**: the robot keeps moving or turning, the highlighted line keeps changing, and the step counter of the status bar keeps rising, even for a loop that doesn't move the robot. The page never freezes, even at **Instant**.
-- A breakpoint pauses the program before it runs that line.
+- A breakpoint pauses the program before it runs that line: once, when the line starts, not when it is highlighted again after a call (decided on 2026-11-13). In a recursion, a breakpoint on the line of the call pauses each time a call reaches that line, never when one comes back to it.
 - The robot's actions are animated at the chosen speed: moving, turning, painting, picking up, dropping, and a bump against a wall that stops the program.
 - The robot picks up and drops an item with a pincer that comes out of its front, then goes back in; the item it carries lies in the bay at its back.
 - At the end of a run, the robot shows the result: when every goal is met, its eyes light up in yellow and it hops; when a goal isn't met, its eyes dim, it shakes its head, and the cells of the goals not met get a red flag (see [Levels and progression](#levels-and-progression)).
@@ -304,8 +304,8 @@ Everything in the console and the variables panel is in the font of the code, as
 
 Its tab opens by itself when the program pauses (by **Pause**, **Step** or a breakpoint). When the program stops on an error, the console stays shown, with the error, and a dot on the tab **Variables** says that it holds the state at that moment. Otherwise, the tab says *"Pause the program to see its variables."* It shows:
 
-- the variables of the function being run (or of the main program), with their values; the ones changed by the last step stand out;
-- the calls in progress, from the main program to the current function, each with its line (`paint_side · Ln 5`); a click on one shows its variables.
+- the variables of the function being run (or of the main program), with their values; the ones changed by the last step stand out: the ones it declared, the parameters of a call it entered, and the ones it gave a value with `=`, even the value they had (decided on 2026-11-13);
+- the calls in progress, from the main program to the current function, each with the line it is on (`paint_side · Ln 5`), which is the line of its call for one that waits for another to end; a click on one shows its variables.
 
 ### Manual
 
