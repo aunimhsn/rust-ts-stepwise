@@ -119,3 +119,9 @@ The world in Rust alone, without `serde`: its cells (floor or wall, at most 16 Ã
 ### 8b. Levels (#33)
 
 The TOML format with its version (decided on 2026-11-12 rather than JSON, see [Technical choices](technical-choices.md), Levels), one file per level in `web/levels/` named after its stable name, its validation (a map of a level has goals, not all met at the start, and enough items), the goals checked on a world with the cell of each goal not met, the file of the sandbox, and a test that reads every level file of the repository and checks its starting code.
+
+## 9. Interpreter
+
+### 9a. Machine and statements (#34)
+
+The values, the expressions and their errors (types, division by zero, overflow), the variables, `if`, `while`, `repeat`, `break`, the steps and the current line; `print` alone among the built-in functions, so that the tests see what a program does. Until 9b and 9c, calling a function of the program or another built-in function stops the program with the error kept for what the checks rule out.
