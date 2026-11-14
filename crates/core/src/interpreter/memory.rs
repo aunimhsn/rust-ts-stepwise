@@ -253,7 +253,11 @@ impl Memory {
                 let values = self.take_arguments(*arguments)?;
                 self.result = match builtins::call(*builtin, &values, world)? {
                     Outcome::Acted(acted) => {
-                        *event = Some(acted);
+                        // A step shows one thing at most: a second one is a mistake of the
+                        // compiler, told rather than lost.
+                        if event.replace(acted).is_some() {
+                            return Err(RuntimeErrorKind::Internal);
+                        }
                         // What acts gives back no value.
                         None
                     }

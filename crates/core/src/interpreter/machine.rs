@@ -249,6 +249,10 @@ while true:
             builtin: Builtin::StartPainting,
             arguments: 0,
         };
+        let turn = || Instruction::CallBuiltin {
+            builtin: Builtin::TurnLeft,
+            arguments: 0,
+        };
         let short_circuit = Instruction::ShortCircuit {
             operator: BinaryOperator::And,
             decisive: false,
@@ -282,6 +286,9 @@ while true:
             // A built-in function with a wrong number of values.
             vec![number(), forward_with_a_value],
             vec![paint_without_color],
+            // Two actions in one step, which shows one thing at most. The end of the program
+            // follows them: without it, the list would stop for want of an instruction.
+            vec![turn(), turn(), Instruction::End],
             // No variable in this slot.
             vec![Instruction::Load(3)],
             vec![number(), Instruction::Store(3)],

@@ -7,7 +7,7 @@
 
 use stepwise_core::checker::check;
 use stepwise_core::color::Color;
-use stepwise_core::interpreter::{Machine, RuntimeErrorKind, State};
+use stepwise_core::interpreter::{Action, Event, Machine, RuntimeErrorKind, State};
 use stepwise_core::level::{GoalNotMet, Level};
 use stepwise_core::parser::parse;
 use stepwise_core::world::{Point, RobotError};
@@ -80,6 +80,38 @@ fn the_starting_code_of_the_trial_levels_is_checked() {
         assert_eq!(check(&program), []);
         assert_eq!(level.maps().len(), 2);
     }
+}
+
+// The events: what the interface reads at each step.
+
+#[test]
+fn each_step_gives_what_the_learner_sees_of_it() {
+    let level = Level::from_toml(CARRY_THE_ITEM).expect("a valid level file");
+    let map = level.maps().first().expect("a first map");
+    let source = "forward()\nforward()\npick_up()\nprint(is_carrying())\nturn_left()\ndrop()\n";
+    let program = parse(source).expect("a program without syntax error");
+    assert_eq!(check(&program), []);
+    let mut machine = Machine::new(&program, map.world().clone());
+    let mut events = Vec::new();
+    for _ in 0..MAX_STEPS {
+        if !matches!(machine.state(), State::Running { .. }) {
+            break;
+        }
+        // A step gives one event or none.
+        events.extend(machine.step());
+    }
+    assert_eq!(*machine.state(), State::Ended);
+    assert_eq!(
+        events,
+        [
+            Event::Robot(Action::Moved),
+            Event::Robot(Action::Moved),
+            Event::Robot(Action::PickedUp),
+            Event::Printed("true".to_owned()),
+            Event::Robot(Action::TurnedLeft),
+            Event::Robot(Action::Dropped),
+        ]
+    );
 }
 
 // Paint: the brush, the functions of the program, the goals of paint.

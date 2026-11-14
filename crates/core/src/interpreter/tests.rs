@@ -1748,9 +1748,9 @@ fn the_robot_turns_a_quarter_turn_on_its_cell() {
     let run = run_on(&[">"], "turn_left()\n");
     assert_eq!(run.actions, [Action::TurnedLeft]);
     assert_eq!(run.world().robot().direction(), Direction::North);
-    let run = run_on(&[">"], "turn_right()\nturn_right()\n");
-    assert_eq!(run.actions, [Action::TurnedRight, Action::TurnedRight]);
-    assert_eq!(run.world().robot().direction(), Direction::West);
+    let run = run_on(&[">"], "turn_right()\n");
+    assert_eq!(run.actions, [Action::TurnedRight]);
+    assert_eq!(run.world().robot().direction(), Direction::South);
     assert_eq!(run.world().robot().position(), Point::new(0, 0));
 }
 
@@ -1985,17 +1985,21 @@ fn sensed(rows: &[&str], expression: &str) -> String {
 
 #[test]
 fn the_robot_senses_the_floor_cells_around_it() {
-    // The robot looks east: its left is the north, its right the south.
-    let rows = [".#", ">.", "#."];
-    assert_eq!(sensed(&rows, "front_is_clear()"), "true");
-    assert_eq!(sensed(&rows, "left_is_clear()"), "true");
-    assert_eq!(sensed(&rows, "right_is_clear()"), "false");
-    let rows = ["##", ">#", ".#"];
-    assert_eq!(sensed(&rows, "front_is_clear()"), "false");
-    assert_eq!(sensed(&rows, "left_is_clear()"), "false");
-    assert_eq!(sensed(&rows, "right_is_clear()"), "true");
+    let sensors = ["front_is_clear()", "left_is_clear()", "right_is_clear()"];
+    // The robot looks east: its left is the north, its right the south. One side is clear on
+    // each map, so that a sensor that looks at another side answers wrong twice.
+    for (rows, clear) in [
+        (["##", ">.", "##"], "front_is_clear()"),
+        ([".#", ">#", "##"], "left_is_clear()"),
+        (["##", ">#", ".#"], "right_is_clear()"),
+    ] {
+        for sensor in sensors {
+            let expected = (sensor == clear).to_string();
+            assert_eq!(sensed(&rows, sensor), expected, "{sensor} on {rows:?}");
+        }
+    }
     // Outside the map counts as a wall.
-    for sensor in ["front_is_clear()", "left_is_clear()", "right_is_clear()"] {
+    for sensor in sensors {
         assert_eq!(sensed(&[">"], sensor), "false", "{sensor}");
         assert_eq!(sensed(&["<"], sensor), "false", "{sensor}");
     }
@@ -2054,8 +2058,9 @@ print(item_here(), item_in_front(), is_carrying())
         run.printed,
         ["false true false", "true false false", "false false true"]
     );
-    // A wall in front has no item.
+    // A wall in front has no item, nor has a floor cell without one.
     assert_eq!(sensed(&[">#"], "item_in_front()"), "false");
+    assert_eq!(sensed(&[">."], "item_in_front()"), "false");
 }
 
 #[test]
