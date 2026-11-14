@@ -37,5 +37,30 @@ export {
 	type Span
 } from '#lib/wasm/stepwise.js';
 
+/**
+ * The levels and the sandbox (see crates/wasm/src/level.rs and world.rs), to create once
+ * `loadCore` has resolved: `new Level(toml)` and `new Sandbox(toml)` read the text of a file of
+ * `web/levels/`, and throw an `Error` with the reason, in English, when it isn't valid.
+ *
+ * A level stays in the module: free it once its screen closes (`using`, or `free()`), and don't
+ * call it afterwards. What it gives (`maps()`, `world()`) are plain objects, built again at each
+ * call: read them once and keep them, in a component in `$state.raw`, since a world is never
+ * changed but replaced whole, and `$state` would wrap each of its cells in a proxy.
+ */
+export {
+	Level,
+	Sandbox,
+	type Cell,
+	type Color,
+	type Direction,
+	type Goals,
+	type LevelMap,
+	type Paint,
+	type PaintGoal,
+	type Point,
+	type Robot,
+	type World
+} from '#lib/wasm/stepwise.js';
+
 /** The probe of step 4c (see crates/core/src/probe.rs), to create once `loadCore` has resolved. */
-export { Probe, type Action, type Direction } from '#lib/wasm/stepwise.js';
+export { Probe, type Action, type ProbeDirection } from '#lib/wasm/stepwise.js';

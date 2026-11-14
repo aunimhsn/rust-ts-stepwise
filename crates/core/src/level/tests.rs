@@ -237,6 +237,86 @@ items_at = [[5, 0], [3, 0]]
         let goals = level.maps()[0].goals();
         assert_eq!(goals.paints()[0].path().len(), 5);
     }
+
+    #[test]
+    fn the_cells_to_paint_are_given_once_in_the_order_of_the_strokes() {
+        // The first stroke closes on its first cell, and the second comes back on two of them.
+        let level = level(&small_with_goals(
+            r#"paints = [
+    { color = "red", path = [[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]] },
+    { color = "red", path = [[2, 0], [1, 0], [1, 1], [2, 1]] },
+    { color = "blue", path = [[3, 1]] },
+]"#,
+        ));
+        let red = |x, y| (Point::new(x, y), Color::Red);
+        assert_eq!(
+            level.maps()[0].goals().paint_cells(),
+            [
+                red(0, 0),
+                red(1, 0),
+                red(1, 1),
+                red(0, 1),
+                red(2, 0),
+                red(2, 1),
+                (Point::new(3, 1), Color::Blue),
+            ]
+        );
+    }
+
+    #[test]
+    fn the_passages_of_the_goals_are_those_their_strokes_cross() {
+        let level = level(&small_with_goals(
+            r#"paints = [
+    { color = "red", path = [[0, 0], [1, 0], [1, 1]] },
+    { color = "blue", path = [[2, 1], [3, 1]] },
+    { color = "blue", path = [[3, 0]] },
+]"#,
+        ));
+        let goals = level.maps()[0].goals();
+        let passages = |x, y| {
+            Direction::ALL
+                .into_iter()
+                .filter(|&direction| goals.passage(Point::new(x, y), direction))
+                .collect::<Vec<_>>()
+        };
+        // A passage is crossed from both of its cells, whatever the way of the stroke.
+        assert_eq!(passages(0, 0), [Direction::East]);
+        assert_eq!(passages(1, 0), [Direction::South, Direction::West]);
+        assert_eq!(passages(1, 1), [Direction::North]);
+        assert_eq!(passages(2, 1), [Direction::East]);
+        assert_eq!(passages(3, 1), [Direction::West]);
+        // Two strokes next to each other don't join: [1, 1] and [2, 1], [3, 0] and [3, 1].
+        assert_eq!(passages(3, 0), []);
+        // A cell that no stroke paints, and the cells past the edges of the map.
+        assert_eq!(passages(0, 1), []);
+        assert!(!goals.passage(Point::new(0, 0), Direction::North));
+        assert!(!goals.passage(Point::new(0, 0), Direction::West));
+    }
+
+    #[test]
+    fn the_passages_of_the_goals_are_those_of_the_same_strokes_painted() {
+        // A square that closes, and a stroke that comes back on two of its cells.
+        let strokes = r#"paints = [
+    { color = "red", path = [[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]] },
+    { color = "red", path = [[2, 0], [1, 0], [1, 1], [2, 1], [3, 1]] },
+]"#;
+        // The same strokes at the start and in the goals; `robot_at` keeps the goals from
+        // being all met before the program runs.
+        let level = level(&format!(
+            "{SMALL}{strokes}\n\n[maps.goals]\nrobot_at = [3, 0]\n{strokes}\n"
+        ));
+        let map = the_world(&level).map();
+        let goals = level.maps()[0].goals();
+        for at in map.points() {
+            for direction in Direction::ALL {
+                assert_eq!(
+                    goals.passage(at, direction),
+                    map.passage(at, direction),
+                    "{at:?} {direction:?}"
+                );
+            }
+        }
+    }
 }
 
 mod refused {

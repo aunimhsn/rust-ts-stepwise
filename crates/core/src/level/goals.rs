@@ -3,7 +3,7 @@
 
 use super::{LevelErrorKind, Stroke};
 use crate::color::Color;
-use crate::world::{BuildError, Cell, Map, Point, World};
+use crate::world::{BuildError, Cell, Direction, Map, Point, World};
 
 /// The goals of a map: each is optional, and a map has at least one.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -66,6 +66,27 @@ impl Goals {
     #[must_use]
     pub fn paints(&self) -> &[Stroke] {
         &self.paints
+    }
+
+    /// Each cell of the strokes to paint, once, with its color, in the order of the strokes:
+    /// what the goals look at, and where the map marks them.
+    #[must_use]
+    pub fn paint_cells(&self) -> &[(Point, Color)] {
+        &self.paint_cells
+    }
+
+    /// Whether a stroke to paint crosses the passage from the cell at `point` to its neighbor
+    /// in `direction`: what [`Map::passage`] says once the strokes are painted as written. The
+    /// goals don't look at the passages; the marks of the map draw them.
+    #[must_use]
+    pub fn passage(&self, point: Point, direction: Direction) -> bool {
+        let Some(neighbor) = point.toward(direction) else {
+            return false;
+        };
+        self.paints
+            .iter()
+            .flat_map(Stroke::steps)
+            .any(|step| step == (point, neighbor) || step == (neighbor, point))
     }
 
     /// Whether no cell other than those of the strokes should be painted.
