@@ -18,7 +18,7 @@ pub struct Level(level::Level);
 
 #[wasm_bindgen]
 impl Level {
-    /// Reads and checks a level file.
+    /// Reads and checks the text of a level file.
     ///
     /// # Errors
     ///
@@ -61,7 +61,7 @@ pub struct Sandbox(level::Sandbox);
 
 #[wasm_bindgen]
 impl Sandbox {
-    /// Reads and checks the file of the sandbox.
+    /// Reads and checks the text of the file of the sandbox.
     ///
     /// # Errors
     ///
@@ -114,7 +114,8 @@ pub struct Goals {
     /// The cell where the robot should stand.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub robot_at: Option<Point>,
-    /// The cells to paint, each once, in the order of the strokes of the file.
+    /// The cells to paint, each once, in the order of the strokes of the file: the cells of
+    /// `Goals::paint_cells` in the core, not its strokes.
     pub paints: Vec<PaintGoal>,
     /// The cells where an item should lie.
     pub items_at: Vec<Point>,
@@ -162,7 +163,7 @@ mod tests {
 
     use super::{Goals, Level, LevelMap, PaintGoal, Sandbox};
     use crate::world::Direction::{self, East, North, South, West};
-    use crate::world::{Color, Point, World};
+    use crate::world::{Color, Point};
 
     /// A level of two maps: a square to paint, then a corridor with an item to carry.
     const LEVEL: &str = r#"
@@ -282,12 +283,8 @@ robot = { at = [0, 0], facing = "north" }
     }
 
     #[test]
-    fn the_sandbox_gives_its_starting_code_and_its_world() {
+    fn the_sandbox_gives_its_starting_code_as_written() {
         let sandbox = Sandbox::new(SANDBOX).expect("a valid sandbox file");
         assert_eq!(sandbox.starting_code(), "# Try anything here.\n");
-        let core = level::Sandbox::from_toml(SANDBOX).expect("a valid sandbox file");
-        let world = World::from(core.world());
-        assert_eq!((world.width, world.height), (2, 1));
-        assert_eq!(world.robot.direction, Direction::North);
     }
 }

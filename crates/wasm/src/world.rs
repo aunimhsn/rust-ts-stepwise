@@ -150,22 +150,24 @@ impl From<&world::World> for World {
     }
 }
 
-/// The cell of `map` at `at`. Outside the map counts as a wall, as for the robot.
+/// The cell of `map` at `at`.
 fn cell(map: &world::Map, at: world::Point) -> Cell {
-    let Some(world::Cell::Floor(floor)) = map.cell(at) else {
-        return Cell::Wall;
-    };
-    Cell::Floor {
-        paint: floor.paint().map(|color| Paint {
-            color: color.into(),
-            passages: passages(|direction| map.passage(at, direction)),
-        }),
-        item: floor.has_item(),
+    match map.cell(at) {
+        Some(world::Cell::Floor(floor)) => Cell::Floor {
+            paint: floor.paint().map(|color| Paint {
+                color: color.into(),
+                passages: passages(|direction| map.passage(at, direction)),
+            }),
+            item: floor.has_item(),
+        },
+        // Outside the map counts as a wall, as for the robot.
+        Some(world::Cell::Wall) | None => Cell::Wall,
     }
 }
 
 /// The directions whose passage is `painted`, clockwise from the north.
-pub(crate) fn passages(painted: impl Fn(world::Direction) -> bool) -> Vec<Direction> {
+#[must_use]
+pub fn passages(painted: impl Fn(world::Direction) -> bool) -> Vec<Direction> {
     world::Direction::ALL
         .into_iter()
         .filter(|&direction| painted(direction))

@@ -44,7 +44,8 @@ export {
  *
  * A level stays in the module: free it once its screen closes (`using`, or `free()`), and don't
  * call it afterwards. What it gives (`maps()`, `world()`) are plain objects, built again at each
- * call: read them once and keep them.
+ * call: read them once and keep them, in a component in `$state.raw`, since a world is never
+ * changed but replaced whole, and `$state` would wrap each of its cells in a proxy.
  */
 export {
 	Level,

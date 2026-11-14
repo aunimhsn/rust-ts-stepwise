@@ -11,8 +11,7 @@ import {
 	Probe,
 	Sandbox,
 	type Cell,
-	type Span,
-	type World
+	type Span
 } from '#lib/wasm/stepwise.js';
 
 const workspaceVersion = /\[workspace\.package\]\nversion = "([^"]+)"/.exec(
@@ -242,35 +241,34 @@ items_at = [[0, 0]]
 		const onWall = levelOf(
 			`terrain = '.#.'\nrobot = { at = [1, 0], facing = "east" }\n\n[maps.goals]\nrobot_at = [2, 0]\n`
 		);
+		// The sentences are those of the core, tested there: one of a map, one of the file, and
+		// the start of what the reader of TOML says.
 		expect(() => new Level(onWall)).toThrow(new Error('map 1: [1, 0] is a wall'));
-		const noGoal = levelOf(`terrain = '..'\nrobot = { at = [0, 0], facing = "east" }\n`);
-		expect(() => new Level(noGoal)).toThrow(new Error('map 1: the map has no goal'));
 		expect(() => new Level('version = 2\n')).toThrow(
 			new Error('the file has version 2, while this core reads version 1')
 		);
-		// The reader of TOML says the line and the column of what it refuses.
-		expect(() => new Level('version = \n')).toThrow(/^TOML parse error at line 1, column 11/);
+		expect(() => new Level('version = \n')).toThrow(/^TOML parse error/);
 	});
 });
 
 describe('the file of the sandbox', () => {
-	const file = readFileSync(new URL('../../levels/sandbox.toml', import.meta.url), 'utf8');
+	it('gives its starting code and its world as a plain object', () => {
+		const small = `version = 1\nstarting_code = '# Try'\n\n[map]\nterrain = '.#'\nrobot = { at = [0, 0], facing = "north" }\n`;
+		using sandbox = new Sandbox(small);
+		expect(sandbox.startingCode()).toBe('# Try');
+		expect(sandbox.world()).toStrictEqual({
+			width: 2,
+			height: 1,
+			cells: [{ type: 'floor', item: false }, { type: 'wall' }],
+			robot: { position: { x: 0, y: 0 }, direction: 'north', carrying: false }
+		});
+	});
 
-	/** The terrain of `world` as a level file draws it: a row per line, `#` a wall, `.` a floor. */
-	function terrain(world: World): string {
-		const cells = world.cells.map((cell) => (cell.type === 'wall' ? '#' : '.'));
-		const rows = Array.from({ length: world.height }, (_, y) =>
-			cells.slice(y * world.width, (y + 1) * world.width).join('')
-		);
-		return rows.join('\n') + '\n';
-	}
-
-	it('is read as the website will read it', () => {
+	it('reads the file of the website, whatever its map becomes', () => {
+		const file = readFileSync(new URL('../../levels/sandbox.toml', import.meta.url), 'utf8');
 		using sandbox = new Sandbox(file);
 		const world = sandbox.world();
 		expect(world.cells).toHaveLength(world.width * world.height);
-		// The walls are where the file draws them, whatever the map of the sandbox becomes.
-		expect(terrain(world)).toBe(/^terrain = '''\n([^']*)'''$/m.exec(file)?.[1]);
 		expect(check(sandbox.startingCode())).toEqual([]);
 	});
 

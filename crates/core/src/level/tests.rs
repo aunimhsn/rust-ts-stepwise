@@ -292,6 +292,31 @@ items_at = [[5, 0], [3, 0]]
         assert!(!goals.passage(Point::new(0, 0), Direction::North));
         assert!(!goals.passage(Point::new(0, 0), Direction::West));
     }
+
+    #[test]
+    fn the_passages_of_the_goals_are_those_of_the_same_strokes_painted() {
+        // A square that closes, and a stroke that comes back on two of its cells.
+        let strokes = r#"paints = [
+    { color = "red", path = [[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]] },
+    { color = "red", path = [[2, 0], [1, 0], [1, 1], [2, 1], [3, 1]] },
+]"#;
+        // The same strokes at the start and in the goals; `robot_at` keeps the goals from
+        // being all met before the program runs.
+        let level = level(&format!(
+            "{SMALL}{strokes}\n\n[maps.goals]\nrobot_at = [3, 0]\n{strokes}\n"
+        ));
+        let map = the_world(&level).map();
+        let goals = level.maps()[0].goals();
+        for at in map.points() {
+            for direction in Direction::ALL {
+                assert_eq!(
+                    goals.passage(at, direction),
+                    map.passage(at, direction),
+                    "{at:?} {direction:?}"
+                );
+            }
+        }
+    }
 }
 
 mod refused {
