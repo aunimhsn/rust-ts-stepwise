@@ -3,7 +3,9 @@
 
 use super::value::ValueType;
 use crate::ast::{BinaryOperator, UnaryOperator};
+use crate::builtin::Builtin;
 use crate::span::Span;
+use crate::world::RobotError;
 
 /// An error that stops a program while it runs: only the values decide it, so the checks
 /// before running can't find it.
@@ -84,8 +86,26 @@ pub enum RuntimeErrorKind {
         /// The function called.
         function: String,
     },
+    /// An action the robot can't do: a wall in front of `forward()`, no item to pick up… The
+    /// world stays as it was before the call. The span is the call.
+    Robot(RobotError),
+    /// A value that is no color given to a built-in function that takes one
+    /// (`start_painting(3)`, `here_is("red")`): the function does nothing. The span is the
+    /// call.
+    ValueNotColor {
+        /// The function.
+        function: Builtin,
+        /// The type of the value it was given.
+        found: ValueType,
+    },
     /// What the checks before running rule out (a name that is no variable, a `break` outside
     /// a loop…), or a mistake of the core: never for a checked program. The span is the
     /// closest place known.
     Internal,
+}
+
+impl From<RobotError> for RuntimeErrorKind {
+    fn from(error: RobotError) -> Self {
+        Self::Robot(error)
+    }
 }

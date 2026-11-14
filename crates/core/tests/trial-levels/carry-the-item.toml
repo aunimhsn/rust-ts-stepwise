@@ -1,0 +1,33 @@
+# A trial level for the tests of the core (see ../programs.rs), not a level of the website: an
+# item to bring to the end of a corridor, at two distances.
+version = 1
+
+starting_code = '''
+# Bring the item to its slot
+'''
+
+[[maps]]
+terrain = '''
+#########
+#.......#
+#########
+'''
+robot = { at = [1, 1], facing = "east" }
+items = [[3, 1]]
+
+[maps.goals]
+items_at = [[7, 1]]
+carrying = false
+
+[[maps]]
+terrain = '''
+#########
+#.......#
+#########
+'''
+robot = { at = [1, 1], facing = "east" }
+items = [[5, 1]]
+
+[maps.goals]
+items_at = [[7, 1]]
+carrying = false

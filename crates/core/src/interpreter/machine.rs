@@ -8,6 +8,7 @@ use super::event::Event;
 use super::memory::{CallInProgress, Flow, Memory};
 use crate::ast::Program;
 use crate::span::Span;
+use crate::world::World;
 
 /// Where a program is, between two steps.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -28,43 +29,50 @@ pub enum State {
     Failed(RuntimeError),
 }
 
-/// A program being run, one step at a time (see *Running a program* in `specs.md`).
+/// A program being run on a world, one step at a time (see *Running a program* in
+/// `specs.md`).
 #[derive(Debug)]
 pub struct Machine {
     /// The instructions of the program, which never change.
     code: Code,
-    /// What the program has changed so far.
+    /// What the program has changed of its own so far: its variables, its calls in progress.
     memory: Memory,
+    /// The world of the robot, as the built-in functions have changed it so far.
+    world: World,
     state: State,
 }
 
 impl Machine {
-    /// A machine about to run `program`, paused before its first line.
+    /// A machine about to run `program` on `world`, paused before its first line. The
+    /// machine owns the world from then on: running the program again takes a new machine,
+    /// on a copy of the world as it starts.
     ///
     /// The checker must have found `program` without error. A program the compiler can't
     /// translate (a name that is no variable, a `break` outside a loop…) starts stopped on
     /// [`RuntimeErrorKind::Internal`], at the place that stops the compiler. Any other
     /// program the checks refuse may run: it never panics, but what it does isn't specified.
     #[must_use]
-    pub fn new(program: &Program) -> Self {
+    pub fn new(program: &Program, world: World) -> Self {
         match compile(program) {
-            Ok(code) => Self::start(code),
+            Ok(code) => Self::start(code, world),
             Err(NotChecked(span)) => {
                 let kind = RuntimeErrorKind::Internal;
                 Self {
                     code: Code::default(),
                     memory: Memory::new(),
+                    world,
                     state: State::Failed(RuntimeError { kind, span }),
                 }
             }
         }
     }
 
-    /// A machine about to run `code`, paused before its first line.
-    fn start(code: Code) -> Self {
+    /// A machine about to run `code` on `world`, paused before its first line.
+    fn start(code: Code, world: World) -> Self {
         let mut machine = Self {
             code,
             memory: Memory::new(),
+            world,
             state: State::Ended,
         };
         // Up to the first line, where the first step starts: nothing runs before it.
@@ -76,6 +84,15 @@ impl Machine {
     #[must_use]
     pub const fn state(&self) -> &State {
         &self.state
+    }
+
+    /// The world of the robot, as the program has changed it so far: the map to draw, and
+    /// what the goals of a level are checked on once the program has ended. It stays as it
+    /// was once the program has stopped on an error, the robot against the wall it bumped
+    /// into.
+    #[must_use]
+    pub const fn world(&self) -> &World {
+        &self.world
     }
 
     /// The calls in progress, from the main program to the function being run, each with
@@ -90,6 +107,11 @@ impl Machine {
     /// line of a function it calls, or to the end of the function it is in, which goes back
     /// to the line of its call. Once the program has ended or stopped on an error, nothing
     /// happens anymore.
+    ///
+    /// It gives what the learner sees of the step outside the editor, if anything: an action
+    /// of the robot, or a line printed. A step that stops the program may have acted first
+    /// (`if forward():` moves the robot, then stops on the value missing): it gives its
+    /// event, and [`Machine::state`] its error.
     pub fn step(&mut self) -> Option<Event> {
         if !matches!(self.state, State::Running { .. }) {
             return None;
@@ -122,7 +144,10 @@ impl Machine {
                 break RuntimeErrorKind::Internal;
             };
             instructions_left = left;
-            match self.memory.execute(instruction, place, event) {
+            match self
+                .memory
+                .execute(instruction, place, &mut self.world, event)
+            {
                 Ok(Flow::Continue) => {}
                 Ok(Flow::Pause { after_call }) => {
                     let line = self.memory.line();
@@ -146,7 +171,7 @@ mod tests {
     use crate::interpreter::code::{Code, Function, Instruction};
     use crate::interpreter::{RuntimeError, RuntimeErrorKind, Value};
     use crate::parser::parse;
-    use crate::test_support::span;
+    use crate::test_support::{span, world};
 
     #[test]
     fn a_loop_that_never_ends_keeps_no_more_values_at_each_turn() {
@@ -160,7 +185,7 @@ while true:
     turns = turns + 1
 ";
         let program = parse(source).unwrap();
-        let mut machine = Machine::new(&program);
+        let mut machine = Machine::new(&program, world(&[">"]));
         let mut sizes = Vec::new();
         for _ in 0..1000 {
             machine.step();
@@ -191,7 +216,7 @@ while true:
     total = find(2) + find(1) - 30
 ";
         let program = parse(source).unwrap();
-        let mut machine = Machine::new(&program);
+        let mut machine = Machine::new(&program, world(&[">"]));
         let mut sizes = Vec::new();
         for _ in 0..3000 {
             machine.step();
@@ -215,6 +240,14 @@ while true:
         let print_two_values = Instruction::CallBuiltin {
             builtin: Builtin::Print,
             arguments: 2,
+        };
+        let forward_with_a_value = Instruction::CallBuiltin {
+            builtin: Builtin::Forward,
+            arguments: 1,
+        };
+        let paint_without_color = Instruction::CallBuiltin {
+            builtin: Builtin::StartPainting,
+            arguments: 0,
         };
         let short_circuit = Instruction::ShortCircuit {
             operator: BinaryOperator::And,
@@ -246,6 +279,9 @@ while true:
             vec![Instruction::RepeatStart],
             vec![Instruction::RepeatNext(0)],
             vec![number(), print_two_values],
+            // A built-in function with a wrong number of values.
+            vec![number(), forward_with_a_value],
+            vec![paint_without_color],
             // No variable in this slot.
             vec![Instruction::Load(3)],
             vec![number(), Instruction::Store(3)],
@@ -271,7 +307,7 @@ while true:
             for instruction in &wrong {
                 code.push(instruction.clone(), place);
             }
-            let mut machine = Machine::start(code);
+            let mut machine = Machine::start(code, world(&[">"]));
             let kind = RuntimeErrorKind::Internal;
             // An empty list has no instruction to give its place: the start of the program.
             let span = if wrong.is_empty() {
