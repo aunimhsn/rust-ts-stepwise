@@ -3,7 +3,7 @@
      speed, the robot moved by CSS transitions. Created once the core has loaded. -->
 <script lang="ts">
 	import { onDestroy } from 'svelte';
-	import { Probe, type Direction } from '#lib/core.ts';
+	import { Probe, type ProbeDirection } from '#lib/core.ts';
 	import { t } from '#lib/i18n.ts';
 	import { paceFrame, runInstant, SPEEDS, START_CARRY } from '#lib/pace.ts';
 
@@ -14,7 +14,7 @@
 	/** The share of the time between two steps an animation takes, at an animated speed. */
 	const ANIMATION_SHARE = 0.8;
 	/** The robot of the drawings looks north. */
-	const ANGLES: Record<Direction, number> = { north: 0, east: 90, south: 180, west: 270 };
+	const ANGLES: Record<ProbeDirection, number> = { north: 0, east: 90, south: 180, west: 270 };
 
 	const size = Probe.mapSize();
 	const cells = Array.from({ length: size * size }, (_, index) => ({

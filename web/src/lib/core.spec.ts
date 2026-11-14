@@ -3,7 +3,17 @@
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { check, coreVersion, initSync, Probe, type Span } from '#lib/wasm/stepwise.js';
+import {
+	check,
+	coreVersion,
+	initSync,
+	Level,
+	Probe,
+	Sandbox,
+	type Cell,
+	type Span,
+	type World
+} from '#lib/wasm/stepwise.js';
 
 const workspaceVersion = /\[workspace\.package\]\nversion = "([^"]+)"/.exec(
 	readFileSync(new URL('../../../Cargo.toml', import.meta.url), 'utf8')
@@ -127,5 +137,148 @@ describe('the checks before running', () => {
 		const kind = check('print(sidse)\n')[0]?.kind;
 		// Only some errors carry a name: this line compiles because the code narrows the type.
 		expect(kind?.code === 'unknown-name' ? kind.name : undefined).toBe('sidse');
+	});
+});
+
+describe('a level file', () => {
+	// Two maps: a corner to paint, with an item to bring back; then a corridor, the item carried.
+	const LEVEL = `
+version = 1
+
+starting_code = '''
+# Paint the corner
+repeat 2:
+    forward()
+'''
+
+[[maps]]
+terrain = '''
+..#
+...
+'''
+robot = { at = [0, 0], facing = "east" }
+items = [[2, 1]]
+paints = [{ color = "blue", path = [[0, 1], [1, 1]] }]
+
+[maps.goals]
+robot_at = [1, 1]
+paints = [{ color = "red", path = [[0, 0], [1, 0], [1, 1]] }]
+nothing_else_painted = true
+items_at = [[0, 0]]
+carrying = false
+
+[[maps]]
+terrain = '''
+....
+'''
+robot = { at = [3, 0], facing = "west", carrying = true }
+
+[maps.goals]
+items_at = [[0, 0]]
+`;
+
+	/** The file of a level of one map, the body of its `[[maps]]` table. */
+	function levelOf(map: string): string {
+		return `version = 1\nstarting_code = ''\n\n[[maps]]\n${map}`;
+	}
+
+	it('gives the code the learner starts with, as written', () => {
+		using level = new Level(LEVEL);
+		expect(level.startingCode()).toBe('# Paint the corner\nrepeat 2:\n    forward()\n');
+	});
+
+	it('gives the world of each map as plain objects', () => {
+		using level = new Level(LEVEL);
+		const empty: Cell = { type: 'floor', item: false };
+		// A key is left out rather than undefined: a cell without paint has no `paint`.
+		expect(level.maps().map((map) => map.world)).toStrictEqual([
+			{
+				width: 3,
+				height: 2,
+				cells: [
+					empty,
+					empty,
+					{ type: 'wall' },
+					{ type: 'floor', paint: { color: 'blue', passages: ['east'] }, item: false },
+					{ type: 'floor', paint: { color: 'blue', passages: ['west'] }, item: false },
+					{ type: 'floor', item: true }
+				],
+				robot: { position: { x: 0, y: 0 }, direction: 'east', carrying: false }
+			},
+			{
+				width: 4,
+				height: 1,
+				cells: [empty, empty, empty, empty],
+				robot: { position: { x: 3, y: 0 }, direction: 'west', carrying: true }
+			}
+		]);
+	});
+
+	it('gives the goals of each map that have a cell, to mark on it', () => {
+		using level = new Level(LEVEL);
+		expect(level.maps().map((map) => map.goals)).toStrictEqual([
+			{
+				robotAt: { x: 1, y: 1 },
+				paints: [
+					{ at: { x: 0, y: 0 }, color: 'red', passages: ['east'] },
+					{ at: { x: 1, y: 0 }, color: 'red', passages: ['south', 'west'] },
+					{ at: { x: 1, y: 1 }, color: 'red', passages: ['north'] }
+				],
+				itemsAt: [{ x: 0, y: 0 }]
+			},
+			{ paints: [], itemsAt: [{ x: 0, y: 0 }] }
+		]);
+	});
+
+	it('gives cells that TypeScript tells apart by their type', () => {
+		using level = new Level(LEVEL);
+		const cells = level.maps()[0]?.world.cells ?? [];
+		// Only a floor cell has a paint: this line compiles because the type narrows the cell.
+		const colors = cells.map((cell) => (cell.type === 'floor' ? cell.paint?.color : undefined));
+		expect(colors).toEqual([undefined, undefined, undefined, 'blue', 'blue', undefined]);
+	});
+
+	it('throws an error that says why a file is refused', () => {
+		const onWall = levelOf(
+			`terrain = '.#.'\nrobot = { at = [1, 0], facing = "east" }\n\n[maps.goals]\nrobot_at = [2, 0]\n`
+		);
+		expect(() => new Level(onWall)).toThrow(new Error('map 1: [1, 0] is a wall'));
+		const noGoal = levelOf(`terrain = '..'\nrobot = { at = [0, 0], facing = "east" }\n`);
+		expect(() => new Level(noGoal)).toThrow(new Error('map 1: the map has no goal'));
+		expect(() => new Level('version = 2\n')).toThrow(
+			new Error('the file has version 2, while this core reads version 1')
+		);
+		// The reader of TOML says the line and the column of what it refuses.
+		expect(() => new Level('version = \n')).toThrow(/^TOML parse error at line 1, column 11/);
+	});
+});
+
+describe('the file of the sandbox', () => {
+	const file = readFileSync(new URL('../../levels/sandbox.toml', import.meta.url), 'utf8');
+
+	/** The terrain of `world` as a level file draws it: a row per line, `#` a wall, `.` a floor. */
+	function terrain(world: World): string {
+		const cells = world.cells.map((cell) => (cell.type === 'wall' ? '#' : '.'));
+		const rows = Array.from({ length: world.height }, (_, y) =>
+			cells.slice(y * world.width, (y + 1) * world.width).join('')
+		);
+		return rows.join('\n') + '\n';
+	}
+
+	it('is read as the website will read it', () => {
+		using sandbox = new Sandbox(file);
+		const world = sandbox.world();
+		expect(world.cells).toHaveLength(world.width * world.height);
+		// The walls are where the file draws them, whatever the map of the sandbox becomes.
+		expect(terrain(world)).toBe(/^terrain = '''\n([^']*)'''$/m.exec(file)?.[1]);
+		expect(check(sandbox.startingCode())).toEqual([]);
+	});
+
+	it('throws the error of a file that has goals, or that is the one of a level', () => {
+		const map = `terrain = '..'\nrobot = { at = [0, 0], facing = "east" }\n`;
+		const withGoals = `version = 1\nstarting_code = ''\n\n[map]\n${map}\n[map.goals]\nrobot_at = [1, 0]\n`;
+		expect(() => new Sandbox(withGoals)).toThrow(new Error('the map of the sandbox has goals'));
+		const level = `version = 1\nstarting_code = ''\n\n[[maps]]\n${map}`;
+		expect(() => new Sandbox(level)).toThrow(/^TOML parse error/);
 	});
 });

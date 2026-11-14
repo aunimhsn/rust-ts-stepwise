@@ -20,7 +20,9 @@
 )]
 
 mod check;
+mod level;
 mod position;
+mod world;
 
 use stepwise_core::probe;
 use wasm_bindgen::prelude::wasm_bindgen;
@@ -47,10 +49,11 @@ pub enum Action {
     Bumped = "bumped",
 }
 
-/// Where the robot looks, as `probe::Direction`.
+/// Where the robot looks, as `probe::Direction`. It is named apart from the direction of the
+/// world (`world::Direction`), the one that stays: both would be `Direction` in TypeScript.
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Direction {
+pub enum ProbeDirection {
     North = "north",
     East = "east",
     South = "south",
@@ -67,7 +70,7 @@ impl From<probe::Action> for Action {
     }
 }
 
-impl From<probe::Direction> for Direction {
+impl From<probe::Direction> for ProbeDirection {
     fn from(direction: probe::Direction) -> Self {
         match direction {
             probe::Direction::North => Self::North,
@@ -120,7 +123,7 @@ impl Probe {
     /// Where the robot looks.
     #[wasm_bindgen(getter)]
     #[must_use]
-    pub fn direction(&self) -> Direction {
+    pub fn direction(&self) -> ProbeDirection {
         self.0.robot().direction.into()
     }
 
@@ -146,7 +149,7 @@ mod tests {
         let mut probe = Probe::new();
         assert_eq!(
             (probe.x(), probe.y(), probe.direction()),
-            (1, 1, Direction::East)
+            (1, 1, ProbeDirection::East)
         );
         assert_eq!(
             [probe.step(), probe.step(), probe.step()],
@@ -154,7 +157,7 @@ mod tests {
         );
         assert_eq!(
             (probe.x(), probe.y(), probe.direction()),
-            (3, 1, Direction::South)
+            (3, 1, ProbeDirection::South)
         );
         assert_eq!(probe.steps(), 3);
         assert_eq!(Probe::map_size(), probe::MAP_SIZE);
