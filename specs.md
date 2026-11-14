@@ -289,7 +289,7 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
 
 - **Running**: the first control is **Pause** (⏸), **Step** is greyed, the next line is highlighted, the step counter rises; the console is shown. When the learner types, the code doesn't change and the status bar lights up briefly with *"Reset the program to edit your code."*
 - **Paused on a breakpoint**: the breakpoint and the highlighted line together; the first control is **Resume** (▶); the variables panel opens by itself.
-- **Errors before running**: the words underlined, their message on hover; *"2 errors"* in the status bar; **Run** lists them in the console, each with its place in red, written as in the status bar (*"Ln 5, Col 9"*), which puts the cursor on it; the map stays at its start.
+- **Errors before running**: the words underlined, their message on hover; *"2 errors"* in the status bar; **Run** lists them in the console, each with its line in red (*"Ln 5"*), a click putting the cursor on its place; the map stays at its start.
 - **Error while running**: the line of the error marked in the margin, the map as it was at the error (the robot against the wall), the error in the console, a dot on the tab **Variables**; the status bar says `Error at line 5`.
 - **Goal not met**: a flag on each cell of a goal not met, the eyes of the robot dimmed; the console says which goal (*"The goal isn't met: 7 cells of the square aren't red."*); the tab of the map doesn't turn teal; the status bar says `Ended · goal not met`.
 
@@ -298,7 +298,7 @@ The window needs at least 1280 × 720 pixels: below, a message replaces the scre
 Everything in the console and the variables panel is in the font of the code, as the editor (Source Code Pro in semi-bold, its titles in extra-bold).
 
 - The lines written by `print`, in order, in plain text; a long line goes on to the next one, without scrolling sideways. When the lines fill the block, it scrolls and keeps the last ones in sight.
-- The errors, before running or while running: their place in red, written as in the status bar (`Ln 9, Col 17`), then in extra-bold what happened and under it how to fix it. The whole error lights up on hover; a click puts the cursor on its position in the editor.
+- The errors, before running or while running: their line in red (`Ln 9`), without a column, since the editor shows the place (see [Error handling](#error-handling)), then in extra-bold what happened and under it the rule to follow. The whole error lights up on hover; a click puts the cursor on its position in the editor.
 - The messages of the level: a goal not met in extra-bold, with a red flag as on the map, in neutral words; a map passed in green with a check (*"Map 1 passed. Try map 2."*).
 - Cleared at each **Run**.
 - **Run** shows the console tab.

@@ -19,6 +19,7 @@ The ideas, polish and edge cases found along the way that the current step doesn
 
 - The French translation of the interface, the levels and the manual; the comments of the starting code of the levels too, which stay in English in the level files for now (seen at step 8b).
 - The code normalized to NFC in the editor (step 16): a name pasted with its accents decomposed (`côté` written `co` + U+0302 + …) is cut before the accent by the lexer, which reads the combining mark as an unexpected character (seen in the review of step 5).
+- The column of the cursor in the status bar (step 16) counted in characters, as the core counts and as a learner does: an emoji is one column, while the editor counts two units for it (seen at step 10a).
 - The description of a built-in function on hover in the editor.
 - A phone or tablet layout.
 - The home screen in the mock-up (step 3): the path painted up to the level to play and drawn as a ghost after it, as the paint and the goal marks of the map.
