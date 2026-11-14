@@ -50,6 +50,8 @@ The ideas, polish and edge cases found along the way that the current step doesn
 - Measure the size and the speed of the WebAssembly module again once the interpreter exists (step 9 or 10): `opt-level` 3 was the smallest on the probe of step 4c, a code too small to be sure it stays so, and `wasm-opt` could matter for a larger module (see [Technical choices](technical-choices.md), WebAssembly size).
 - The level files read in TypeScript (`smol-toml`) and handed to the core through the bridge, if the weight of the reader in the WebAssembly module becomes a problem: `serde` and `toml` add about 100 kB gzipped to it (measured at step 8b, see [Technical choices](technical-choices.md), Levels). The files would not change; the cost is a second reader of the format.
 - A JSON Schema of the level files, so that VS Code (with Even Better TOML) completes and checks their fields while they are written.
+- The commits of `main` up to #35 keep the address their author had then; since 2026-11-14, the commits carry the no-reply address of GitHub. Giving it to the earlier ones means rewriting the history of `main` (every commit changes its identifier, with a forced push that the Git workflow of `CLAUDE.md` otherwise forbids), then asking GitHub Support to purge the old commits, which the pages of the pull requests keep; it is easiest while the repository has no fork and no release. The owner accepts leaving them as they are (decided on 2026-11-14).
+- The former name of the GitHub account, left in `Cargo.toml` (`repository`), `design-journal.md`, `docs/github-pages-usage.md` and `process.md`, and in the remote of a local clone: GitHub redirects the old addresses as long as nobody takes that name.
 
 ## Distribution
 
