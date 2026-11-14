@@ -1,9 +1,13 @@
-//! The places of a source as the editor counts them.
+//! The places of a source as JavaScript counts them in its text.
 //!
 //! The core gives a line and a column, both from 1, the column in characters, as a learner
-//! counts them. The editor counts from the start of the document, in UTF-16 code units, where
-//! an emoji takes two. This module is the one place where the positions change (see Positions
-//! in `docs/technical-choices.md`).
+//! counts them. JavaScript indexes a text from its start, in UTF-16 code units, where an emoji
+//! takes two. This module is the one place where the positions change (see Positions in
+//! `docs/technical-choices.md`).
+//!
+//! The offsets are those of the very text that was checked. They are also those of the
+//! editor when that text is the one of its document, where every line break is one `\n`: the
+//! editor counts one unit for a line break, whatever the text it was given wrote there.
 
 use serde::Serialize;
 use stepwise_core::span::{self, Position};
@@ -14,8 +18,8 @@ use tsify::Tsify;
 pub struct Span {
     /// The line of its start, from 1: what the console and the status bar write.
     pub line: u32,
-    /// The offset of its start from the start of the source, in UTF-16 code units, as the
-    /// editor counts.
+    /// The offset of its start in the text that was checked, in UTF-16 code units, as
+    /// JavaScript indexes it. The editor counts the same when that text is its document.
     pub from: u32,
     /// The offset just after its end. It equals `from` for a place between two characters,
     /// such as the end of a line where something is missing.
@@ -50,7 +54,11 @@ impl Offsets {
         let mut lines = Vec::new();
         let mut start = 0_u32;
         for whole in source.split('\n') {
-            let text = whole.strip_suffix('\r').unwrap_or(whole);
+            // The line break: its `\n`, and its `\r` when the lexer takes one off the line.
+            let (text, line_break) = match whole.strip_suffix('\r') {
+                Some(text) => (text, 2),
+                None => (whole, 1),
+            };
             let mut end = start;
             let mut wide = Vec::new();
             for (column, character) in (1_u32..).zip(text.chars()) {
@@ -63,8 +71,6 @@ impl Offsets {
                 end = end.saturating_add(units);
             }
             lines.push(Line { start, end, wide });
-            // The line break: its `\n`, and its `\r` when the lexer took one off the line.
-            let line_break = if text.len() == whole.len() { 1 } else { 2 };
             start = end.saturating_add(line_break);
         }
         let end = u32::try_from(source.encode_utf16().count()).unwrap_or(u32::MAX);
@@ -112,6 +118,7 @@ impl Offsets {
 
 #[cfg(test)]
 mod tests {
+    use stepwise_core::lexer::{TokenKind, tokenize};
     use stepwise_core::span::{self, Position};
 
     use super::{Offsets, Span};
@@ -120,8 +127,8 @@ mod tests {
         span::Span::new(Position::new(start.0, start.1), Position::new(end.0, end.1))
     }
 
-    /// What the editor would select with the offsets of `span`: the source cut in UTF-16 code
-    /// units, as JavaScript cuts a string.
+    /// What JavaScript would cut out of `source` with the offsets of `span`: the source in
+    /// UTF-16 code units, as it indexes a string.
     #[track_caller]
     fn cut(source: &str, span: Span) -> String {
         let units: Vec<u16> = source.encode_utf16().collect();
@@ -129,8 +136,8 @@ mod tests {
         String::from_utf16(&units[from..to]).expect("offsets between two characters")
     }
 
-    /// The stretch of `source` from `start` to `end`, each a line and a column, cut as the
-    /// editor would.
+    /// The stretch of `source` from `start` to `end`, each a line and a column, cut as
+    /// JavaScript would.
     #[track_caller]
     fn text(source: &str, start: (u32, u32), end: (u32, u32)) -> String {
         cut(source, Offsets::new(source).span(core_span(start, end)))
@@ -192,6 +199,9 @@ mod tests {
             text(source, (1, 1), (3, 14)),
             "while true:\n    # 🤖\n    forward()"
         );
+        // Its line is the one where it starts.
+        let span = Offsets::new(source).span(core_span((2, 5), (3, 14)));
+        assert_eq!(span.line, 2);
     }
 
     #[test]
@@ -243,12 +253,29 @@ mod tests {
         assert_eq!(offsets.offset(Position::new(line, column)), end);
     }
 
+    /// The lines are cut here as the lexer cuts them, a rule written in both crates: the
+    /// positions of this test come from the lexer itself.
+    #[test]
+    fn every_name_the_lexer_reads_is_cut_where_it_is_written() {
+        let source = "let côté = \"🤖\"\r\nif côté:\r\n    print(côté, sidse)\n# 🤖\nforward()";
+        let offsets = Offsets::new(source);
+        let mut names = Vec::new();
+        for token in tokenize(source).unwrap().tokens {
+            if let TokenKind::Name(name) = token.kind {
+                assert_eq!(cut(source, offsets.span(token.span)), name);
+                names.push(name);
+            }
+        }
+        assert_eq!(names, ["côté", "côté", "print", "côté", "sidse", "forward"]);
+    }
+
     #[test]
     fn a_place_the_source_does_not_have_stays_inside_it() {
         let source = "ab 🤖\ncd\n";
         let offsets = Offsets::new(source);
-        // Past the end of a line: the end of that line, before its line break.
+        // Past the end of a line: the end of that line, before its line break, whatever it is.
         assert_eq!(offsets.offset(Position::new(1, 99)), 5);
+        assert_eq!(Offsets::new("ab\r\ncd\r\n").offset(Position::new(1, 99)), 2);
         assert_eq!(offsets.offset(Position::new(2, u32::MAX)), 8);
         // A line that isn't there, and the line 0 that no position has: the end of the source.
         assert_eq!(offsets.offset(Position::new(9, 1)), 9);

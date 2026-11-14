@@ -18,6 +18,7 @@ The ideas, polish and edge cases found along the way that the current step doesn
 
 - The French translation of the interface, the levels and the manual; the comments of the starting code of the levels too, which stay in English in the level files for now (seen at step 8b).
 - The code normalized to NFC in the editor (step 16): a name pasted with its accents decomposed (`côté` written `co` + U+0302 + …) is cut before the accent by the lexer, which reads the combining mark as an unexpected character (seen in the review of step 5).
+- The checks given the text of the document of the editor, never a text from elsewhere (step 16), and a test on a document made from a text with `\r\n`: the places of the bridge are those of the text checked, where a `\r\n` is two units, while CodeMirror counts one unit for every line break (seen in the review of step 10a, see [Technical choices](technical-choices.md), Positions).
 - The column of the cursor in the status bar (step 16) counted in characters, as the core counts and as a learner does: an emoji is one column, while the editor counts two units for it (seen at step 10a).
 - The description of a built-in function on hover in the editor.
 - A phone or tablet layout.

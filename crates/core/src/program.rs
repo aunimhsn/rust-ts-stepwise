@@ -1,8 +1,9 @@
 //! A source checked before it runs (see *Checks before running* in `specs.md`): its syntax
 //! first, then its names and its structure.
 //!
-//! [`check`] is the one way to a [`Checked`] program, which is what runs: the interface shows
-//! the errors of a source that is refused, and has nothing to start.
+//! [`check`] is the one way to a [`Checked`] program, the only one the machine will take
+//! (step 10c): the interface shows the errors of a source that is refused, and will have
+//! nothing to start.
 
 use crate::ast::Program;
 use crate::checker::{self, CheckError};
