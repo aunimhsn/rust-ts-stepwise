@@ -129,3 +129,7 @@ The values, the expressions and their errors (types, division by zero, overflow)
 ### 9b. Functions (#35)
 
 The calls, the stack of frames, the parameters, `return`, the value missing, the limit of 200 calls; the calls in progress and their variables, readable for the variables panel.
+
+### 9c. Robot (#36)
+
+The built-in functions acting on the map and the sensors, their errors, a value that is no color given to a function that takes one (decided on 2026-11-14), what each step reports (the action of the robot by its name, the printed line; an action that fails is told by its error alone), and whole programs run on the maps of three trial levels kept with the tests, their goals checked at the end. The probe of step 4c stayed: the page still ran it through the bridge.
