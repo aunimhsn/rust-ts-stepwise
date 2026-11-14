@@ -1,22 +1,30 @@
 //! The tests of the interpreter: whole programs, with the lines highlighted step after step,
-//! what they print and how they end, grouped by the rules of *Running a program*, *Values*,
-//! *Expressions*, *Statements* and *Functions* in `specs.md`.
+//! what they print, what the robot does and how they end, grouped by the rules of *Running a
+//! program*, *Values*, *Expressions*, *Statements*, *Functions* and *Built-in functions* in
+//! `specs.md`.
 
 use std::iter;
 
 use super::code::{Code, Instruction};
 use super::compiler::compile;
 use super::{
-    Event, MAX_CALL_DEPTH, Machine, RuntimeError, RuntimeErrorKind as E, State, ValueType,
+    Action, Event, MAX_CALL_DEPTH, Machine, RuntimeError, RuntimeErrorKind as E, State, ValueType,
 };
 use crate::ast::{BinaryOperator, Program, Statement, StatementKind, UnaryOperator};
+use crate::builtin::Builtin;
 use crate::checker::check;
+use crate::color::Color;
 use crate::parser::{MAX_BLOCK_DEPTH, MAX_DEPTH, ParseErrorKind, SyntaxError, parse};
 use crate::span::Span;
-use crate::test_support::{Random, span};
+use crate::test_support::{Random, paints, span, world};
+use crate::world::{Direction, Point, RobotError, Tool, World};
 
 /// The most steps a test runs: a program that never ends is still running after them.
 const MAX_STEPS: usize = 1000;
+
+/// The world of the programs that don't use the robot, drawn as [`world`] reads it: one
+/// floor cell.
+const ONE_CELL: &[&str] = &[">"];
 
 /// What a program did, step after step.
 #[derive(Debug)]
@@ -25,21 +33,38 @@ struct Run {
     lines: Vec<u32>,
     /// The lines written by `print`, in order.
     printed: Vec<String>,
+    /// The actions of the robot, in order.
+    actions: Vec<Action>,
     /// The line of each step that ended a function, in order: the line of its call was
     /// highlighted again after it.
     returned_from: Vec<u32>,
     /// Where the program is after its last step.
     state: State,
-    /// The machine after its last step, with its calls in progress.
+    /// The machine after its last step, with its calls in progress and its world.
     machine: Machine,
 }
 
-/// Runs `source`, which must pass the checks before running, for at most [`MAX_STEPS`].
+impl Run {
+    /// The world after the last step.
+    fn world(&self) -> &World {
+        self.machine.world()
+    }
+}
+
+/// Runs `source`, which must pass the checks before running, for at most [`MAX_STEPS`], on
+/// a world of one cell.
 #[track_caller]
 fn run(source: &str) -> Run {
+    run_on(ONE_CELL, source)
+}
+
+/// Runs `source`, which must pass the checks before running, for at most [`MAX_STEPS`], on
+/// the world drawn as `rows` (see [`world`]).
+#[track_caller]
+fn run_on(rows: &[&str], source: &str) -> Run {
     let program = parse(source).unwrap();
     assert_eq!(check(&program), [], "in {source:?}");
-    run_program(&program)
+    run_program(&program, world(rows))
 }
 
 /// Runs `source` without the checks before running, which would refuse it.
@@ -47,21 +72,22 @@ fn run(source: &str) -> Run {
 fn run_unchecked(source: &str) -> Run {
     let program = parse(source).unwrap();
     assert_ne!(check(&program), [], "in {source:?}");
-    run_program(&program)
+    run_program(&program, world(ONE_CELL))
 }
 
-/// Runs `program`, and checks at each step that the line highlighted is one the program
-/// runs and the one of the call being run, and first that its instructions follow the rule
-/// that ends a step: a mistake of the compiler is caught even by a test that looks at
-/// something else.
+/// Runs `program` on `world`, and checks at each step that the line highlighted is one the
+/// program runs and the one of the call being run, and first that its instructions follow
+/// the rule that ends a step: a mistake of the compiler is caught even by a test that looks
+/// at something else.
 #[track_caller]
-fn run_program(program: &Program) -> Run {
+fn run_program(program: &Program, world: World) -> Run {
     assert_every_step_ends(program);
     let mut steps = Vec::new();
     lines_run(&program.statements, &mut steps);
-    let mut machine = Machine::new(program);
+    let mut machine = Machine::new(program, world);
     let mut lines = Vec::new();
     let mut printed = Vec::new();
+    let mut actions = Vec::new();
     let mut returned_from = Vec::new();
     for _ in 0..MAX_STEPS {
         let State::Running { line, after_call } = *machine.state() else {
@@ -76,6 +102,7 @@ fn run_program(program: &Program) -> Run {
         lines.push(line.start.line);
         match machine.step() {
             Some(Event::Printed(text)) => printed.push(text),
+            Some(Event::Robot(action)) => actions.push(action),
             None => {}
         }
     }
@@ -83,6 +110,7 @@ fn run_program(program: &Program) -> Run {
     Run {
         lines,
         printed,
+        actions,
         returned_from,
         state,
         machine,
@@ -258,7 +286,7 @@ fn calls(machine: &Machine) -> Vec<String> {
 fn paused_on(source: &str, line: u32) -> Machine {
     let program = parse(source).unwrap();
     assert_eq!(check(&program), [], "in {source:?}");
-    let mut machine = Machine::new(&program);
+    let mut machine = Machine::new(&program, world(ONE_CELL));
     for _ in 0..MAX_STEPS {
         match machine.state() {
             State::Running { line: next, .. } if next.start.line == line => return machine,
@@ -291,7 +319,7 @@ fn each_statement_is_a_step() {
 #[test]
 fn a_program_starts_paused_before_its_first_line() {
     let program = parse("# Count the sides\n\nlet sides = 4\n").unwrap();
-    let machine = Machine::new(&program);
+    let machine = Machine::new(&program, world(ONE_CELL));
     let (line, after_call) = (span(3, 1, 14), false);
     assert_eq!(*machine.state(), State::Running { line, after_call });
 }
@@ -308,7 +336,7 @@ else if 2 > 1:
         print(3)
 ";
     let program = parse(source).unwrap();
-    let mut machine = Machine::new(&program);
+    let mut machine = Machine::new(&program, world(ONE_CELL));
     let mut lines = Vec::new();
     while let State::Running { line, .. } = *machine.state() {
         lines.push(line);
@@ -328,7 +356,7 @@ else if 2 > 1:
 #[test]
 fn a_step_after_the_end_does_nothing() {
     let program = parse("print(1)\n").unwrap();
-    let mut machine = Machine::new(&program);
+    let mut machine = Machine::new(&program, world(ONE_CELL));
     assert_eq!(machine.step(), Some(Event::Printed("1".to_owned())));
     for _ in 0..3 {
         assert_eq!(*machine.state(), State::Ended);
@@ -339,7 +367,7 @@ fn a_step_after_the_end_does_nothing() {
 #[test]
 fn a_step_after_an_error_does_nothing() {
     let program = parse("print(1 / 0)\nprint(2)\n").unwrap();
-    let mut machine = Machine::new(&program);
+    let mut machine = Machine::new(&program, world(ONE_CELL));
     assert_eq!(machine.step(), None);
     let failed = machine.state().clone();
     assert!(matches!(failed, State::Failed(_)));
@@ -1164,7 +1192,7 @@ let total = double(3) + 1
 print(total)
 ";
     let program = parse(source).unwrap();
-    let mut machine = Machine::new(&program);
+    let mut machine = Machine::new(&program, world(ONE_CELL));
     let mut states = Vec::new();
     while let State::Running { line, after_call } = *machine.state() {
         states.push((line, after_call));
@@ -1704,6 +1732,421 @@ print(share(sides, 0))
     );
 }
 
+// The built-in functions: the robot acts on its world.
+
+#[test]
+fn forward_moves_the_robot_one_cell_in_front() {
+    let run = run_on(&[">.."], "forward()\nforward()\n");
+    assert_eq!(run.lines, [1, 2]);
+    assert_eq!(run.actions, [Action::Moved, Action::Moved]);
+    assert_eq!(run.world().robot().position(), Point::new(2, 0));
+    assert_eq!(run.state, State::Ended);
+}
+
+#[test]
+fn the_robot_turns_a_quarter_turn_on_its_cell() {
+    let run = run_on(&[">"], "turn_left()\n");
+    assert_eq!(run.actions, [Action::TurnedLeft]);
+    assert_eq!(run.world().robot().direction(), Direction::North);
+    let run = run_on(&[">"], "turn_right()\n");
+    assert_eq!(run.actions, [Action::TurnedRight]);
+    assert_eq!(run.world().robot().direction(), Direction::South);
+    assert_eq!(run.world().robot().position(), Point::new(0, 0));
+}
+
+#[test]
+fn the_brush_paints_the_cells_the_robot_moves_into_until_it_is_lifted() {
+    let source = "\
+start_painting(red)
+forward()
+start_painting(blue)
+forward()
+stop_painting()
+forward()
+";
+    let run = run_on(&[">..."], source);
+    assert_eq!(
+        run.actions,
+        [
+            Action::StartedPainting,
+            Action::Moved,
+            Action::StartedPainting,
+            Action::Moved,
+            Action::StoppedPainting,
+            Action::Moved,
+        ]
+    );
+    assert_eq!(paints(run.world()), ["rbb."]);
+    assert_eq!(run.world().robot().tool(), None);
+}
+
+#[test]
+fn the_eraser_removes_the_paint_of_the_cells_the_robot_moves_into_until_it_is_lifted() {
+    let source = "start_erasing()\nforward()\nstop_erasing()\nforward()\n";
+    let run = run_on(&[">yyy"], source);
+    assert_eq!(
+        run.actions,
+        [
+            Action::StartedErasing,
+            Action::Moved,
+            Action::StoppedErasing,
+            Action::Moved,
+        ]
+    );
+    assert_eq!(paints(run.world()), ["..yy"]);
+    assert_eq!(run.world().robot().tool(), None);
+}
+
+#[test]
+fn putting_a_tool_down_lifts_the_other() {
+    let run = run_on(&[">"], "start_painting(red)\nstart_erasing()\n");
+    assert_eq!(run.world().robot().tool(), Some(Tool::Eraser));
+    assert_eq!(paints(run.world()), ["."]);
+    let run = run_on(&[">"], "start_erasing()\nstart_painting(yellow)\n");
+    let brush = Tool::Brush(Color::Yellow);
+    assert_eq!(run.world().robot().tool(), Some(brush));
+    assert_eq!(paints(run.world()), ["y"]);
+}
+
+#[test]
+fn the_robot_picks_up_an_item_and_drops_it_on_another_cell() {
+    let run = run_on(&[">o."], "forward()\npick_up()\nforward()\ndrop()\n");
+    assert_eq!(
+        run.actions,
+        [
+            Action::Moved,
+            Action::PickedUp,
+            Action::Moved,
+            Action::Dropped
+        ]
+    );
+    let world = run.world();
+    assert!(!world.map().has_item(Point::new(1, 0)));
+    assert!(world.map().has_item(Point::new(2, 0)));
+    assert!(!world.is_carrying());
+}
+
+#[test]
+fn an_action_that_changes_nothing_is_reported_all_the_same() {
+    let run = run_on(&[">"], "stop_painting()\nstop_erasing()\n");
+    assert_eq!(
+        run.actions,
+        [Action::StoppedPainting, Action::StoppedErasing]
+    );
+    assert_eq!(*run.world(), world(&[">"]));
+    assert_eq!(run.state, State::Ended);
+}
+
+#[test]
+fn the_functions_of_the_program_act_on_the_same_world() {
+    let source = "\
+function paint_side(length):
+    start_painting(red)
+    repeat length:
+        forward()
+    stop_painting()
+
+paint_side(2)
+turn_right()
+paint_side(1)
+";
+    let run = run_on(&[">..", "..."], source);
+    assert_eq!(paints(run.world()), ["rrr", "..r"]);
+    assert_eq!(run.world().robot().position(), Point::new(2, 1));
+    assert_eq!(run.state, State::Ended);
+}
+
+#[test]
+fn a_loop_that_never_ends_keeps_the_robot_acting() {
+    let run = run_on(&[">"], "while true:\n    turn_left()\n");
+    assert!(matches!(run.state, State::Running { .. }));
+    assert_eq!(run.actions, [Action::TurnedLeft; MAX_STEPS / 2]);
+}
+
+// The built-in functions: the actions the robot can't do.
+
+/// The error of the robot that stops `source` on the world drawn as `rows`, with its place.
+#[track_caller]
+fn robot_error(rows: &[&str], source: &str) -> (RobotError, Span) {
+    match run_on(rows, source).state {
+        State::Failed(RuntimeError {
+            kind: E::Robot(error),
+            span,
+        }) => (error, span),
+        state => panic!("{source:?} should stop on an error of the robot: {state:?}"),
+    }
+}
+
+#[test]
+fn a_wall_or_the_edge_of_the_map_in_front_stops_the_program() {
+    for rows in [[">#"], [">"]] {
+        let run = run_on(&rows, "forward()\nprint(\"after\")\n");
+        assert_eq!(run.lines, [1], "on {rows:?}");
+        let error = RuntimeError {
+            kind: E::Robot(RobotError::Bump),
+            span: span(1, 1, 10),
+        };
+        assert_eq!(run.state, State::Failed(error), "on {rows:?}");
+        // A bump is no event: the error tells it, and the robot stays against the wall.
+        assert_eq!(run.actions, [Action::Moved; 0], "on {rows:?}");
+        assert_eq!(*run.world(), world(&rows));
+    }
+}
+
+#[test]
+fn what_the_robot_did_before_an_error_stays() {
+    let run = run_on(&[">.#"], "start_painting(red)\nforward()\nforward()\n");
+    assert_eq!(run.lines, [1, 2, 3]);
+    assert_eq!(run.actions, [Action::StartedPainting, Action::Moved]);
+    let error = RuntimeError {
+        kind: E::Robot(RobotError::Bump),
+        span: span(3, 1, 10),
+    };
+    assert_eq!(run.state, State::Failed(error));
+    assert_eq!(paints(run.world()), ["rr#"]);
+    assert_eq!(run.world().robot().position(), Point::new(1, 0));
+}
+
+#[test]
+fn pick_up_needs_an_item_on_the_cell_and_a_robot_that_carries_none() {
+    assert_eq!(
+        robot_error(&[">o"], "pick_up()\n"),
+        (RobotError::NoItemHere, span(1, 1, 10))
+    );
+    assert_eq!(
+        robot_error(&[">oo"], "forward()\npick_up()\nforward()\npick_up()\n"),
+        (RobotError::AlreadyCarrying, span(4, 1, 10))
+    );
+    // Both: the error says the first, which explains a `pick_up()` called twice.
+    assert_eq!(
+        robot_error(&[">o"], "forward()\npick_up()\npick_up()\n"),
+        (RobotError::AlreadyCarrying, span(3, 1, 10))
+    );
+}
+
+#[test]
+fn drop_needs_an_item_carried_and_a_cell_without_item() {
+    assert_eq!(
+        robot_error(&[">"], "drop()\n"),
+        (RobotError::NotCarrying, span(1, 1, 7))
+    );
+    assert_eq!(
+        robot_error(&[">oo"], "forward()\npick_up()\nforward()\ndrop()\n"),
+        (RobotError::ItemAlreadyHere, span(4, 1, 7))
+    );
+    // Both: the error says the first, which explains a `drop()` called twice.
+    assert_eq!(
+        robot_error(&[">o"], "forward()\npick_up()\ndrop()\ndrop()\n"),
+        (RobotError::NotCarrying, span(4, 1, 7))
+    );
+}
+
+#[test]
+fn an_item_the_robot_could_not_drop_stays_carried() {
+    let run = run_on(&[">oo"], "forward()\npick_up()\nforward()\ndrop()\n");
+    assert_eq!(
+        run.actions,
+        [Action::Moved, Action::PickedUp, Action::Moved]
+    );
+    assert!(run.world().is_carrying());
+    assert!(run.world().map().has_item(Point::new(2, 0)));
+}
+
+#[test]
+fn the_result_of_an_action_is_no_value_once_the_robot_has_acted() {
+    let program = parse("if forward():\n    print(\"moved\")\n").unwrap();
+    assert_eq!(check(&program), []);
+    let mut machine = Machine::new(&program, world(&[">."]));
+    // One step: the robot moves, then the condition finds no value.
+    assert_eq!(machine.step(), Some(Event::Robot(Action::Moved)));
+    let error = RuntimeError {
+        kind: no_value("forward"),
+        span: span(1, 4, 13),
+    };
+    assert_eq!(*machine.state(), State::Failed(error));
+    assert_eq!(machine.world().robot().position(), Point::new(1, 0));
+}
+
+// The built-in functions: the sensors.
+
+/// What `print` writes for `expression`, which only senses, on the world drawn as `rows`.
+#[track_caller]
+fn sensed(rows: &[&str], expression: &str) -> String {
+    let run = run_on(rows, &format!("print({expression})\n"));
+    assert_eq!(run.state, State::Ended, "for {expression:?}");
+    assert_eq!(run.actions, [Action::Moved; 0], "for {expression:?}");
+    assert_eq!(
+        *run.world(),
+        world(rows),
+        "{expression:?} changes the world"
+    );
+    run.printed.join("\n")
+}
+
+#[test]
+fn the_robot_senses_the_floor_cells_around_it() {
+    let sensors = ["front_is_clear()", "left_is_clear()", "right_is_clear()"];
+    // The robot looks east: its left is the north, its right the south. One side is clear on
+    // each map, so that a sensor that looks at another side answers wrong twice.
+    for (rows, clear) in [
+        (["##", ">.", "##"], "front_is_clear()"),
+        ([".#", ">#", "##"], "left_is_clear()"),
+        (["##", ">#", ".#"], "right_is_clear()"),
+    ] {
+        for sensor in sensors {
+            let expected = (sensor == clear).to_string();
+            assert_eq!(sensed(&rows, sensor), expected, "{sensor} on {rows:?}");
+        }
+    }
+    // Outside the map counts as a wall.
+    for sensor in sensors {
+        assert_eq!(sensed(&[">"], sensor), "false", "{sensor}");
+        assert_eq!(sensed(&["<"], sensor), "false", "{sensor}");
+    }
+}
+
+#[test]
+fn the_robot_senses_the_paint_of_the_cells_around_it() {
+    let rows = ["y.", ">b", "r."];
+    for (expression, expected) in [
+        ("front_is(blue)", "true"),
+        ("front_is(red)", "false"),
+        ("left_is(yellow)", "true"),
+        ("left_is(blue)", "false"),
+        ("right_is(red)", "true"),
+        ("right_is(yellow)", "false"),
+    ] {
+        assert_eq!(sensed(&rows, expression), expected, "{expression}");
+    }
+    // An unpainted cell, a wall and the outside of the map have no paint.
+    let rows = [".", ">", "#"];
+    for sensor in ["front_is", "left_is", "right_is"] {
+        for color in ["red", "yellow", "blue"] {
+            let expression = format!("{sensor}({color})");
+            assert_eq!(sensed(&rows, &expression), "false", "{expression}");
+        }
+    }
+}
+
+#[test]
+fn the_robot_senses_the_paint_of_its_cell() {
+    let source = "\
+print(here_is(red), here_is(yellow), here_is(blue))
+start_painting(yellow)
+print(here_is(red), here_is(yellow), here_is(blue))
+start_erasing()
+print(here_is(red), here_is(yellow), here_is(blue))
+";
+    let run = run_on(&[">"], source);
+    assert_eq!(
+        run.printed,
+        ["false false false", "false true false", "false false false"]
+    );
+}
+
+#[test]
+fn the_robot_senses_the_items_and_what_it_carries() {
+    let source = "\
+print(item_here(), item_in_front(), is_carrying())
+forward()
+print(item_here(), item_in_front(), is_carrying())
+pick_up()
+print(item_here(), item_in_front(), is_carrying())
+";
+    let run = run_on(&[">o"], source);
+    assert_eq!(
+        run.printed,
+        ["false true false", "true false false", "false false true"]
+    );
+    // A wall in front has no item, nor has a floor cell without one.
+    assert_eq!(sensed(&[">#"], "item_in_front()"), "false");
+    assert_eq!(sensed(&[">."], "item_in_front()"), "false");
+}
+
+#[test]
+fn the_robot_senses_the_tool_that_is_down() {
+    let source = "\
+print(is_painting(), is_erasing())
+start_painting(red)
+print(is_painting(), is_erasing())
+start_erasing()
+print(is_painting(), is_erasing())
+stop_erasing()
+print(is_painting(), is_erasing())
+";
+    let run = run_on(&[">"], source);
+    assert_eq!(
+        run.printed,
+        ["false false", "true false", "false true", "false false"]
+    );
+}
+
+#[test]
+fn the_value_of_a_sensor_alone_on_its_line_is_dropped() {
+    let run = run_on(&[">."], "front_is_clear()\nprint(\"after\")\n");
+    assert_eq!(run.lines, [1, 2]);
+    assert_eq!(run.printed, ["after"]);
+    assert_eq!(run.actions, [Action::Moved; 0]);
+    assert_eq!(run.state, State::Ended);
+}
+
+// The built-in functions: the colors they take.
+
+#[test]
+fn a_function_that_takes_a_color_refuses_any_other_value() {
+    for (source, function, found, place) in [
+        (
+            "start_painting(3)\n",
+            Builtin::StartPainting,
+            ValueType::Number,
+            span(1, 1, 18),
+        ),
+        (
+            "print(here_is(\"red\"))\n",
+            Builtin::HereIs,
+            ValueType::Text,
+            span(1, 7, 21),
+        ),
+        (
+            "print(front_is(true))\n",
+            Builtin::FrontIs,
+            ValueType::Boolean,
+            span(1, 7, 21),
+        ),
+        (
+            "print(left_is(1 + 1))\n",
+            Builtin::LeftIs,
+            ValueType::Number,
+            span(1, 7, 21),
+        ),
+        (
+            "print(right_is(\"\"))\n",
+            Builtin::RightIs,
+            ValueType::Text,
+            span(1, 7, 19),
+        ),
+    ] {
+        let run = run_on(&[">."], source);
+        let kind = E::ValueNotColor { function, found };
+        let error = RuntimeError { kind, span: place };
+        assert_eq!(run.state, State::Failed(error), "in {source:?}");
+        // The function did nothing: the brush stays up.
+        assert_eq!(run.actions, [Action::Moved; 0], "in {source:?}");
+        assert_eq!(run.printed, [""; 0], "in {source:?}");
+        assert_eq!(*run.world(), world(&[">."]), "in {source:?}");
+    }
+}
+
+#[test]
+fn a_variable_gives_its_color_to_a_function() {
+    let source = "\
+let paint = blue
+start_painting(paint)
+print(here_is(paint), here_is(red))
+";
+    assert_eq!(run_on(&[">"], source).printed, ["true false"]);
+}
+
 // The depth of a program.
 
 /// Runs `source`, the deepest program of its kind: `deeper`, one level more, is refused by
@@ -1836,7 +2279,7 @@ fn an_expression_alone_on_its_line_leaves_no_value() {
 
 /// The lines of the main program of a random program. An `else` only follows the block of
 /// its `if`: they are drawn together, or almost no program would have one.
-const MAIN_PIECES: [&str; 27] = [
+const MAIN_PIECES: [&str; 37] = [
     "let side = sides + 1",
     "let turns = 2",
     "sides = sides + 1",
@@ -1864,12 +2307,22 @@ const MAIN_PIECES: [&str; 27] = [
     "if walk(sides) > 1:",
     "while walk(sides) < 2:",
     "repeat walk(1):",
+    "forward()",
+    "turn_left()",
+    "start_painting(red)",
+    "start_erasing()",
+    "pick_up()",
+    "drop()",
+    "if front_is_clear():\n    forward()",
+    "if item_here() and not is_carrying():\n    pick_up()",
+    "if here_is(red) or right_is(blue):",
+    "while left_is_clear() and sides < 3:",
 ];
 
 /// The lines of the function `walk(n)` of a random program, whose block is drawn too: a
 /// `return` goes back to a place only known while the program runs, from anywhere in the
 /// loops of the function.
-const FUNCTION_PIECES: [&str; 19] = [
+const FUNCTION_PIECES: [&str; 22] = [
     "let turn = n + 1",
     "n = n - 1",
     "turn = turn * 2",
@@ -1889,7 +2342,13 @@ const FUNCTION_PIECES: [&str; 19] = [
     "repeat 3:\n    n = n - 1\n    if n < 2:\n        return n",
     "while n > 0:\n    repeat n:\n        return walk(n - 1) + 1\n    n = n - 1",
     "break",
+    "turn_right()",
+    "if front_is_clear():\n    forward()",
+    "if is_painting() or item_in_front():",
 ];
+
+/// The world of a random program: walls to bump into, items to carry and a paint to sense.
+const RANDOM_WORLD: &[&str] = &[">.o.", ".#.b", "o..."];
 
 /// A random program: the function `walk(n)`, then a main program that may call it.
 fn random_program(random: &mut Random) -> String {
@@ -1933,6 +2392,7 @@ fn random_checked_programs_never_stop_on_a_mistake_of_the_core() {
     let (mut ended, mut failed, mut running) = (0, 0, 0);
     let (mut with_else, mut with_logic, mut with_break) = (0, 0, 0);
     let (mut with_return, mut with_repeat_left) = (0, 0);
+    let (mut with_action, mut with_robot_error) = (0, 0);
     for _ in 0..20_000 {
         let source = random_program(&mut random);
         let Ok(program) = parse(&source) else {
@@ -1944,7 +2404,8 @@ fn random_checked_programs_never_stop_on_a_mistake_of_the_core() {
         with_else += usize::from(source.contains("else"));
         with_logic += usize::from(source.contains(" and ") || source.contains(" or "));
         with_break += usize::from(source.contains("break"));
-        let run = run_program(&program);
+        let run = run_program(&program, world(RANDOM_WORLD));
+        with_action += usize::from(!run.actions.is_empty());
         with_return += usize::from(!run.returned_from.is_empty());
         let mut returned_from = run.returned_from.iter();
         with_repeat_left +=
@@ -1954,13 +2415,14 @@ fn random_checked_programs_never_stop_on_a_mistake_of_the_core() {
             State::Running { .. } => running += 1,
             State::Failed(error) => {
                 assert_ne!(error.kind, E::Internal, "in {source:?}");
+                with_robot_error += usize::from(matches!(error.kind, E::Robot(_)));
                 failed += 1;
             }
         }
     }
     // Enough programs of each kind: the ones that end, that stop on an error of their own
-    // (a count below zero, a division by zero, a value missing, too many calls), and that
-    // never end.
+    // (a count below zero, a division by zero, a value missing, too many calls, a wall in
+    // front of the robot), and that never end.
     assert!(ended > 500, "only {ended} programs ended");
     assert!(failed > 80, "only {failed} programs stopped on an error");
     assert!(running > 80, "only {running} programs kept running");
@@ -1979,17 +2441,10 @@ fn random_checked_programs_never_stop_on_a_mistake_of_the_core() {
         with_repeat_left > 100,
         "only {with_repeat_left} programs came back from a function with turns of a repeat left"
     );
-}
-
-// Until the next sub-step.
-
-#[test]
-fn until_step_9c_the_robot_does_not_act() {
-    let run = run("print(\"before\")\nforward()\n");
-    assert_eq!(run.lines, [1, 2]);
-    let error = RuntimeError {
-        kind: E::Internal,
-        span: span(2, 1, 10),
-    };
-    assert_eq!(run.state, State::Failed(error));
+    // And enough that use the robot, up to an action it can't do.
+    assert!(with_action > 300, "only {with_action} programs acted");
+    assert!(
+        with_robot_error > 100,
+        "only {with_robot_error} programs stopped on an error of the robot"
+    );
 }

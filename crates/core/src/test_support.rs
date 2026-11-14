@@ -1,10 +1,63 @@
 //! What the tests of several modules share.
 
+use crate::color::Color;
 use crate::span::{Position, Span};
+use crate::world::{Cell, Direction, Map, Point, Robot, World};
 
 /// The stretch of `line` from the column `start` included to the column `end` excluded.
 pub fn span(line: u32, start: u32, end: u32) -> Span {
     Span::new(Position::new(line, start), Position::new(line, end))
+}
+
+/// A world drawn as rows of characters: `#` a wall, `.` a floor, `o` an item, `r` `y` `b` a
+/// paint (without passages), and the robot `^` `>` `v` `<` facing north, east, south or west,
+/// on a floor cell.
+#[track_caller]
+pub fn world(rows: &[&str]) -> World {
+    let width = rows[0].chars().count();
+    let height = rows.len();
+    let mut map = Map::new(width, height).unwrap();
+    let mut robot = None;
+    for (y, row) in (0..).zip(rows) {
+        for (x, character) in (0..).zip(row.chars()) {
+            let point = Point::new(x, y);
+            match character {
+                '#' => map.set_wall(point).unwrap(),
+                'o' => map.set_item(point).unwrap(),
+                'r' => map.set_paint(point, Color::Red).unwrap(),
+                'y' => map.set_paint(point, Color::Yellow).unwrap(),
+                'b' => map.set_paint(point, Color::Blue).unwrap(),
+                '^' => robot = Some(Robot::new(point, Direction::North)),
+                '>' => robot = Some(Robot::new(point, Direction::East)),
+                'v' => robot = Some(Robot::new(point, Direction::South)),
+                '<' => robot = Some(Robot::new(point, Direction::West)),
+                '.' => {}
+                other => panic!("unknown character {other:?}"),
+            }
+        }
+    }
+    World::new(map, robot.expect("a robot")).unwrap()
+}
+
+/// The paints of the map, as rows of characters: `#` a wall, `.` an unpainted floor, `r` `y`
+/// `b` a paint.
+pub fn paints(world: &World) -> Vec<String> {
+    let map = world.map();
+    (0..map.height())
+        .map(|y| {
+            (0..map.width())
+                .map(|x| match map.cell(Point::new(x, y)) {
+                    Some(Cell::Floor(floor)) => match floor.paint() {
+                        Some(Color::Red) => 'r',
+                        Some(Color::Yellow) => 'y',
+                        Some(Color::Blue) => 'b',
+                        None => '.',
+                    },
+                    _ => '#',
+                })
+                .collect()
+        })
+        .collect()
 }
 
 /// A small generator of numbers, the same at every run, without a dependency.

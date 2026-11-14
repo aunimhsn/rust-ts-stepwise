@@ -8,10 +8,14 @@
 //!
 //! The parts depend on each other in one direction: the values (`value`), the errors that
 //! name their types (`error`), what the operators compute (`operators`), the instructions
-//! (`code`) and their translation (`compiler`), what a step reports (`event`), what each
-//! instruction changes (`memory`), and the machine (`machine`) above them all, which runs
-//! the instructions up to the end of a step.
+//! (`code`) and their translation (`compiler`), what a step reports (`event`), what the
+//! built-in functions do to the world of the robot (`builtins`), what each instruction
+//! changes (`memory`), and the machine (`machine`) above them all, which runs the
+//! instructions up to the end of a step. The program acts on the world through `builtins`
+//! alone; the machine knows nothing of the goals of a level, which are checked on its world
+//! once the program has ended.
 
+mod builtins;
 mod code;
 mod compiler;
 mod error;
@@ -25,7 +29,7 @@ mod value;
 mod tests;
 
 pub use error::{RuntimeError, RuntimeErrorKind};
-pub use event::Event;
+pub use event::{Action, Event};
 pub use machine::{Machine, State};
 pub use memory::{CallInProgress, MAX_CALL_DEPTH, Variable};
 pub use value::{MAX_TEXT_LENGTH, Value, ValueType};

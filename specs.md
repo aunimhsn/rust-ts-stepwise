@@ -125,19 +125,22 @@ The robot stands on one cell and faces one of the four directions. It can carry 
 |---|---|---|---|
 | Move | `forward()` | Moves one cell in front. | A wall or the edge of the map is in front: the robot bumps and the program stops. |
 | Move | `turn_left()`, `turn_right()` | Turns a quarter turn on its cell. | Never. |
-| Paint | `start_painting(color)` | Puts the brush down with the color: paints its cell at once, then every cell it moves into and the passage it crosses, over any paint already there. Called while painting, it changes the color. | Never. |
+| Paint | `start_painting(color)` | Puts the brush down with the color: paints its cell at once, then every cell it moves into and the passage it crosses, over any paint already there. Called while painting, it changes the color. | Its value is no color. |
 | Paint | `stop_painting()` | Lifts the brush: the robot moves on without painting. | Never (nothing happens when the brush is already up). |
 | Paint | `start_erasing()` | Puts the eraser down: removes the paint of its cell at once, then of every cell it moves into, with the painted passages of these cells. | Never (an unpainted cell stays unpainted). |
 | Paint | `stop_erasing()` | Lifts the eraser. | Never (nothing happens when the eraser is already up). |
 | Carry | `pick_up()` | Picks up the item of its cell. | The robot already carries an item, or there is no item on the cell; when both are true, the error says the first, which explains a `pick_up()` called twice. |
 | Carry | `drop()` | Drops the item it carries on its cell. | The robot carries nothing, or the cell already has an item; when both are true, the error says the first, which explains a `drop()` called twice. |
 | Sense | `front_is_clear()`, `left_is_clear()`, `right_is_clear()` | `true` when the cell in that direction is a floor cell of the map. | Never. |
-| Sense | `here_is(color)` | `true` when its cell has that paint. | Never. |
-| Sense | `front_is(color)`, `left_is(color)`, `right_is(color)` | `true` when the cell in that direction has that paint (`false` for a wall). | Never. |
+| Sense | `here_is(color)` | `true` when its cell has that paint. | Its value is no color. |
+| Sense | `front_is(color)`, `left_is(color)`, `right_is(color)` | `true` when the cell in that direction has that paint (`false` for a wall). | Their value is no color. |
 | Sense | `item_here()`, `item_in_front()` | `true` when its cell, or the cell in front, has an item. | Never. |
 | Sense | `is_carrying()` | `true` when the robot carries an item. | Never. |
 | Sense | `is_painting()`, `is_erasing()` | `true` when the brush, or the eraser, is down. | Never. |
 | Write | `print(value, …)` | Writes its values to the console, separated by spaces, on one line. Without a value (`print()`), it writes an empty line. | Never. |
+
+- An error of a built-in function stops the program on its call, and the function does nothing: the robot stays against the wall, the item where it was.
+- A function that takes a color, given any other value (`start_painting(3)`, `here_is("red")`), stops the program with an error that names the function and the type of the value, as a condition that isn't a boolean does. A sensor doesn't answer `false` to it, which would hide the mistake. Only the values decide it (`start_painting(paint)`), so the checks before running don't find it (decided on 2026-11-14).
 
 ### Checks before running
 

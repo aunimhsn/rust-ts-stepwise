@@ -1,0 +1,29 @@
+# A trial level for the tests of the core (see ../programs.rs), not a level of the website: a
+# corridor that turns, to the right on one map and to the left on the other.
+version = 1
+
+starting_code = '''
+# Go to the end of the corridor
+'''
+
+[[maps]]
+terrain = '''
+....#
+###.#
+###.#
+'''
+robot = { at = [0, 0], facing = "east" }
+
+[maps.goals]
+robot_at = [3, 2]
+
+[[maps]]
+terrain = '''
+###.#
+###.#
+....#
+'''
+robot = { at = [0, 2], facing = "east" }
+
+[maps.goals]
+robot_at = [3, 0]

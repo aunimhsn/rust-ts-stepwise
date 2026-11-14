@@ -5,14 +5,15 @@ use std::iter;
 use std::mem;
 use std::rc::Rc;
 
+use super::builtins::{self, Outcome};
 use super::code::{Function, Instruction};
 use super::error::RuntimeErrorKind;
 use super::event::Event;
 use super::operators;
 use super::value::Value;
 use crate::ast::BinaryOperator;
-use crate::builtin::Builtin;
 use crate::span::{Position, Span};
+use crate::world::World;
 
 /// The most calls in progress, one inside the other, the main program apart: one more stops
 /// the program (see *Functions* in `specs.md`).
@@ -87,9 +88,10 @@ pub(super) enum Flow {
     End,
 }
 
-/// What changes while a program runs: where it is, its calls in progress with their
+/// What changes in a program while it runs: where it is, its calls in progress with their
 /// variables, and the values of the expression being evaluated. Apart from the instructions,
-/// which it only reads.
+/// which it only reads, and from the world of the robot, which only the built-in functions
+/// change.
 #[derive(Debug)]
 pub(super) struct Memory {
     /// The call being run: the main program, or the function called last.
@@ -171,11 +173,13 @@ impl Memory {
     }
 
     /// Runs `instruction`, the next one, which comes from `span` and which the program moves
-    /// past first: a jump then says where it goes on.
+    /// past first: a jump then says where it goes on. A built-in function acts on `world`,
+    /// and what the learner sees of it goes to `event`.
     pub(super) fn execute(
         &mut self,
         instruction: &Instruction,
         span: Span,
+        world: &mut World,
         event: &mut Option<Event>,
     ) -> Result<Flow, RuntimeErrorKind> {
         self.frame.next = self.frame.next.saturating_add(1);
@@ -247,14 +251,17 @@ impl Memory {
             Instruction::RepeatNext(exit) => self.next_turn(*exit)?,
             Instruction::CallBuiltin { builtin, arguments } => {
                 let values = self.take_arguments(*arguments)?;
-                self.result = match builtin {
-                    Builtin::Print => {
-                        *event = Some(Event::Printed(printed_line(&values)));
-                        // `print` gives back no value.
+                self.result = match builtins::call(*builtin, &values, world)? {
+                    Outcome::Acted(acted) => {
+                        // A step shows one thing at most: a second one is a mistake of the
+                        // compiler, told rather than lost.
+                        if event.replace(acted).is_some() {
+                            return Err(RuntimeErrorKind::Internal);
+                        }
+                        // What acts gives back no value.
                         None
                     }
-                    // Until step 9c, which gives the machine the world of the robot.
-                    _ => return Err(RuntimeErrorKind::Internal),
+                    Outcome::Sensed(sensed) => Some(Value::Boolean(sensed)),
                 };
             }
             Instruction::Call(function) => self.enter(function, span)?,
@@ -367,10 +374,4 @@ impl Memory {
         let first = first.ok_or(RuntimeErrorKind::Internal)?;
         Ok(self.operands.drain(first..).collect())
     }
-}
-
-/// The line `print` writes for `values`: each as it is written, separated by spaces.
-fn printed_line(values: &[Value]) -> String {
-    let written: Vec<String> = values.iter().map(Value::to_string).collect();
-    written.join(" ")
 }
