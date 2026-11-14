@@ -133,3 +133,9 @@ The calls, the stack of frames, the parameters, `return`, the value missing, the
 ### 9c. Robot (#36)
 
 The built-in functions acting on the map and the sensors, their errors, a value that is no color given to a function that takes one (decided on 2026-11-14), what each step reports (the action of the robot by its name, the printed line; an action that fails is told by its error alone), and whole programs run on the maps of three trial levels kept with the tests, their goals checked at the end. The probe of step 4c stayed: the page still ran it through the bridge.
+
+## 10. WebAssembly bridge
+
+### 10a. Checks (#37)
+
+How the data crosses the bridge (see [Technical choices](technical-choices.md), Bridge), the places of the source as the editor counts them (a line, and offsets in UTF-16 code units), `check(source)` and every error of syntax, of names and of structure with its TypeScript type; a function of the core that checks a source and gives either its errors or a checked program, the only one the machine will run (decided on 2026-11-14); tests from TypeScript on the place of an error after accents and an emoji.
