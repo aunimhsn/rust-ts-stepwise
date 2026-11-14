@@ -21,5 +21,11 @@ export async function loadCore(): Promise<Core> {
 	return { version: coreVersion() };
 }
 
+/**
+ * The checks before running (see crates/wasm/src/check.rs), to call once `loadCore` has resolved:
+ * the errors of a program, each a code with its values and its place as the editor counts it.
+ */
+export { check, type ProgramError, type ReservedKind, type Span } from '#lib/wasm/stepwise.js';
+
 /** The probe of step 4c (see crates/core/src/probe.rs), to create once `loadCore` has resolved. */
 export { Probe, type Action, type Direction } from '#lib/wasm/stepwise.js';

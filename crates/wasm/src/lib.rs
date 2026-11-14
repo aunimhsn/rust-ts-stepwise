@@ -19,6 +19,9 @@
     )
 )]
 
+mod check;
+mod position;
+
 use stepwise_core::probe;
 use wasm_bindgen::prelude::wasm_bindgen;
 
