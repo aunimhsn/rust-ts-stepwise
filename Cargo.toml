@@ -16,6 +16,11 @@ publish = false
 
 [workspace.dependencies]
 stepwise-core = { path = "crates/core" }
+serde = { version = "1.0.228", features = ["derive"] }
+# The TypeScript types of what crosses the bridge, generated from its Rust types, which
+# `serde-wasm-bindgen` (its `js` feature) turns into JavaScript objects (see
+# docs/technical-choices.md, Bridge).
+tsify = { version = "0.5.8", default-features = false, features = ["js"] }
 # Pinned to an exact version: the `wasm-bindgen` command-line tool that generates the
 # JavaScript glue must be at the very same version, or the module refuses to load.
 wasm-bindgen = "=0.2.130"

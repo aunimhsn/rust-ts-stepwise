@@ -16,7 +16,9 @@ publish.workspace = true
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
+serde.workspace = true
 stepwise-core.workspace = true
+tsify.workspace = true
 wasm-bindgen.workspace = true
 
 [lints]

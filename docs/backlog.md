@@ -10,7 +10,6 @@ The ideas, polish and edge cases found along the way that the current step doesn
 - Messages of their own, rather than *unexpected character*, for `1.5` (no decimal numbers in version 1), `;` (one statement per line) and the typographic quotes `“ ”` pasted from a document (seen at step 5); the error already carries the character, so this may be done in the messages alone.
 
 - A function written in another function that uses a variable or a parameter of the function around it: today an unknown name, while the same mistake in a block of the main program is a variable the function doesn't see. And a variable used after a block that held a function declaring the same name: the `let` given is the one of the block, not the closest above. Both already have the error of a function defined in a block, and go away with it (seen in the review of step 7b).
-- A type `Checked` that only `check` gives and that `Machine::new` asks for, so that a program can't be run without its checks: to weigh at step 10, whose bridge is the one caller (seen in the review of step 9a).
 - The result of a built-in function that gives back no value, found by the checks before running rather than while the program runs (`if forward():`, `let steps = turn_left()`): the checker knows these functions, and a beginner may well write the first one to ask whether the robot can move. Today the function runs, then the program stops (seen at step 9).
 - A value that is no color written as such in a call of a function that takes one (`start_painting(3)`, `here_is("red")`), found by the checks before running: today the program stops when it reaches the call, since only a variable needs the values to decide (seen at step 9c).
 - The words of Python written with a capital, `True`, `False` and `None`: today names that aren't in `snake_case`, so the checker recalls the rule of the names instead of showing `true`, `false` or that there is no empty value (seen at step 6a).
@@ -19,6 +18,8 @@ The ideas, polish and edge cases found along the way that the current step doesn
 
 - The French translation of the interface, the levels and the manual; the comments of the starting code of the levels too, which stay in English in the level files for now (seen at step 8b).
 - The code normalized to NFC in the editor (step 16): a name pasted with its accents decomposed (`côté` written `co` + U+0302 + …) is cut before the accent by the lexer, which reads the combining mark as an unexpected character (seen in the review of step 5).
+- The checks given the text of the document of the editor, never a text from elsewhere (step 16), and a test on a document made from a text with `\r\n`: the places of the bridge are those of the text checked, where a `\r\n` is two units, while CodeMirror counts one unit for every line break (seen in the review of step 10a, see [Technical choices](technical-choices.md), Positions).
+- The column of the cursor in the status bar (step 16) counted in characters, as the core counts and as a learner does: an emoji is one column, while the editor counts two units for it (seen at step 10a).
 - The description of a built-in function on hover in the editor.
 - A phone or tablet layout.
 - The home screen in the mock-up (step 3): the path painted up to the level to play and drawn as a ghost after it, as the paint and the goal marks of the map.
