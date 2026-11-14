@@ -125,3 +125,7 @@ The TOML format with its version (decided on 2026-11-12 rather than JSON, see [T
 ### 9a. Machine and statements (#34)
 
 The values, the expressions and their errors (types, division by zero, overflow), the variables, `if`, `while`, `repeat`, `break`, the steps and the current line; `print` alone among the built-in functions, so that the tests see what a program does. Until 9b and 9c, calling a function of the program or another built-in function stops the program with the error kept for what the checks rule out.
+
+### 9b. Functions (#35)
+
+The calls, the stack of frames, the parameters, `return`, the value missing, the limit of 200 calls; the calls in progress and their variables, readable for the variables panel.
